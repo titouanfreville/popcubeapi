@@ -1,14 +1,18 @@
 package datastores
 
 import (
-	"github.com/titouanfreville/popcubeapi/models"
 	"strings"
+
+	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
 // RoleStoreImpl Used to implement RoleStore interface
-type RoleStoreImpl struct {
-	RoleStore
+type RoleStoreImpl struct{}
+
+// NewRoleStore Generate the struct for avatar store
+func NewRoleStore() RoleStore {
+	return &RoleStoreImpl{}
 }
 
 // Save Use to save role in BB

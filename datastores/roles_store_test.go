@@ -4,18 +4,18 @@
 package datastores
 
 import (
-	. "github.com/titouanfreville/popcubeapi/models"
 	"testing"
-	u "github.com/titouanfreville/popcubeapi/utils"
 
 	. "github.com/smartystreets/goconvey/convey"
+	. "github.com/titouanfreville/popcubeapi/models"
+	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
 func TestRoleStore(t *testing.T) {
 	ds := DbStore{}
 	ds.InitConnection("root", "popcube_test", "popcube_dev")
 	db := *ds.Db
-	rsi := RoleStoreImpl{}
+	rsi := NewRoleStore()
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("roleStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
 		alreadyExistError := u.NewLocAppError("roleStoreImpl.Save", "save.transaction.create.already_exist", nil, "Role Name: classe")

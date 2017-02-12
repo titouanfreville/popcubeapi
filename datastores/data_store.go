@@ -113,7 +113,7 @@ type ChannelStore interface {
 	Save(channel *models.Channel, ds DbStore) *u.AppError
 	Update(channel *models.Channel, newChannel *models.Channel, ds DbStore) *u.AppError
 	GetByName(channelName string, ds DbStore) *models.Channel
-	GetByType(channelType string, ds DbStore) *models.Channel
+	GetByType(channelType string, ds DbStore) *[]models.Channel
 	GetPublic(ds DbStore) *[]models.Channel
 	GetPrivate(ds DbStore) *[]models.Channel
 	GetAll(ds DbStore) *[]models.Channel
@@ -127,7 +127,7 @@ type EmojiStore interface {
 	GetByName(emojiName string, ds DbStore) *models.Emoji
 	GetByShortcut(emojiShortcut string, ds DbStore) *models.Emoji
 	GetByLink(emojiLink string, ds DbStore) *models.Emoji
-	GetAll(ds DbStore) *models.Emoji
+	GetAll(ds DbStore) *[]models.Emoji
 	Delete(emoji *models.Emoji, ds DbStore) *u.AppError
 }
 
@@ -179,7 +179,7 @@ type OrganisationStore interface {
 type ParameterStore interface {
 	Save(parameter *models.Parameter, ds DbStore) *u.AppError
 	Update(parameter *models.Parameter, newParameter *models.Parameter, ds DbStore) *u.AppError
-	GetAll(ds DbStore) *models.Parameter
+	Get(ds DbStore) *models.Parameter
 }
 
 /*RoleStore interface the role communication*/
@@ -204,7 +204,8 @@ type UserStore interface {
 	GetByFirstName(firstName string, ds DbStore) *[]models.User
 	GetByLastName(lastName string, ds DbStore) *[]models.User
 	GetByRole(role *models.Role, ds DbStore) *[]models.User
-	GetByChannel(channel *models.Channel, ds DbStore) *[]models.User
 	GetAll(ds DbStore) *[]models.User
 	Delete(user *models.User, ds DbStore) *u.AppError
 }
+
+// GetByChannel(channel *models.Channel, ds DbStore) *[]models.User

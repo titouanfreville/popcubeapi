@@ -6,8 +6,11 @@ import (
 )
 
 // UserStoreImpl Used to implement UserStore interface
-type UserStoreImpl struct {
-	UserStore
+type UserStoreImpl struct{}
+
+// NewUserStore Generate the struct for user store
+func NewUserStore() UserStore {
+	return &UserStoreImpl{}
 }
 
 // Save Use to save user in BB

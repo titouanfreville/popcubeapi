@@ -18,7 +18,7 @@ func TestChannelStore(t *testing.T) {
 	ds := DbStore{}
 	ds.InitConnection("root", "popcube_test", "popcube_dev")
 	db := *ds.Db
-	csi := ChannelStoreImpl{}
+	csi := NewChannelStore()
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("channelStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
 		alreadyExistError := u.NewLocAppError("channelStoreImpl.Save", "save.transaction.create.already_exist", nil, "Channel Name: electras")

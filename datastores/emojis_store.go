@@ -6,8 +6,11 @@ import (
 )
 
 // EmojiStoreImpl implement EmojiStore interface
-type EmojiStoreImpl struct {
-	EmojiStore
+type EmojiStoreImpl struct{}
+
+// NewEmojiStore Generate the struct for channel store
+func NewEmojiStore() EmojiStore {
+	return &EmojiStoreImpl{}
 }
 
 // Save Use to save emoji in BB

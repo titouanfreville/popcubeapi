@@ -6,8 +6,7 @@ import (
 )
 
 // AvatarStoreImpl Used to implement AvatarStore interface
-type AvatarStoreImpl struct {
-}
+type AvatarStoreImpl struct{}
 
 // NewAvatarStore Generate the struct for avatar store
 func NewAvatarStore() AvatarStore {

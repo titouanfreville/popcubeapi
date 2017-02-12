@@ -17,7 +17,7 @@ func TestOrganisationStore(t *testing.T) {
 	ds := DbStore{}
 	ds.InitConnection("root", "popcube_test", "popcube_dev")
 	db := *ds.Db
-	osi := OrganisationStoreImpl{}
+	osi := NewOrganisationStore()
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("organisationStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
 		alreadyexistError := u.NewLocAppError("organisationStoreImpl.Save", "save.transaction.create.already_exist", nil, "Organisation Name: zeus")

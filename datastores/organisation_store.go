@@ -6,8 +6,11 @@ import (
 )
 
 // OrganisationStoreImpl implements OrganisationSotre interface
-type OrganisationStoreImpl struct {
-	OrganisationStore
+type OrganisationStoreImpl struct{}
+
+// NewOrganisationStore Generate the struct for avatar store
+func NewOrganisationStore() OrganisationStore {
+	return &OrganisationStoreImpl{}
 }
 
 // Save Use to save data in BB
