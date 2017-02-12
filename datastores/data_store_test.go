@@ -12,10 +12,10 @@ import (
 // Test correction test for user ;)
 
 // Test Password functionalities from user Model
-func TestdbStores(t *testing.T) {
+func TestDbStores(t *testing.T) {
 	Convey("Testing DB initialisation and closure", t, func() {
 		Convey("Given a datastore", func() {
-			ds := dbStore{}
+			ds := DbStore{}
 			Convey("Initialising should provide a db", func() {
 				ds.InitConnection("root", "popcube_test", "popcube_dev")
 				db, _ := gorm.Open("mysql", "root:popcube_dev@/?charset=utf8&parseTime=True&loc=Local")

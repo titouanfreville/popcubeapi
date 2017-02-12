@@ -4,16 +4,17 @@
 package datastores
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
-	. "github.com/titouanfreville/popcubeapi/models"
 	"strconv"
 	"strings"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
+	. "github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
 func TestOrganisationStore(t *testing.T) {
-	ds := dbStore{}
+	ds := DbStore{}
 	ds.InitConnection("root", "popcube_test", "popcube_dev")
 	db := *ds.Db
 	osi := OrganisationStoreImpl{}

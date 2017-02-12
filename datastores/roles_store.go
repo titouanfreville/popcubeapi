@@ -12,7 +12,7 @@ type RoleStoreImpl struct {
 }
 
 // Save Use to save role in BB
-func (rsi RoleStoreImpl) Save(role *models.Role, ds dbStore) *u.AppError {
+func (rsi RoleStoreImpl) Save(role *models.Role, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	if appError := role.IsValid(); appError != nil {
@@ -32,7 +32,7 @@ func (rsi RoleStoreImpl) Save(role *models.Role, ds dbStore) *u.AppError {
 }
 
 // Update Used to update role in DB
-func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, ds dbStore) *u.AppError {
+func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	if appError := role.IsValid(); appError != nil {
@@ -66,7 +66,7 @@ func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, ds dbSt
 }
 
 // GetAll Used to get role from DB
-func (rsi RoleStoreImpl) GetAll(ds dbStore) *[]models.Role {
+func (rsi RoleStoreImpl) GetAll(ds DbStore) *[]models.Role {
 	db := *ds.Db
 	roles := []models.Role{}
 	db.Find(&roles)
@@ -74,7 +74,7 @@ func (rsi RoleStoreImpl) GetAll(ds dbStore) *[]models.Role {
 }
 
 // GetByName Used to get role from DB
-func (rsi RoleStoreImpl) GetByName(roleName string, ds dbStore) *models.Role {
+func (rsi RoleStoreImpl) GetByName(roleName string, ds DbStore) *models.Role {
 	db := *ds.Db
 	role := models.Role{}
 	db.Where("roleName = ?", roleName).First(&role)
@@ -83,7 +83,7 @@ func (rsi RoleStoreImpl) GetByName(roleName string, ds dbStore) *models.Role {
 
 // GetByRights Used to get role from DB
 // You can only search for roles set to true.
-func (rsi RoleStoreImpl) GetByRights(roleRights *models.Role, ds dbStore) *[]models.Role {
+func (rsi RoleStoreImpl) GetByRights(roleRights *models.Role, ds DbStore) *[]models.Role {
 	db := *ds.Db
 	roles := []models.Role{}
 	db.Where(&roleRights).Find(&roles)
@@ -91,7 +91,7 @@ func (rsi RoleStoreImpl) GetByRights(roleRights *models.Role, ds dbStore) *[]mod
 }
 
 // Delete Used to get role from DB
-func (rsi RoleStoreImpl) Delete(role *models.Role, ds dbStore) *u.AppError {
+func (rsi RoleStoreImpl) Delete(role *models.Role, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	if appError := role.IsValid(); appError != nil {

@@ -11,7 +11,7 @@ type ChannelStoreImpl struct {
 }
 
 // Save Use to save channel in BB
-func (csi ChannelStoreImpl) Save(channel *models.Channel, ds dbStore) *u.AppError {
+func (csi ChannelStoreImpl) Save(channel *models.Channel, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	channel.PreSave()
@@ -32,7 +32,7 @@ func (csi ChannelStoreImpl) Save(channel *models.Channel, ds dbStore) *u.AppErro
 }
 
 // Update Used to update channel in DB
-func (csi ChannelStoreImpl) Update(channel *models.Channel, newChannel *models.Channel, ds dbStore) *u.AppError {
+func (csi ChannelStoreImpl) Update(channel *models.Channel, newChannel *models.Channel, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	newChannel.PreUpdate()
@@ -62,7 +62,7 @@ func (csi ChannelStoreImpl) Update(channel *models.Channel, newChannel *models.C
 }
 
 // GetAll Used to get channel from DB
-func (csi ChannelStoreImpl) GetAll(ds dbStore) *[]models.Channel {
+func (csi ChannelStoreImpl) GetAll(ds DbStore) *[]models.Channel {
 	db := *ds.Db
 	channels := []models.Channel{}
 	db.Find(&channels)
@@ -70,7 +70,7 @@ func (csi ChannelStoreImpl) GetAll(ds dbStore) *[]models.Channel {
 }
 
 // GetByName Used to get channel from DB
-func (csi ChannelStoreImpl) GetByName(channelName string, ds dbStore) *models.Channel {
+func (csi ChannelStoreImpl) GetByName(channelName string, ds DbStore) *models.Channel {
 	db := *ds.Db
 	channel := models.Channel{}
 	db.Where("channelName = ?", channelName).First(&channel)
@@ -78,7 +78,7 @@ func (csi ChannelStoreImpl) GetByName(channelName string, ds dbStore) *models.Ch
 }
 
 // GetByType allow to find channels by types.
-func (csi ChannelStoreImpl) GetByType(channelType string, ds dbStore) *[]models.Channel {
+func (csi ChannelStoreImpl) GetByType(channelType string, ds DbStore) *[]models.Channel {
 	db := *ds.Db
 	channels := []models.Channel{}
 	db.Where("type = ?", channelType).Find(&channels)
@@ -86,7 +86,7 @@ func (csi ChannelStoreImpl) GetByType(channelType string, ds dbStore) *[]models.
 }
 
 // GetPublic allow to find publics channels.
-func (csi ChannelStoreImpl) GetPublic(ds dbStore) *[]models.Channel {
+func (csi ChannelStoreImpl) GetPublic(ds DbStore) *[]models.Channel {
 	db := *ds.Db
 	channels := []models.Channel{}
 	db.Where("private = ?", false).Find(&channels)
@@ -94,7 +94,7 @@ func (csi ChannelStoreImpl) GetPublic(ds dbStore) *[]models.Channel {
 }
 
 // GetPrivate allow to find publics channels.
-func (csi ChannelStoreImpl) GetPrivate(ds dbStore) *[]models.Channel {
+func (csi ChannelStoreImpl) GetPrivate(ds DbStore) *[]models.Channel {
 	db := *ds.Db
 	channels := []models.Channel{}
 	db.Where("private = ?", true).Find(&channels)
@@ -102,7 +102,7 @@ func (csi ChannelStoreImpl) GetPrivate(ds dbStore) *[]models.Channel {
 }
 
 // Delete Used to get channel from DB
-func (csi ChannelStoreImpl) Delete(channel *models.Channel, ds dbStore) *u.AppError {
+func (csi ChannelStoreImpl) Delete(channel *models.Channel, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	if appError := channel.IsValid(true); appError != nil {

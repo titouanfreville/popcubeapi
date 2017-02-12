@@ -12,7 +12,7 @@ import (
 )
 
 func TestRoleStore(t *testing.T) {
-	ds := dbStore{}
+	ds := DbStore{}
 	ds.InitConnection("root", "popcube_test", "popcube_dev")
 	db := *ds.Db
 	rsi := RoleStoreImpl{}

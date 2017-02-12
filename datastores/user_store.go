@@ -12,7 +12,7 @@ type UserStoreImpl struct {
 }
 
 // Save Use to save user in BB
-func (usi UserStoreImpl) Save(user *models.User, ds dbStore) *u.AppError {
+func (usi UserStoreImpl) Save(user *models.User, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	user.PreSave()
@@ -34,7 +34,7 @@ func (usi UserStoreImpl) Save(user *models.User, ds dbStore) *u.AppError {
 }
 
 // Update Used to update user in DB
-func (usi UserStoreImpl) Update(user *models.User, newUser *models.User, ds dbStore) *u.AppError {
+func (usi UserStoreImpl) Update(user *models.User, newUser *models.User, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	newUser.PreUpdate()
@@ -55,7 +55,7 @@ func (usi UserStoreImpl) Update(user *models.User, newUser *models.User, ds dbSt
 }
 
 // GetAll Used to get user from DB
-func (usi UserStoreImpl) GetAll(ds dbStore) *[]models.User {
+func (usi UserStoreImpl) GetAll(ds DbStore) *[]models.User {
 	db := *ds.Db
 	users := []models.User{}
 	db.Find(&users)
@@ -63,7 +63,7 @@ func (usi UserStoreImpl) GetAll(ds dbStore) *[]models.User {
 }
 
 // GetByUserName Used to get user from DB
-func (usi UserStoreImpl) GetByUserName(userName string, ds dbStore) *models.User {
+func (usi UserStoreImpl) GetByUserName(userName string, ds DbStore) *models.User {
 	db := *ds.Db
 	user := models.User{}
 	db.Where("userName = ?", userName).First(&user)
@@ -71,7 +71,7 @@ func (usi UserStoreImpl) GetByUserName(userName string, ds dbStore) *models.User
 }
 
 // GetByEmail Used to get user from DB by email
-func (usi UserStoreImpl) GetByEmail(userEmail string, ds dbStore) *models.User {
+func (usi UserStoreImpl) GetByEmail(userEmail string, ds DbStore) *models.User {
 	db := *ds.Db
 	user := models.User{}
 	db.Where("email = ?", userEmail).First(&user)
@@ -79,7 +79,7 @@ func (usi UserStoreImpl) GetByEmail(userEmail string, ds dbStore) *models.User {
 }
 
 // GetOrderedByDate get all users ordered by date
-func (usi UserStoreImpl) GetOrderedByDate(userDate int, ds dbStore) *[]models.User {
+func (usi UserStoreImpl) GetOrderedByDate(userDate int, ds DbStore) *[]models.User {
 	db := *ds.Db
 	users := []models.User{}
 	db.Order("updatedAt, userName, email").Find(&users)
@@ -87,7 +87,7 @@ func (usi UserStoreImpl) GetOrderedByDate(userDate int, ds dbStore) *[]models.Us
 }
 
 // GetDeleted get deleted users
-func (usi UserStoreImpl) GetDeleted(ds dbStore) *[]models.User {
+func (usi UserStoreImpl) GetDeleted(ds DbStore) *[]models.User {
 	db := *ds.Db
 	users := []models.User{}
 	db.Where("deleted = ?", true).First(&users)
@@ -95,7 +95,7 @@ func (usi UserStoreImpl) GetDeleted(ds dbStore) *[]models.User {
 }
 
 // GetByNickName get user from nick name
-func (usi UserStoreImpl) GetByNickName(nickName string, ds dbStore) *models.User {
+func (usi UserStoreImpl) GetByNickName(nickName string, ds DbStore) *models.User {
 	db := *ds.Db
 	user := models.User{}
 	db.Where("nickName = ?", nickName).First(&user)
@@ -103,7 +103,7 @@ func (usi UserStoreImpl) GetByNickName(nickName string, ds dbStore) *models.User
 }
 
 // GetByFirstName get user by first name
-func (usi UserStoreImpl) GetByFirstName(firstName string, ds dbStore) *[]models.User {
+func (usi UserStoreImpl) GetByFirstName(firstName string, ds DbStore) *[]models.User {
 	db := *ds.Db
 	users := []models.User{}
 	db.Where("firstName = ?", firstName).Find(&users)
@@ -111,7 +111,7 @@ func (usi UserStoreImpl) GetByFirstName(firstName string, ds dbStore) *[]models.
 }
 
 // GetByLastName get user from last name
-func (usi UserStoreImpl) GetByLastName(lastName string, ds dbStore) *[]models.User {
+func (usi UserStoreImpl) GetByLastName(lastName string, ds DbStore) *[]models.User {
 	db := *ds.Db
 	users := []models.User{}
 	db.Where("lastName = ?", lastName).Find(&users)
@@ -119,7 +119,7 @@ func (usi UserStoreImpl) GetByLastName(lastName string, ds dbStore) *[]models.Us
 }
 
 // GetByRole get user from rolme
-func (usi UserStoreImpl) GetByRole(role *models.Role, ds dbStore) *[]models.User {
+func (usi UserStoreImpl) GetByRole(role *models.Role, ds DbStore) *[]models.User {
 	db := *ds.Db
 	users := []models.User{}
 	db.Debug().Model(role).Related(&users, "Role")
@@ -129,14 +129,14 @@ func (usi UserStoreImpl) GetByRole(role *models.Role, ds dbStore) *[]models.User
 
 // Need MEMEBER functions to do it
 // GetByChannel Get user in a channem
-// func (usi UserStoreImpl) GetByChannel(channel *models.Channel, ds dbStore) *[]models.User {
+// func (usi UserStoreImpl) GetByChannel(channel *models.Channel, ds DbStore) *[]models.User {
 
 // }
 
 //
 
 // Delete Used to get user from DB
-func (usi UserStoreImpl) Delete(user *models.User, ds dbStore) *u.AppError {
+func (usi UserStoreImpl) Delete(user *models.User, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	if appError := user.IsValid(true); appError != nil {

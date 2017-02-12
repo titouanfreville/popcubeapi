@@ -1,8 +1,8 @@
-package api
+package main
 
 import (
 	myapi "github.com/titouanfreville/popcubeapi/api"
-	ds "github.com/titouanfreville/popcubeapi/datastores"
+	datastores "github.com/titouanfreville/popcubeapi/datastores"
 )
 
 func api() {
@@ -10,5 +10,10 @@ func api() {
 }
 
 func init() {
-	ds.InitConnection()
+	ds := datastores.DbStore{}
+	ds.InitConnection("root", "popcube_test", "popcube_dev")
+}
+
+func main() {
+
 }

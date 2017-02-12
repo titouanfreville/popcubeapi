@@ -11,7 +11,7 @@ type OrganisationStoreImpl struct {
 }
 
 // Save Use to save data in BB
-func (osi OrganisationStoreImpl) Save(organisation *models.Organisation, ds dbStore) *u.AppError {
+func (osi OrganisationStoreImpl) Save(organisation *models.Organisation, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	organisation.PreSave()
@@ -32,7 +32,7 @@ func (osi OrganisationStoreImpl) Save(organisation *models.Organisation, ds dbSt
 }
 
 // Update Used to update data in DB
-func (osi OrganisationStoreImpl) Update(organisation *models.Organisation, newOrganisation *models.Organisation, ds dbStore) *u.AppError {
+func (osi OrganisationStoreImpl) Update(organisation *models.Organisation, newOrganisation *models.Organisation, ds DbStore) *u.AppError {
 	db := *ds.Db
 	transaction := db.Begin()
 	newOrganisation.PreSave()
@@ -53,7 +53,7 @@ func (osi OrganisationStoreImpl) Update(organisation *models.Organisation, newOr
 }
 
 // Get Used to get organisation from DB
-func (osi OrganisationStoreImpl) Get(ds dbStore) *models.Organisation {
+func (osi OrganisationStoreImpl) Get(ds DbStore) *models.Organisation {
 	db := *ds.Db
 	organisation := models.Organisation{}
 	db.First(&organisation)
