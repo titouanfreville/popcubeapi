@@ -1,7 +1,6 @@
 package datastores
 
 import (
-	"fmt"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -24,8 +23,7 @@ func (usi UserStoreImpl) Save(user *models.User, ds DbStore) *u.AppError {
 		transaction.Rollback()
 		return u.NewLocAppError("userStoreImpl.Save", "save.transaction.create.already_exist", nil, "User Name: "+user.Username)
 	}
-	fmt.Printf("IDRole is : %d, InUserRole ID is : %d", user.IDRole, user.Role.IDRole)
-	if err := transaction.Debug().Create(&user).Error; err != nil {
+	if err := transaction.Create(&user).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("userStoreImpl.Save", "save.transaction.create.encounterError :"+err.Error(), nil, "")
 	}
@@ -82,7 +80,7 @@ func (usi UserStoreImpl) GetByEmail(userEmail string, ds DbStore) *models.User {
 func (usi UserStoreImpl) GetOrderedByDate(userDate int, ds DbStore) *[]models.User {
 	db := *ds.Db
 	users := []models.User{}
-	db.Order("updatedAt, userName, email").Find(&users)
+	db.Order("lastUpdate, userName, email").Find(&users)
 	return &users
 }
 
@@ -122,8 +120,7 @@ func (usi UserStoreImpl) GetByLastName(lastName string, ds DbStore) *[]models.Us
 func (usi UserStoreImpl) GetByRole(role *models.Role, ds DbStore) *[]models.User {
 	db := *ds.Db
 	users := []models.User{}
-	db.Debug().Model(role).Related(&users, "Role")
-	// db.Debug().Model(&role).Association("Role").Find(&users)
+	db.Table("users").Select("*").Joins("natural join roles").Where("roles.idRole = ?", role.IDRole).Find(&users)
 	return &users
 }
 

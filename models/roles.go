@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"regexp"
+
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 

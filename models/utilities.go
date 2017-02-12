@@ -10,9 +10,9 @@ import (
 	"regexp"
 	"strings"
 	"time"
-	u "github.com/titouanfreville/popcubeapi/utils"
 
 	"github.com/pborman/uuid"
+	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
 const (

@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"io"
+
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 

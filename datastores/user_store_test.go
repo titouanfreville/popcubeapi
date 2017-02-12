@@ -4,14 +4,11 @@
 package datastores
 
 import (
-	// "strings"
 	"testing"
 	"time"
 
 	. "github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
-
-	"fmt"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -68,14 +65,7 @@ func TestUserStore(t *testing.T) {
 	}
 	rsi.Save(&guestRole, ds)
 
-	Convey("NEED TO KNOW WHAT OWNER LOOK LIKE", t, func() {
-		So(ownerRole, ShouldNotResemble, ownerRole)
-		So(guestRole, ShouldNotResemble, guestRole)
-		So(adminRole, ShouldNotResemble, adminRole)
-		So(standartRole, ShouldNotResemble, standartRole)
-	})
-
-	time.Sleep(100 * 100)
+	// time.Sleep(100 * 100)
 
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("userStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
@@ -87,10 +77,8 @@ func TestUserStore(t *testing.T) {
 			NickName:  "NickName",
 			FirstName: "Test",
 			LastName:  "L",
-			Role:      ownerRole,
 			IDRole:    ownerRole.IDRole,
 		}
-		fmt.Printf("IDRole is : %d. Official is : %d", user.IDRole, ownerRole.IDRole)
 
 		Convey("Given a correct user.", func() {
 			appError := usi.Save(&user, ds)
@@ -119,7 +107,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "NickName",
 			FirstName: "Test",
 			LastName:  "L",
-			Role:      ownerRole,
 			IDRole:    ownerRole.IDRole,
 		}
 		userNew := User{
@@ -130,7 +117,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Luky",
 			LastName:  "Luke",
 			Locale:    "vn_VN",
-			Role:      adminRole,
 			IDRole:    adminRole.IDRole,
 		}
 
@@ -144,7 +130,7 @@ func TestUserStore(t *testing.T) {
 			userShouldResemble := userNew
 			userShouldResemble.WebID = user.WebID
 			userShouldResemble.IDUser = user.IDUser
-			userShouldResemble.UpdatedAt = user.UpdatedAt
+			userShouldResemble.LastUpdate = user.LastUpdate
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dbError)
 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -264,7 +250,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Luky",
 			LastName:  "Luke",
 			Locale:    "en_EN",
-			Role:      adminRole,
 			IDRole:    adminRole.IDRole,
 		}
 		user1 := User{
@@ -275,7 +260,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Joe",
 			LastName:  "Dalton",
 			Locale:    "en_EN",
-			Role:      standartRole,
 			IDRole:    standartRole.IDRole,
 		}
 		user2 := User{
@@ -286,7 +270,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Moris",
 			LastName:  "Gossiny",
 			Locale:    "fr_FR",
-			Role:      ownerRole,
 			IDRole:    ownerRole.IDRole,
 		}
 		user1New := User{
@@ -297,7 +280,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Joe, Jack, William, Avrell",
 			LastName:  "Dalton",
 			Locale:    "en_EN",
-			Role:      guestRole,
 			IDRole:    guestRole.IDRole,
 		}
 		user3 := User{
@@ -308,7 +290,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Jolly",
 			LastName:  "Jumper",
 			Locale:    "en_EN",
-			Role:      standartRole,
 			IDRole:    standartRole.IDRole,
 		}
 		user4 := User{
@@ -319,7 +300,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Billy",
 			LastName:  "The Kid",
 			Locale:    "en_EN",
-			Role:      guestRole,
 			IDRole:    guestRole.IDRole,
 		}
 

@@ -9,7 +9,7 @@ import (
 func TestMemberModel(t *testing.T) {
 	userTest := User{
 		WebID:              NewID(),
-		UpdatedAt:          10,
+		LastUpdate:          10,
 		Deleted:            true,
 		Username:           "l",
 		Password:           "test",
@@ -27,7 +27,7 @@ func TestMemberModel(t *testing.T) {
 	channelTest := Channel{
 		WebID:       NewID(),
 		ChannelName: "electra",
-		UpdatedAt:   GetMillis(),
+		LastUpdate:   GetMillis(),
 		Type:        "audio",
 		Private:     false,
 		Description: "Testing channel description :O",

@@ -77,7 +77,7 @@ func TestChannelStore(t *testing.T) {
 			channelShouldResemble := channelNew
 			channelShouldResemble.WebID = channel.WebID
 			channelShouldResemble.IDChannel = channel.IDChannel
-			channelShouldResemble.UpdatedAt = channel.UpdatedAt
+			channelShouldResemble.LastUpdate = channel.LastUpdate
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dbError)
 			So(appError, ShouldNotResemble, alreadyExistError)

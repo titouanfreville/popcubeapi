@@ -25,7 +25,7 @@ func TestChannelModel(t *testing.T) {
 			channel := Channel{
 				WebID:       NewID(),
 				ChannelName: "electra",
-				UpdatedAt:   GetMillis(),
+				LastUpdate:   GetMillis(),
 				Type:        "audio",
 				Private:     false,
 				Description: "Testing channel description :O",
@@ -45,7 +45,7 @@ func TestChannelModel(t *testing.T) {
 			empty := Channel{}
 			channel := Channel{
 				ChannelName: "Electra",
-				UpdatedAt:   GetMillis(),
+				LastUpdate:   GetMillis(),
 				Type:        "audio",
 				Private:     false,
 				Description: "Testing channel description :O",
@@ -82,11 +82,11 @@ func TestChannelModel(t *testing.T) {
 				So(channel.IsValid(false), ShouldResemble, u.NewLocAppError("Channel.IsValid", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channel.WebID))
 			})
 			channel.ChannelName = "electra"
-			channel.UpdatedAt = 0
+			channel.LastUpdate = 0
 			Convey("Given an incorrect update date should be refuse", func() {
 				So(channel.IsValid(false), ShouldResemble, u.NewLocAppError("Channel.IsValid", "model.channel.is_valid.update_at.app_error", nil, "id="+channel.WebID))
 			})
-			channel.UpdatedAt = GetMillis()
+			channel.LastUpdate = GetMillis()
 			channel.Description = "Il Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face:"
 			Convey("Given a too long description, should return too long description error :p", func() {
 				So(channel.IsValid(false), ShouldResemble, u.NewLocAppError("Channel.IsValid", "model.channel.is_valid.description.app_error", nil, "id="+channel.WebID))
@@ -106,7 +106,7 @@ func TestChannelModel(t *testing.T) {
 
 	Convey("Testing PreSave function", t, func() {
 		channel := Channel{}
-		Convey("If channel is empty, should fill some fields - webID, ChannelName, UpdatedAt, Avatar and type, and channel should not be valid", func() {
+		Convey("If channel is empty, should fill some fields - webID, ChannelName, LastUpdate, Avatar and type, and channel should not be valid", func() {
 			channel.PreSave()
 			So(channel.IsValid(false), ShouldResemble, u.NewLocAppError("Channel.IsValid", "model.channel.is_valid.channel_name.app_error", nil, "id="+channel.WebID))
 			So(channel.IsValid(false), ShouldNotResemble, u.NewLocAppError("Channel.IsValid", "model.channel.is_valid.id.app_error", nil, ""))
@@ -148,16 +148,16 @@ func TestChannelModel(t *testing.T) {
 			channel := Channel{
 				WebID:       "TestWebID",
 				ChannelName: "TestChannelName",
-				UpdatedAt:   GetMillis() - 20,
+				LastUpdate:   GetMillis() - 20,
 				Type:        "audio",
 				Private:     true,
 				Description: "Testing channel description",
 				Subject:     "Sujet",
 				Avatar:      "jesuiscool.svg",
 			}
-			oldUpdatedat := channel.UpdatedAt
+			oldUpdatedat := channel.LastUpdate
 			channel.PreUpdate()
-			So(channel.UpdatedAt, ShouldBeGreaterThan, oldUpdatedat)
+			So(channel.LastUpdate, ShouldBeGreaterThan, oldUpdatedat)
 			So(channel.WebID, ShouldEqual, "TestWebID")
 			So(channel.ChannelName, ShouldEqual, "testchannelname")
 			So(channel.Type, ShouldEqual, "audio")

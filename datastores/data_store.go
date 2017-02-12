@@ -45,11 +45,11 @@ func (ds *DbStore) InitConnection(user string, dbname string, password string) {
 		models.Member{}, &models.Message{}, &models.Organisation{}, &models.Parameter{},
 		&models.Role{}, &models.User{})
 
-	// Will not set CreatedAt and UpdatedAt on .Create() call
+	// Will not set CreatedAt and LastUpdate on .Create() call
 	db.Callback().Create().Remove("gorm:update_time_stamp")
 	db.Callback().Create().Remove("gorm:save_associations")
 
-	// Will not update UpdatedAt on .Save() call
+	// Will not update LastUpdate on .Save() call
 	db.Callback().Update().Remove("gorm:update_time_stamp")
 	db.Callback().Update().Remove("gorm:save_associations")
 

@@ -23,8 +23,8 @@ import (
 	"regexp"
 	"strings"
 	"unicode/utf8"
-	u "github.com/titouanfreville/popcubeapi/utils"
 
+	u "github.com/titouanfreville/popcubeapi/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -59,7 +59,7 @@ var (
 
 - emailVerified: true if email was verified by user. - REQUIRED
 
-- updatedAt: Time of the last update. Used to create tag for browser cache. - REQUIRED
+- lastUpdate: Time of the last update. Used to create tag for browser cache. - REQUIRED
 
 - deleted: True if user is deleted. - REQUIRED
 
@@ -83,17 +83,17 @@ var (
 */
 type User struct {
 	IDUser             uint64 `gorm:"primary_key;column:idUser;AUTO_INCREMENT" json:"-"`
-	WebID              string `gorm:"column:webID; not null; unique;" json:"web_id"`
+	WebID              string `gorm:"column:webId; not null; unique;" json:"web_id"`
 	Username           string `gorm:"column:userName; not null; unique;" json:"username"`
 	Email              string `gorm:"column:email; not null; unique;" json:"email"`
 	EmailVerified      bool   `gorm:"column:emailVerified; not null;" json:"email_verified"`
-	UpdatedAt          int64  `gorm:"column:updatedAt; not null;" json:"update_at"`
+	LastUpdate         int64  `gorm:"column:lastUpdate; not null;" json:"last_update"`
 	Deleted            bool   `gorm:"column:deleted; not null;" json:"deleted"`
 	Password           string `gorm:"column:password; not null;" json:"password"`
 	LastPasswordUpdate int64  `gorm:"column:lastPasswordUpdate; not null;" json:"last_password_update"`
 	FailedAttempts     int    `gorm:"column:failedAttempts; not null;" json:"failed_attempts"`
 	Locale             string `gorm:"column:locale; not null;" json:"locale"`
-	Role               Role   `gorm:"ForeignKey:IDRole;" json:"-"`
+	Role               Role   `gorm:"ForeignKey:IDRole;" db:"-" json:"-"`
 	IDRole             uint64 `gorm:"column:idRole; not null;" json:"idRole"`
 	Avatar             string `gorm:"column:avatar;" json:"avatar, omitempty"`
 	NickName           string `gorm:"column:nickName; unique" json:"nickname, omitempty"`
@@ -153,8 +153,8 @@ func (user *User) PreSave() {
 	user.Username = strings.ToLower(user.Username)
 	user.Email = strings.ToLower(user.Email)
 
-	user.UpdatedAt = GetMillis()
-	user.LastPasswordUpdate = user.UpdatedAt
+	user.LastUpdate = GetMillis()
+	user.LastPasswordUpdate = user.LastUpdate
 
 	if user.Locale == "" {
 		user.Locale = DefaultLocale
@@ -169,11 +169,11 @@ func (user *User) PreSave() {
 func (user *User) PreUpdate() {
 	user.Username = strings.ToLower(user.Username)
 	user.Email = strings.ToLower(user.Email)
-	user.UpdatedAt = GetMillis()
+	user.LastUpdate = GetMillis()
 
 	if len(user.Password) > 0 {
 		user.Password = HashPassword(user.Password)
-		user.LastPasswordUpdate = user.UpdatedAt
+		user.LastPasswordUpdate = user.LastUpdate
 	}
 }
 
@@ -218,7 +218,7 @@ func IsValidUsername(user string) bool {
 
 // Etag Generate a valwebID strong Etag so the browser can cache the results
 func (user *User) Etag(showFullName, showemail bool) string {
-	return Etag(user.WebID, user.UpdatedAt, showFullName, showemail)
+	return Etag(user.WebID, user.LastUpdate, showFullName, showemail)
 }
 
 // GetFullName of the user

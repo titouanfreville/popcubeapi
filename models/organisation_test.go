@@ -84,7 +84,7 @@ func TestOrganisationModel(t *testing.T) {
 
 	Convey("Testing PreSave function", t, func() {
 		organisation := Organisation{}
-		Convey("If organisation is empty, should fill some fields - webID, OrganisationName, UpdatedAt, Avatar and type, and organisation should not be valid", func() {
+		Convey("If organisation is empty, should fill some fields - webID, OrganisationName, LastUpdate, Avatar and type, and organisation should not be valid", func() {
 			organisation.PreSave()
 			So(organisation.IsValid(), ShouldResemble, u.NewLocAppError("Organisation.IsValid", "model.organisation.is_valid.organisation_name.app_error", nil, "id="+strconv.FormatUint(organisation.IDOrganisation, 10)))
 			So(organisation.IsValid(), ShouldNotResemble, u.NewLocAppError("Organisation.IsValid", "model.organisation.is_valid.not_alphanum_organisation_name.app_error", nil, "id="+strconv.FormatUint(organisation.IDOrganisation, 10)))
