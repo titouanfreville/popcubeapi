@@ -17,8 +17,6 @@ The following is a list of stores described:
 package datastores
 
 import (
-	"fmt"
-
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 
@@ -35,7 +33,6 @@ type DbStore struct {
 
 // InitConnection init Database connection && database models
 func (ds *DbStore) InitConnection(user string, dbname string, password string) {
-	fmt.Printf("\n######## Intialisating Db conection  ########\n")
 	connectionChain := user + ":" + password + "@(database:3306)/" + dbname + "?charset=utf8&parseTime=True&loc=Local"
 
 	db, _ := gorm.Open("mysql", connectionChain)
