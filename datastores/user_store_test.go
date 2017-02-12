@@ -5,9 +5,10 @@ package datastores
 
 import (
 	// "strings"
-	. "github.com/titouanfreville/popcubeapi/models"
 	"testing"
 	"time"
+
+	. "github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 
 	"fmt"
@@ -16,7 +17,7 @@ import (
 )
 
 func TestUserStore(t *testing.T) {
-	ds := dbStore{}
+	ds := DbStore{}
 	ds.InitConnection("root", "popcube_test", "popcube_dev")
 	db := *ds.Db
 

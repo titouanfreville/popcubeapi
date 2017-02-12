@@ -5,16 +5,17 @@ package datastores
 
 import (
 	// "fmt"
-	. "github.com/smartystreets/goconvey/convey"
-	. "github.com/titouanfreville/popcubeapi/models"
 	"strings"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
+	. "github.com/titouanfreville/popcubeapi/models"
 	// "time"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
 func TestChannelStore(t *testing.T) {
-	ds := dbStore{}
+	ds := DbStore{}
 	ds.InitConnection("root", "popcube_test", "popcube_dev")
 	db := *ds.Db
 	csi := ChannelStoreImpl{}
