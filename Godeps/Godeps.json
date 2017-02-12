@@ -1,0 +1,58 @@
+{
+	"ImportPath": "github.com/titouanfreville/popcubeapi",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/go-sql-driver/mysql",
+			"Comment": "v1.3-2-g2e00b5c",
+			"Rev": "2e00b5cd70399450106cec6431c2e2ce3cae5034"
+		},
+		{
+			"ImportPath": "github.com/jinzhu/gorm",
+			"Comment": "v1.0-103-gf828909",
+			"Rev": "f8289099830fa240ffbeb1a88b8a9cec0228b17a"
+		},
+		{
+			"ImportPath": "github.com/jinzhu/inflection",
+			"Rev": "1c35d901db3da928c72a72d8458480cc9ade058f"
+		},
+		{
+			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
+			"Comment": "v1.7.0",
+			"Rev": "f757c9f9b69c16ff69d38dbf224be28a7b6537bb"
+		},
+		{
+			"ImportPath": "github.com/nicksnyder/go-i18n/i18n/bundle",
+			"Comment": "v1.7.0",
+			"Rev": "f757c9f9b69c16ff69d38dbf224be28a7b6537bb"
+		},
+		{
+			"ImportPath": "github.com/nicksnyder/go-i18n/i18n/language",
+			"Comment": "v1.7.0",
+			"Rev": "f757c9f9b69c16ff69d38dbf224be28a7b6537bb"
+		},
+		{
+			"ImportPath": "github.com/nicksnyder/go-i18n/i18n/translation",
+			"Comment": "v1.7.0",
+			"Rev": "f757c9f9b69c16ff69d38dbf224be28a7b6537bb"
+		},
+		{
+			"ImportPath": "github.com/pborman/uuid",
+			"Comment": "v1.0-19-g5007efa",
+			"Rev": "5007efa264d92316c43112bc573e754bc889b7b1"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "f6b343c37ca80bfa8ea539da67a0b621f84fab1d"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "f6b343c37ca80bfa8ea539da67a0b621f84fab1d"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "a5b47d31c556af34a302ce5d659e6fea44d90de0"
+		}
+	]
+}
