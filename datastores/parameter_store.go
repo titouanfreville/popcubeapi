@@ -6,8 +6,11 @@ import (
 )
 
 // ParameterStoreImpl implement ParameterStore interface
-type ParameterStoreImpl struct {
-	ParameterStore
+type ParameterStoreImpl struct{}
+
+// NewParameterStore Generate the struct for parameter store
+func NewParameterStore() ParameterStore {
+	return &ParameterStoreImpl{}
 }
 
 // Save Use to save parameter in BB

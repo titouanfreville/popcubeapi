@@ -57,9 +57,9 @@ func TestUserModel(t *testing.T) {
 				So(user.Username, ShouldNotBeBlank)
 				So(user.EmailVerified, ShouldBeFalse)
 				So(user.Deleted, ShouldBeFalse)
-				So(user.UpdatedAt, ShouldNotBeNil)
-				So(user.UpdatedAt, ShouldBeGreaterThan, 0)
-				So(user.UpdatedAt, ShouldEqual, user.LastPasswordUpdate)
+				So(user.LastUpdate, ShouldNotBeNil)
+				So(user.LastUpdate, ShouldBeGreaterThan, 0)
+				So(user.LastUpdate, ShouldEqual, user.LastPasswordUpdate)
 				So(user.Locale, ShouldNotBeBlank)
 				So(ComparePassword(user.Password, "test"), ShouldBeTrue)
 			})
@@ -73,7 +73,7 @@ func TestUserModel(t *testing.T) {
 			Convey("Etag should be correctly generated", func() {
 				user.PreSave()
 				Etag := user.Etag(true, true)
-				expected := CurrentVersion + "." + user.WebID + "." + strconv.FormatInt(user.UpdatedAt, 10) + "." + "true" + "." + "true"
+				expected := CurrentVersion + "." + user.WebID + "." + strconv.FormatInt(user.LastUpdate, 10) + "." + "true" + "." + "true"
 				So(Etag, ShouldEqual, expected)
 			})
 		})
@@ -87,9 +87,9 @@ func TestUserModel(t *testing.T) {
 				So(user.Email, ShouldEqual, "test@popcube.fr")
 				So(user.EmailVerified, ShouldBeFalse)
 				So(user.Deleted, ShouldBeFalse)
-				So(user.UpdatedAt, ShouldNotBeNil)
-				So(user.UpdatedAt, ShouldBeGreaterThan, 0)
-				So(user.UpdatedAt, ShouldEqual, user.LastPasswordUpdate)
+				So(user.LastUpdate, ShouldNotBeNil)
+				So(user.LastUpdate, ShouldBeGreaterThan, 0)
+				So(user.LastUpdate, ShouldEqual, user.LastPasswordUpdate)
 				So(user.Locale, ShouldNotBeBlank)
 				So(ComparePassword(user.Password, "test"), ShouldBeTrue)
 			})
@@ -103,7 +103,7 @@ func TestUserModel(t *testing.T) {
 			Convey("Etag should be correctly generated", func() {
 				user.PreSave()
 				Etag := user.Etag(true, true)
-				expected := CurrentVersion + "." + user.WebID + "." + strconv.FormatInt(user.UpdatedAt, 10) + "." + "true" + "." + "true"
+				expected := CurrentVersion + "." + user.WebID + "." + strconv.FormatInt(user.LastUpdate, 10) + "." + "true" + "." + "true"
 				So(Etag, ShouldEqual, expected)
 			})
 		})
@@ -111,7 +111,7 @@ func TestUserModel(t *testing.T) {
 		Convey("Given a full user entry", func() {
 			user := User{
 				WebID:              "testID",
-				UpdatedAt:          10,
+				LastUpdate:          10,
 				Deleted:            true,
 				Username:           "TesT",
 				Password:           "test",
@@ -130,7 +130,7 @@ func TestUserModel(t *testing.T) {
 			Convey("Applying PreSave should only correctly format field and use good time for last Updates", func() {
 				user.PreSave()
 				So(user.WebID, ShouldEqual, "testID")
-				So(user.UpdatedAt, ShouldNotEqual, 10)
+				So(user.LastUpdate, ShouldNotEqual, 10)
 				So(user.Deleted, ShouldBeTrue)
 				So(user.Username, ShouldEqual, "test")
 				So(ComparePassword(user.Password, "test"), ShouldBeTrue)
@@ -141,7 +141,7 @@ func TestUserModel(t *testing.T) {
 				So(user.LastName, ShouldEqual, "L")
 				So(user.Role, ShouldResemble, Owner)
 				So(user.LastPasswordUpdate, ShouldNotEqual, 20)
-				So(user.LastPasswordUpdate, ShouldEqual, user.UpdatedAt)
+				So(user.LastPasswordUpdate, ShouldEqual, user.LastUpdate)
 				So(user.FailedAttempts, ShouldEqual, 1)
 				So(user.Locale, ShouldEqual, "vi")
 				So(user.LastActivityAt, ShouldEqual, 5)
@@ -150,19 +150,19 @@ func TestUserModel(t *testing.T) {
 			Convey("Etag should be correctly generated", func() {
 				user.PreSave()
 				Etag := user.Etag(true, true)
-				expected := CurrentVersion + "." + user.WebID + "." + strconv.FormatInt(user.UpdatedAt, 10) + "." + "true" + "." + "true"
+				expected := CurrentVersion + "." + user.WebID + "." + strconv.FormatInt(user.LastUpdate, 10) + "." + "true" + "." + "true"
 				So(Etag, ShouldEqual, expected)
 			})
 		})
 
 		Convey("Given an user.", func() {
-			oldUpdated := user1.UpdatedAt
+			oldUpdated := user1.LastUpdate
 			user1.Password = "NewPassword"
 			user1.PreSave()
 
 			Convey("Applying PreSave should correctly update values", func() {
 				So(ComparePassword(user1.Password, "NewPassword"), ShouldBeTrue)
-				So(user1.UpdatedAt, ShouldBeGreaterThan, oldUpdated)
+				So(user1.LastUpdate, ShouldBeGreaterThan, oldUpdated)
 			})
 
 			Convey("Applying PreSave should correctly format values", func() {

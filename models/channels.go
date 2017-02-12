@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 	"unicode/utf8"
+
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
@@ -27,7 +28,7 @@ type Channel struct {
 	WebID       string `gorm:"column:webId;not null;unique" json:"web_id"`
 	ChannelName string `gorm:"column:channelName;not null;unique" json:"display_name"`
 	Type        string `gorm:"column:type;not null" json:"type"`
-	UpdatedAt   int64  `gorm:"column:updatedAt;not null;" json:"updated_at"`
+	LastUpdate  int64  `gorm:"column:lastUpdate;not null;" json:"last_update"`
 	Private     bool   `gorm:"column:private;not null" json:"private"`
 	Description string `gorm:"column:desciption" json:"description,omitempty"`
 	Subject     string `gorm:"column:subject" json:"subject,omitempty"`
@@ -56,7 +57,7 @@ func ChannelFromJSON(data io.Reader) *Channel {
 
 // Etag is a small function used to create cache ID
 func (channel *Channel) Etag() string {
-	return Etag(channel.WebID, channel.UpdatedAt)
+	return Etag(channel.WebID, channel.LastUpdate)
 }
 
 // IsValid check the correctness of a channel object
@@ -67,7 +68,7 @@ func (channel *Channel) IsValid(isUpdate bool) *u.AppError {
 		}
 	}
 
-	if channel.UpdatedAt == 0 {
+	if channel.LastUpdate == 0 {
 		return u.NewLocAppError("Channel.IsValid", "model.channel.is_valid.update_at.app_error", nil, "id="+channel.WebID)
 	}
 
@@ -102,7 +103,7 @@ func (channel *Channel) PreSave() {
 
 	channel.ChannelName = strings.ToLower(channel.ChannelName)
 
-	channel.UpdatedAt = GetMillis()
+	channel.LastUpdate = GetMillis()
 
 	if channel.Avatar == "" {
 		channel.Avatar = "default_channel_avatar.svg"
@@ -121,7 +122,7 @@ func (channel *Channel) PreSave() {
 func (channel *Channel) PreUpdate() {
 	channel.ChannelName = strings.ToLower(channel.ChannelName)
 
-	channel.UpdatedAt = GetMillis()
+	channel.LastUpdate = GetMillis()
 
 	if channel.Type == "direct" {
 		channel.Private = true

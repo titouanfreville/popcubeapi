@@ -82,7 +82,7 @@ func TestParameterModel(t *testing.T) {
 
 	Convey("Testing PreSave function", t, func() {
 		parameter := Parameter{}
-		Convey("If parameter is empty, should fill some fields - webID, ParameterName, UpdatedAt, Avatar and type, and parameter should be valid", func() {
+		Convey("If parameter is empty, should fill some fields - webID, ParameterName, LastUpdate, Avatar and type, and parameter should be valid", func() {
 			parameter.PreSave()
 			So(parameter.IsValid(), ShouldBeNil)
 			So(parameter.IsValid(), ShouldNotResemble, u.NewLocAppError("Parameter.IsValid", "model.parameter.is_valid.parameter_name.app_error", nil, "id="+strconv.FormatUint(parameter.IDParameter, 10)))

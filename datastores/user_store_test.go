@@ -4,14 +4,11 @@
 package datastores
 
 import (
-	// "strings"
 	"testing"
 	"time"
 
 	. "github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
-
-	"fmt"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -21,8 +18,8 @@ func TestUserStore(t *testing.T) {
 	ds.InitConnection("root", "popcube_test", "popcube_dev")
 	db := *ds.Db
 
-	usi := UserStoreImpl{}
-	rsi := RoleStoreImpl{}
+	usi := NewUserStore()
+	rsi := NewRoleStore()
 
 	time.Sleep(100 * 100)
 
@@ -68,15 +65,6 @@ func TestUserStore(t *testing.T) {
 	}
 	rsi.Save(&guestRole, ds)
 
-	Convey("NEED TO KNOW WHAT OWNER LOOK LIKE", t, func() {
-		So(ownerRole, ShouldNotResemble, ownerRole)
-		So(guestRole, ShouldNotResemble, guestRole)
-		So(adminRole, ShouldNotResemble, adminRole)
-		So(standartRole, ShouldNotResemble, standartRole)
-	})
-
-	time.Sleep(100 * 100)
-
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("userStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
 		alreadyExistError := u.NewLocAppError("userStoreImpl.Save", "save.transaction.create.already_exist", nil, "User Name: test")
@@ -87,10 +75,8 @@ func TestUserStore(t *testing.T) {
 			NickName:  "NickName",
 			FirstName: "Test",
 			LastName:  "L",
-			Role:      ownerRole,
 			IDRole:    ownerRole.IDRole,
 		}
-		fmt.Printf("IDRole is : %d. Official is : %d", user.IDRole, ownerRole.IDRole)
 
 		Convey("Given a correct user.", func() {
 			appError := usi.Save(&user, ds)
@@ -119,7 +105,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "NickName",
 			FirstName: "Test",
 			LastName:  "L",
-			Role:      ownerRole,
 			IDRole:    ownerRole.IDRole,
 		}
 		userNew := User{
@@ -130,7 +115,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Luky",
 			LastName:  "Luke",
 			Locale:    "vn_VN",
-			Role:      adminRole,
 			IDRole:    adminRole.IDRole,
 		}
 
@@ -144,7 +128,7 @@ func TestUserStore(t *testing.T) {
 			userShouldResemble := userNew
 			userShouldResemble.WebID = user.WebID
 			userShouldResemble.IDUser = user.IDUser
-			userShouldResemble.UpdatedAt = user.UpdatedAt
+			userShouldResemble.LastUpdate = user.LastUpdate
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dbError)
 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -264,7 +248,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Luky",
 			LastName:  "Luke",
 			Locale:    "en_EN",
-			Role:      adminRole,
 			IDRole:    adminRole.IDRole,
 		}
 		user1 := User{
@@ -275,7 +258,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Joe",
 			LastName:  "Dalton",
 			Locale:    "en_EN",
-			Role:      standartRole,
 			IDRole:    standartRole.IDRole,
 		}
 		user2 := User{
@@ -286,7 +268,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Moris",
 			LastName:  "Gossiny",
 			Locale:    "fr_FR",
-			Role:      ownerRole,
 			IDRole:    ownerRole.IDRole,
 		}
 		user1New := User{
@@ -297,7 +278,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Joe, Jack, William, Avrell",
 			LastName:  "Dalton",
 			Locale:    "en_EN",
-			Role:      guestRole,
 			IDRole:    guestRole.IDRole,
 		}
 		user3 := User{
@@ -308,7 +288,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Jolly",
 			LastName:  "Jumper",
 			Locale:    "en_EN",
-			Role:      standartRole,
 			IDRole:    standartRole.IDRole,
 		}
 		user4 := User{
@@ -319,7 +298,6 @@ func TestUserStore(t *testing.T) {
 			FirstName: "Billy",
 			LastName:  "The Kid",
 			Locale:    "en_EN",
-			Role:      guestRole,
 			IDRole:    guestRole.IDRole,
 		}
 
@@ -377,7 +355,6 @@ func TestUserStore(t *testing.T) {
 			So(user, ShouldNotResemble, &User{})
 			So(user, ShouldResemble, &user2)
 			user = usi.GetByEmail(user3.Email, ds)
-			So(user, ShouldNotResemble, &User{})
 			So(user, ShouldResemble, &user3)
 			user = usi.GetByEmail(user4.Email, ds)
 			So(user, ShouldNotResemble, &User{})
@@ -411,86 +388,96 @@ func TestUserStore(t *testing.T) {
 		})
 	})
 
-	// Convey("Testing delete user", t, func() {
-	// 	dberror := u.NewLocAppError("userStoreImpl.Delete", "update.transaction.delete.encounterError", nil, "")
-	// 	user0 := User{
-	// 		UserName:    "electra",
-	// 		Type:        "video",
-	// 		Private:     false,
-	// 		Description: "Testing user description :O",
-	// 		Subject:     "Sujet",
-	// 		Avatar:      "jesuiscool.svg",
-	// 	}
-	// 	user1 := User{
-	// 		UserName:    "mal",
-	// 		Type:        "audio",
-	// 		Private:     false,
-	// 		Description: "Speaking on Malsdjisqnju BD song from R. Sechan",
-	// 		Subject:     "Sujet1",
-	// 		Avatar:      "cover_mal.svg",
-	// 	}
-	// 	user2 := User{
-	// 		UserName: "lagaffesfantasio",
-	// 		Type:     "direct",
-	// 		Private:  false,
-	// 		Avatar:   "gaston.svg",
-	// 	}
-	// 	user3 := User{
-	// 		UserName:    "corsicarms",
-	// 		Type:        "audio",
-	// 		Private:     false,
-	// 		Description: "Speaking on Corsic Arms song from R. Sechan",
-	// 		Subject:     "Sujet",
-	// 		Avatar:      "cover_csa.svg",
-	// 	}
+	Convey("Testing delete user", t, func() {
+		dberror := u.NewLocAppError("userStoreImpl.Delete", "update.transaction.delete.encounterError", nil, "")
+		user0 := User{
+			Username:  "lucky",
+			Password:  "lucke",
+			Email:     "luckylucke@popcube.fr",
+			NickName:  "LL",
+			FirstName: "Luky",
+			LastName:  "Luke",
+			Locale:    "en_EN",
+			IDRole:    adminRole.IDRole,
+		}
+		user1 := User{
+			Username:  "daltons",
+			Password:  "dalton",
+			Email:     "daltonsbrothers@popcube.fr",
+			NickName:  "thebrothers",
+			FirstName: "Joe",
+			LastName:  "Dalton",
+			Locale:    "en_EN",
+			IDRole:    standartRole.IDRole,
+		}
+		user2 := User{
+			Username:  "moris",
+			Password:  "gossiny",
+			Email:     "moris&gossiny@popcube.fr",
+			NickName:  "Moris",
+			FirstName: "Moris",
+			LastName:  "Gossiny",
+			Locale:    "fr_FR",
+			IDRole:    ownerRole.IDRole,
+		}
+		user3 := User{
+			Username:  "jolly",
+			Password:  "jumper",
+			Email:     "jollyjumper@popcube.fr",
+			NickName:  "JJ",
+			FirstName: "Jolly",
+			LastName:  "Jumper",
+			Locale:    "en_EN",
+			IDRole:    standartRole.IDRole,
+		}
 
-	// 	usi.Save(&user0, ds)
-	// 	usi.Save(&user1, ds)
-	// 	usi.Save(&user2, ds)
-	// 	usi.Save(&user3, ds)
+		usi.Save(&user0, ds)
+		usi.Save(&user1, ds)
+		usi.Save(&user2, ds)
+		usi.Save(&user3, ds)
 
-	// 	// Have to be after save so ID are up to date :O
-	// 	// user3Old := user3
-	// 	// userList1 := []User{
-	// 	// 	user0,
-	// 	// 	user1,
-	// 	// 	user2,
-	// 	// 	user3Old,
-	// 	// }
+		// Have to be after save so ID are up to date :O
+		// user3Old := user3
+		// userList1 := []User{
+		// 	user0,
+		// 	user1,
+		// 	user2,
+		// 	user3Old,
+		// }
 
-	// 	Convey("Deleting a known user should work", func() {
-	// 		appError := usi.Delete(&user2, ds)
-	// 		So(appError, ShouldBeNil)
-	// 		So(appError, ShouldNotResemble, dberror)
-	// 		So(usi.GetByName("God", ds), ShouldResemble, &User{})
-	// 	})
+		Convey("Deleting a known user should work", func() {
+			appError := usi.Delete(&user2, ds)
+			So(appError, ShouldBeNil)
+			So(appError, ShouldNotResemble, dberror)
+			So(usi.GetByUserName("moris", ds), ShouldResemble, &User{})
+		})
 
-	// 	// Convey("Trying to delete from non conform user should return specific user error and should not delete users.", func() {
-	// 	// 	user3.UserName = "Const"
-	// 	// 	Convey("Too long or empty Name should return name error", func() {
-	// 	// 		appError := usi.Delete(&user3, ds)
-	// 	// 		So(appError, ShouldNotBeNil)
-	// 	// 		So(appError, ShouldNotResemble, dberror)
-	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Delete.user.PreSave", "model.user.username.app_error", nil, ""))
-	// 	// 		So(usi.GetAll(ds), ShouldResemble, &userList1)
-	// 	// 		user3.UserName = "+alpha"
-	// 	// 		appError = usi.Delete(&user3, ds)
-	// 	// 		So(appError, ShouldNotBeNil)
-	// 	// 		So(appError, ShouldNotResemble, dberror)
-	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Delete.user.PreSave", "model.user.username.app_error", nil, ""))
-	// 	// 		So(usi.GetAll(ds), ShouldResemble, &userList1)
-	// 	// 		user3.UserName = "alpha-numerique"
-	// 	// 		appError = usi.Delete(&user3, ds)standartRole
-	// 	// 		So(appError, ShouldNotBeNil)
-	// 	// 		So(appError, ShouldNotResemble, dberror)
-	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Delete.user.PreSave", "model.user.username.app_error", nil, ""))
-	// 	// 		So(usi.GetAll(ds), ShouldResemble, &userList1)
-	// 	// 	})
-	// 	// })
+		// Convey("Trying to delete from non conform user should return specific user error and should not delete users.", func() {
+		// 	user3.UserName = "Const"
+		// 	Convey("Too long or empty Name should return name error", func() {
+		// 		appError := usi.Delete(&user3, ds)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dberror)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Delete.user.PreSave", "model.user.username.app_error", nil, ""))
+		// 		So(usi.GetAll(ds), ShouldResemble, &userList1)
+		// 		user3.UserName = "+alpha"
+		// 		appError = usi.Delete(&user3, ds)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dberror)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Delete.user.PreSave", "model.user.username.app_error", nil, ""))
+		// 		So(usi.GetAll(ds), ShouldResemble, &userList1)
+		// 		user3.UserName = "alpha-numerique"
+		// 		appError = usi.Delete(&user3, ds)standartRole
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dberror)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Delete.user.PreSave", "model.user.username.app_error", nil, ""))
+		// 		So(usi.GetAll(ds), ShouldResemble, &userList1)
+		// 	})
+		// })
 
-	// 	db.Delete(&user0)
-	// 	db.Delete(&user1)
-	// 	db.Delete(&user2)
-	// 	db.Delete(&user3)
-	// })
+		db.Delete(&user0)
+		db.Delete(&user1)
+		db.Delete(&user2)
+		db.Delete(&user3)
+	})
 }

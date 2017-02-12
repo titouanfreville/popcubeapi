@@ -6,8 +6,11 @@ import (
 )
 
 // ChannelStoreImpl Used to implement ChannelStore interface
-type ChannelStoreImpl struct {
-	ChannelStore
+type ChannelStoreImpl struct{}
+
+// NewChannelStore Generate the struct for channel store
+func NewChannelStore() ChannelStore {
+	return &ChannelStoreImpl{}
 }
 
 // Save Use to save channel in BB

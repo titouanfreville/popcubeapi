@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 

@@ -34,5 +34,7 @@ services:
     image: mariadb:10.1
     env_file: .env
     hostname: database
+    ports: 
+      - 3306:3306
     volumes :
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql

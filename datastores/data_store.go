@@ -17,8 +17,6 @@ The following is a list of stores described:
 package datastores
 
 import (
-	"fmt"
-
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 
@@ -35,7 +33,6 @@ type DbStore struct {
 
 // InitConnection init Database connection && database models
 func (ds *DbStore) InitConnection(user string, dbname string, password string) {
-	fmt.Printf("\n######## Intialisating Db conection  ########\n")
 	connectionChain := user + ":" + password + "@(database:3306)/" + dbname + "?charset=utf8&parseTime=True&loc=Local"
 
 	db, _ := gorm.Open("mysql", connectionChain)
@@ -45,11 +42,11 @@ func (ds *DbStore) InitConnection(user string, dbname string, password string) {
 		models.Member{}, &models.Message{}, &models.Organisation{}, &models.Parameter{},
 		&models.Role{}, &models.User{})
 
-	// Will not set CreatedAt and UpdatedAt on .Create() call
+	// Will not set CreatedAt and LastUpdate on .Create() call
 	db.Callback().Create().Remove("gorm:update_time_stamp")
 	db.Callback().Create().Remove("gorm:save_associations")
 
-	// Will not update UpdatedAt on .Save() call
+	// Will not update LastUpdate on .Save() call
 	db.Callback().Update().Remove("gorm:update_time_stamp")
 	db.Callback().Update().Remove("gorm:save_associations")
 
@@ -116,7 +113,7 @@ type ChannelStore interface {
 	Save(channel *models.Channel, ds DbStore) *u.AppError
 	Update(channel *models.Channel, newChannel *models.Channel, ds DbStore) *u.AppError
 	GetByName(channelName string, ds DbStore) *models.Channel
-	GetByType(channelType string, ds DbStore) *models.Channel
+	GetByType(channelType string, ds DbStore) *[]models.Channel
 	GetPublic(ds DbStore) *[]models.Channel
 	GetPrivate(ds DbStore) *[]models.Channel
 	GetAll(ds DbStore) *[]models.Channel
@@ -130,7 +127,7 @@ type EmojiStore interface {
 	GetByName(emojiName string, ds DbStore) *models.Emoji
 	GetByShortcut(emojiShortcut string, ds DbStore) *models.Emoji
 	GetByLink(emojiLink string, ds DbStore) *models.Emoji
-	GetAll(ds DbStore) *models.Emoji
+	GetAll(ds DbStore) *[]models.Emoji
 	Delete(emoji *models.Emoji, ds DbStore) *u.AppError
 }
 
@@ -182,7 +179,7 @@ type OrganisationStore interface {
 type ParameterStore interface {
 	Save(parameter *models.Parameter, ds DbStore) *u.AppError
 	Update(parameter *models.Parameter, newParameter *models.Parameter, ds DbStore) *u.AppError
-	GetAll(ds DbStore) *models.Parameter
+	Get(ds DbStore) *models.Parameter
 }
 
 /*RoleStore interface the role communication*/
@@ -207,7 +204,8 @@ type UserStore interface {
 	GetByFirstName(firstName string, ds DbStore) *[]models.User
 	GetByLastName(lastName string, ds DbStore) *[]models.User
 	GetByRole(role *models.Role, ds DbStore) *[]models.User
-	GetByChannel(channel *models.Channel, ds DbStore) *[]models.User
 	GetAll(ds DbStore) *[]models.User
 	Delete(user *models.User, ds DbStore) *u.AppError
 }
+
+// GetByChannel(channel *models.Channel, ds DbStore) *[]models.User

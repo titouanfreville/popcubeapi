@@ -14,7 +14,7 @@ func TestEmojiStore(t *testing.T) {
 	ds := DbStore{}
 	ds.InitConnection("root", "popcube_test", "popcube_dev")
 	db := *ds.Db
-	esi := EmojiStoreImpl{}
+	esi := NewEmojiStore()
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("emojiStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
 		alreadyExistError := u.NewLocAppError("emojiStoreImpl.Save", "save.transaction.create.already_exist", nil, "Emoji Name: Troll Face")
