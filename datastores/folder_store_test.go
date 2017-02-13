@@ -54,18 +54,18 @@ func TestFolderStore(t *testing.T) {
 	}
 	csi.Save(&channelTest, ds)
 
-	message := Message{
+	messageTest := Message{
 		Content:   "Folder test",
 		IDUser:    userTest.IDUser,
 		IDChannel: channelTest.IDChannel,
 	}
-	msi.Save(&message, ds)
+	msi.Save(&messageTest, ds)
 
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("folderStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
 		alreadyExistError := u.NewLocAppError("folderStoreImpl.Save", "save.transaction.create.already_exist", nil, "")
 		folder := Folder{
-			IDMessage: message.IDMessage,
+			IDMessage: messageTest.IDMessage,
 			Type:      "png",
 			Link:      "link/zelda",
 			Name:      "something",
@@ -473,7 +473,8 @@ func TestFolderStore(t *testing.T) {
 	// 	db.Delete(&folder2)
 	// 	db.Delete(&folder3)
 	// })
-	usi.Delete(&userTest, ds)
-	csi.Delete(&channelTest, ds)
-	rsi.Delete(&standartRole, ds)
+	db.Delete(&messageTest)
+	db.Delete(&userTest)
+	db.Delete(&channelTest)
+	db.Delete(&standartRole)
 }

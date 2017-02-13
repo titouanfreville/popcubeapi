@@ -23,12 +23,12 @@ func (message *Message) IsValid() *u.AppError {
 	if message.Date == 0 {
 		return u.NewLocAppError("Message.IsValid", "model.message.date.app_error", nil, "")
 	}
-	if message.Creator == (User{}) {
-		return u.NewLocAppError("Message.IsValid", "model.message.creator.app_error", nil, "")
-	}
-	if message.Channel == (Channel{}) {
-		return u.NewLocAppError("Message.IsValid", "model.message.channel.app_error", nil, "")
-	}
+	// if message.Creator == (User{}) {
+	// 	return u.NewLocAppError("Message.IsValid", "model.message.creator.app_error", nil, "")
+	// }
+	// if message.Channel == (Channel{}) {
+	// 	return u.NewLocAppError("Message.IsValid", "model.message.channel.app_error", nil, "")
+	// }
 
 	return nil
 }

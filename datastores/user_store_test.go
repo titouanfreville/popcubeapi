@@ -475,5 +475,9 @@ func TestUserStore(t *testing.T) {
 		db.Delete(&user1)
 		db.Delete(&user2)
 		db.Delete(&user3)
+		db.Delete(&adminRole)
+		db.Delete(&standartRole)
+		db.Delete(&ownerRole)
+		db.Delete(&guestRole)
 	})
 }

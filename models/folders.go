@@ -29,9 +29,9 @@ func (folder *Folder) IsValid() *u.AppError {
 	if len(folder.Type) == 0 {
 		return u.NewLocAppError("Folder.IsValid", "model.folder.type.app_error", nil, "")
 	}
-	if folder.Message == (Message{}) {
-		return u.NewLocAppError("Folder.IsValid", "model.folder.message.app_error", nil, "")
-	}
+	// if folder.Message == (Message{}) {
+	// 	return u.NewLocAppError("Folder.IsValid", "model.folder.message.app_error", nil, "")
+	// }
 	return nil
 }
 

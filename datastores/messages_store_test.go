@@ -4,12 +4,23 @@
 package datastores
 
 import (
+	"math/rand"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
 	. "github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyz"
+
+func randStringBytes(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
+}
 
 func TestMessageStore(t *testing.T) {
 	ds := DbStore{}
@@ -22,7 +33,7 @@ func TestMessageStore(t *testing.T) {
 	csi := NewChannelStore()
 
 	standartRole := Role{
-		RoleName:      "teststandart",
+		RoleName:      randStringBytes(10),
 		CanUsePrivate: true,
 		CanModerate:   true,
 		CanArchive:    true,
@@ -33,7 +44,7 @@ func TestMessageStore(t *testing.T) {
 	rsi.Save(&standartRole, ds)
 
 	userTest := User{
-		Username:  "TesT",
+		Username:  randStringBytes(10),
 		Password:  "test",
 		Email:     "test@popcube.fr",
 		NickName:  "NickName",
@@ -44,7 +55,7 @@ func TestMessageStore(t *testing.T) {
 	usi.Save(&userTest, ds)
 
 	channelTest := Channel{
-		ChannelName: "electras",
+		ChannelName: randStringBytes(10),
 		Type:        "audio",
 		Private:     false,
 		Description: "Testing channel description :O",
@@ -55,12 +66,10 @@ func TestMessageStore(t *testing.T) {
 
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("messageStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
-		alreadyExistError := u.NewLocAppError("messageStoreImpl.Save", "save.transaction.create.already_exist", nil, "Message Name: test")
+		alreadyExistError := u.NewLocAppError("messageStoreImpl.Save", "save.transaction.create.already_exist", nil, "")
 		message := Message{
 			Content:   "Message test",
-			Creator:   userTest,
 			IDUser:    userTest.IDUser,
-			Channel:   channelTest,
 			IDChannel: channelTest.IDChannel,
 		}
 
@@ -466,7 +475,7 @@ func TestMessageStore(t *testing.T) {
 	// 	db.Delete(&message2)
 	// 	db.Delete(&message3)
 	// })
-	usi.Delete(&userTest, ds)
-	csi.Delete(&channelTest, ds)
-	rsi.Delete(&standartRole, ds)
+	db.Delete(&userTest)
+	db.Delete(&channelTest)
+	db.Delete(&standartRole)
 }
