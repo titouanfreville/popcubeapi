@@ -145,13 +145,13 @@ type FolderStore interface {
 
 /*MemberStore interface communication with member table*/
 type MemberStore interface {
-	Save(emoji *models.Emoji, ds DbStore) *u.AppError
-	Update(emoji *models.Emoji, newEmoji *models.Emoji, ds DbStore) *u.AppError
-	GetByUser()
-	GetByChannel()
-	GetByRole()
-	GetAll(ds DbStore) *models.Emoji
-	Delete(emoji *models.Emoji, ds DbStore) *u.AppError
+	Save(member *models.Member, ds DbStore) *u.AppError
+	Update(member *models.Member, newMember *models.Member, ds DbStore) *u.AppError
+	GetByUser(user *models.User, ds DbStore) *[]models.Member
+	GetByChannel(channel *models.Channel, ds DbStore) *[]models.Member
+	GetByRole(role *models.Role, ds DbStore) *[]models.Member
+	GetAll(ds DbStore) *[]models.Member
+	Delete(member *models.Member, ds DbStore) *u.AppError
 }
 
 /*MessageStore interface communication with message table*/
