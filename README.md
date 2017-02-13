@@ -1,7 +1,3 @@
----
-title: Popcube API
----
-
 # PopCube API
 
 *This repository contain the GO API for PopCube projet*
