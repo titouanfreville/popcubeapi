@@ -9,11 +9,12 @@ import (
 
 // Folder Type descibe the Folder table for Popcube DB. It is linked to Message table
 type Folder struct {
-	IDFolder uint64  `gorm:"primary_key;column:idFolder;AUTO_INCREMENT" json:"-"`
-	Link     string  `gorm:"column:link;not null;unique" json:"link"`
-	Name     string  `gorm:"column:name;not null;unique" json:"name"`
-	Type     string  `gorm:"column:type;not null;" json:"type"`
-	Message  Message `gorm:"column:message; not null;ForeignKey:IDMessage;" json:"-"`
+	IDFolder  uint64  `gorm:"primary_key;column:idFolder;AUTO_INCREMENT" json:"-"`
+	Link      string  `gorm:"column:link;not null;unique" json:"link"`
+	Name      string  `gorm:"column:name;not null;unique" json:"name"`
+	Type      string  `gorm:"column:type;not null;" json:"type"`
+	Message   Message `db:"-" gorm:"-" json:"-"`
+	IDMessage uint64  `gorm:"column:idMessage; not null;" json:"id_message"`
 }
 
 // IsValid is used to check validity of Folder objects
