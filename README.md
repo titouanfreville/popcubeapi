@@ -1,8 +1,8 @@
 # PopCube API
 
-This repository contain the GO API for PopCube projet
+*This repository contain the GO API for PopCube projet*
 
-## Aims
+## Aims
 
 Popcube api is a simple api to manage database communication for the chat project PopCube. It contains data models and methods to manage the database. The api in itself provide basics methods we are using to manage data.
 
@@ -24,7 +24,7 @@ The avatar model is used to store Avatar locations and names.
 
 #### Structure
 
-| Row      | Type   | Parameters                 | Database Column | JSON Key  |
+| Row      | Type   | Parameters                 | Database Column | JSON Key  |
 | -------- | ------ | -------------------------- | --------------- | --------- |
 | IDAvatar | uint64 | primary key, autoincrement | idAvatar        | UNDEFINED |
 | Name     | string | not null, unique           | name            | name      |
@@ -44,7 +44,7 @@ ToJSON is a function to convert the Go Avatar struct in JSON object.
 
 Usage: `avatar.ToJSON()`
 
-##### AvatarFromJSON
+##### AvatarFromJSON
 
 AvatarFromJSON is a function who will try to parse a JSON object as Go Avatar struct.
 
