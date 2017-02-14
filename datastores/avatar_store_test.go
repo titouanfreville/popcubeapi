@@ -4,16 +4,16 @@
 package datastores
 
 import (
-	. "github.com/titouanfreville/popcubeapi/models"
 	"testing"
-	u "github.com/titouanfreville/popcubeapi/utils"
 
 	. "github.com/smartystreets/goconvey/convey"
+	. "github.com/titouanfreville/popcubeapi/models"
+	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
 func TestAvatarStore(t *testing.T) {
 	ds := DbStore{}
-	ds.InitConnection("root", "popcube_test", "popcube_dev")
+	ds.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
 	db := *ds.Db
 	asi := NewAvatarStore()
 	Convey("Testing save function", t, func() {

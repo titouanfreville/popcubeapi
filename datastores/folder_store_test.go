@@ -13,7 +13,7 @@ import (
 
 func TestFolderStore(t *testing.T) {
 	ds := DbStore{}
-	ds.InitConnection("root", "popcube_test", "popcube_dev")
+	ds.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
 	db := *ds.Db
 
 	fsi := NewFolderStore()

@@ -32,8 +32,8 @@ type DbStore struct {
 }
 
 // InitConnection init Database connection && database models
-func (ds *DbStore) InitConnection(user string, dbname string, password string) {
-	connectionChain := user + ":" + password + "@(database:3306)/" + dbname + "?charset=utf8&parseTime=True&loc=Local"
+func (ds *DbStore) InitConnection(user string, dbname string, password string, host string, port string) {
+	connectionChain := user + ":" + password + "@(" + host + ":" + port + ")/" + dbname + "?charset=utf8&parseTime=True&loc=Local"
 
 	db, _ := gorm.Open("mysql", connectionChain)
 

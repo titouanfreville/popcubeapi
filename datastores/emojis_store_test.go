@@ -4,15 +4,16 @@
 package datastores
 
 import (
+	"testing"
+
 	. "github.com/smartystreets/goconvey/convey"
 	. "github.com/titouanfreville/popcubeapi/models"
-	"testing"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
 func TestEmojiStore(t *testing.T) {
 	ds := DbStore{}
-	ds.InitConnection("root", "popcube_test", "popcube_dev")
+	ds.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
 	db := *ds.Db
 	esi := NewEmojiStore()
 	Convey("Testing save function", t, func() {
