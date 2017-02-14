@@ -21,11 +21,11 @@ func (msi MemberStoreImpl) Save(member *models.Member, ds DbStore) *u.AppError {
 		transaction.Rollback()
 		return u.NewLocAppError("memberStoreImpl.Save.member.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if !transaction.NewRecord(member) {
+	if !transaction.Debug().NewRecord(member) {
 		transaction.Rollback()
 		return u.NewLocAppError("memberStoreImpl.Save", "save.transaction.create.already_exist", nil, "")
 	}
-	if err := transaction.Create(&member).Error; err != nil {
+	if err := transaction.Debug().Create(&member).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("memberStoreImpl.Save", "save.transaction.create.encounterError :"+err.Error(), nil, "")
 	}
