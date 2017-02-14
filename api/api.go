@@ -1,10 +1,16 @@
 package api
 
 import (
-	"fmt"
+	"net/http"
+
+	"github.com/pressly/chi"
 )
 
-// API function
-func API() {
-	fmt.Println("hello world")
+// NewRouter initialise api serveur.
+func NewRouter() {
+	r := chi.NewRouter()
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("welcome"))
+	})
+	http.ListenAndServe(":3000", r)
 }
