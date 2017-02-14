@@ -6,7 +6,7 @@ import (
 )
 
 func initAPI() {
-	api.NewRouter()
+	api.StartAPI("", "3000")
 }
 
 func initDatastore() {
