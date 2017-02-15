@@ -23,7 +23,7 @@ func (ll Base) initAvatarRoute() {
 // }
 
 func getAllAvatar(w http.ResponseWriter, r *http.Request) {
-	ds := *BaseConst.ds
+	ds := BaseConst.ds
 	AvatarStore := datastores.NewAvatarStore()
 	avatarListPointer := AvatarStore.GetAll(ds)
 	// avatarList := []*models.Avatar{}
@@ -31,7 +31,7 @@ func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 	// 	avatarList = append(avatarList, &avatars)
 	// }
 	// json := models.AvatarListToJSON(avatarList)
-	render.JSON(w, r, avatarListPointer)
+	render.JSON(w, r, *avatarListPointer)
 }
 
 // paginate is a stub, but very possible to implement middleware logic

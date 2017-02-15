@@ -13,7 +13,7 @@ import (
 
 func TestAvatarStore(t *testing.T) {
 	ds := DbStore{}
-	ds.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
+	ds.InitDatabase("root", "popcube_test", "popcube_dev", "database", "3306")
 	db := *ds.Db
 	asi := NewAvatarStore()
 	Convey("Testing save function", t, func() {

@@ -34,33 +34,8 @@ type DbStore struct {
 // InitConnection init Database connection && database models
 func (ds *DbStore) InitConnection(user string, dbname string, password string, host string, port string) {
 	connectionChain := user + ":" + password + "@(" + host + ":" + port + ")/" + dbname + "?charset=utf8&parseTime=True&loc=Local"
-
 	db, _ := gorm.Open("mysql", connectionChain)
-
-	// Create correct tables
-	db.AutoMigrate(&models.Avatar{}, &models.Channel{}, &models.Emoji{}, &models.Folder{},
-		models.Member{}, &models.Message{}, &models.Organisation{}, &models.Parameter{},
-		&models.Role{}, &models.User{})
-
-	// Will not set CreatedAt and LastUpdate on .Create() call
-	db.Callback().Create().Remove("gorm:update_time_stamp")
-	db.Callback().Create().Remove("gorm:save_associations")
-
-	// Will not update LastUpdate on .Save() call
-	db.Callback().Update().Remove("gorm:update_time_stamp")
-	db.Callback().Update().Remove("gorm:save_associations")
-
 	ds.Db = db
-
-	if db.NewRecord(models.Owner) {
-		ds.roleInitSave(models.Owner)
-	}
-	if db.NewRecord(&models.Admin) {
-		ds.roleInitSave(models.Admin)
-	}
-	if db.NewRecord(&models.Standart) {
-		ds.roleInitSave(models.Standart)
-	}
 }
 
 func (ds *DbStore) roleInitSave(role models.Role) *u.AppError {
@@ -80,6 +55,34 @@ func (ds *DbStore) roleInitSave(role models.Role) *u.AppError {
 	}
 	transaction.Commit()
 	return nil
+}
+
+// InitDatabase initialise a connection to the database and the database.
+func (ds *DbStore) InitDatabase(user string, dbname string, password string, host string, port string) {
+	ds.InitConnection(user, dbname, password, host, port)
+	db := ds.Db
+	// Create correct tables
+	db.Debug().AutoMigrate(&models.Avatar{}, &models.Channel{}, &models.Emoji{}, &models.Folder{},
+		models.Member{}, &models.Message{}, &models.Organisation{}, &models.Parameter{},
+		&models.Role{}, &models.User{})
+
+	// Will not set CreatedAt and LastUpdate on .Create() call
+	db.Callback().Create().Remove("gorm:update_time_stamp")
+	db.Callback().Create().Remove("gorm:save_associations")
+
+	// Will not update LastUpdate on .Save() call
+	db.Callback().Update().Remove("gorm:update_time_stamp")
+	db.Callback().Update().Remove("gorm:save_associations")
+
+	if db.NewRecord(models.Owner) {
+		ds.roleInitSave(models.Owner)
+	}
+	if db.NewRecord(&models.Admin) {
+		ds.roleInitSave(models.Admin)
+	}
+	if db.NewRecord(&models.Standart) {
+		ds.roleInitSave(models.Standart)
+	}
 }
 
 // CloseConnection close database connection

@@ -22,7 +22,7 @@ type Organisation struct {
 	IDOrganisation   uint64 `gorm:"primary_key;column:idOrganisation;AUTO_INCREMENT" json:"-"`
 	DockerStack      int    `gorm:"column:dockerStack;not null;unique" json:"docker_stack"`
 	OrganisationName string `gorm:"column:organisationName;not null;unique" json:"display_name"`
-	Description      string `gorm:"column:desciption" json:"description,omitempty"`
+	Description      string `gorm:"column:description" json:"description,omitempty"`
 	Avatar           string `gorm:"column:avatar" json:"avatar,omitempty"`
 	Domain           string `gorm:"column:domain" json:"avatar,omitempty"`
 }
