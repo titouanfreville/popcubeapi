@@ -10,7 +10,7 @@ import (
 
 // Base store Router and dataStore
 type Base struct {
-	ds     *datastores.DbStore
+	ds     datastores.DbStore
 	router *chi.Mux
 }
 
@@ -49,8 +49,9 @@ func (ll Base) basicRoutes() {
 }
 
 // StartAPI initialise the api with provided host and port.
-func (ll Base) StartAPI(hostname string, port string, ds *datastores.DbStore) {
-	ll.ds = ds
+func (ll Base) StartAPI(hostname string, port string) {
+	ll.ds = datastores.DbStore{}
+	ll.ds.InitConnection("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
 	ll.router = newRouter()
 	ll.initMiddleware()
 	ll.basicRoutes()

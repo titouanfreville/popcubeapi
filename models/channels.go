@@ -30,7 +30,7 @@ type Channel struct {
 	Type        string `gorm:"column:type;not null" json:"type"`
 	LastUpdate  int64  `gorm:"column:lastUpdate;not null;" json:"last_update"`
 	Private     bool   `gorm:"column:private;not null" json:"private"`
-	Description string `gorm:"column:desciption" json:"description,omitempty"`
+	Description string `gorm:"column:description" json:"description,omitempty"`
 	Subject     string `gorm:"column:subject" json:"subject,omitempty"`
 	Avatar      string `gorm:"column:avatar" json:"avatar,omitempty"`
 }
