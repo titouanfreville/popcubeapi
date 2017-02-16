@@ -12,10 +12,9 @@ import (
 )
 
 func TestEmojiStore(t *testing.T) {
-	ds := DbStore{}
-	ds.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
-	db := *ds.Db
-	esi := NewEmojiStore()
+	store := NewStore()
+	db := store.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
+	esi := store.Emoji()
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("emojiStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
 		alreadyExistError := u.NewLocAppError("emojiStoreImpl.Save", "save.transaction.create.already_exist", nil, "Emoji Name: Troll Face")
@@ -25,14 +24,14 @@ func TestEmojiStore(t *testing.T) {
 			Link:     "emojis/trollface.svg",
 		}
 		Convey("Given a correct emoji.", func() {
-			appError := esi.Save(&emoji, ds)
+			appError := esi.Save(&emoji, db)
 			Convey("Trying to add it for the first time, should be accepted", func() {
 				So(appError, ShouldBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 			})
 			Convey("Trying to add it a second time should return duplicate error", func() {
-				appError2 := esi.Save(&emoji, ds)
+				appError2 := esi.Save(&emoji, db)
 				So(appError2, ShouldNotBeNil)
 				So(appError2, ShouldResemble, alreadyExistError)
 				So(appError2, ShouldNotResemble, dbError)
@@ -55,13 +54,13 @@ func TestEmojiStore(t *testing.T) {
 			Link:     "emojis/trollface2.svg",
 		}
 
-		appError := esi.Save(&emoji, ds)
+		appError := esi.Save(&emoji, db)
 		So(appError, ShouldBeNil)
 		So(appError, ShouldNotResemble, dbError)
 		So(appError, ShouldNotResemble, alreadyExistError)
 
 		Convey("Provided correct Emoji to modify should not return errors", func() {
-			appError := esi.Update(&emoji, &emojiNew, ds)
+			appError := esi.Update(&emoji, &emojiNew, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dbError)
 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -70,12 +69,12 @@ func TestEmojiStore(t *testing.T) {
 		Convey("Provided wrong Emoji to modify should result in old_emoji error", func() {
 			emoji.Name = ""
 			Convey("Too long or empty Name should return name error", func() {
-				appError := esi.Update(&emoji, &emojiNew, ds)
+				appError := esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiOld.PreSave", "model.emoji.name.app_error", nil, ""))
 				emoji.Name = "thishastobeatoolongname.For this, it need to be more than 64 char lenght .............. So long. Plus it should be alpha numeric. I'll add the test later on."
-				appError = esi.Update(&emoji, &emojiNew, ds)
+				appError = esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiOld.PreSave", "model.emoji.name.app_error", nil, ""))
@@ -85,7 +84,7 @@ func TestEmojiStore(t *testing.T) {
 			emoji.Link = ""
 
 			Convey("Empty link should result in link error", func() {
-				appError = esi.Update(&emoji, &emojiNew, ds)
+				appError = esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiOld.PreSave", "model.emoji.link.app_error", nil, ""))
@@ -95,12 +94,12 @@ func TestEmojiStore(t *testing.T) {
 			emoji.Shortcut = ":this-is-a-tool-long-shortcut:"
 
 			Convey("Too long shortcut or empty shorctcut should return Shortcut error", func() {
-				appError := esi.Update(&emoji, &emojiNew, ds)
+				appError := esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiOld.PreSave", "model.emoji.shortcut.app_error", nil, ""))
 				emoji.Shortcut = ""
-				appError = esi.Update(&emoji, &emojiNew, ds)
+				appError = esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiOld.PreSave", "model.emoji.shortcut.app_error", nil, ""))
@@ -110,12 +109,12 @@ func TestEmojiStore(t *testing.T) {
 		Convey("Provided wrong Emoji to modify should result in newEmoji error", func() {
 			emojiNew.Name = ""
 			Convey("Too long or empty Name should return name error", func() {
-				appError := esi.Update(&emoji, &emojiNew, ds)
+				appError := esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiNew.PreSave", "model.emoji.name.app_error", nil, ""))
 				emojiNew.Name = "thishastobeatoolongname.For this, it need to be more than 64 char lenght .............. So long. Plus it should be alpha numeric. I'll add the test later on."
-				appError = esi.Update(&emoji, &emojiNew, ds)
+				appError = esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiNew.PreSave", "model.emoji.name.app_error", nil, ""))
@@ -125,7 +124,7 @@ func TestEmojiStore(t *testing.T) {
 			emojiNew.Link = ""
 
 			Convey("Empty link should result in link error", func() {
-				appError = esi.Update(&emoji, &emojiNew, ds)
+				appError = esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiNew.PreSave", "model.emoji.link.app_error", nil, ""))
@@ -135,12 +134,12 @@ func TestEmojiStore(t *testing.T) {
 			emojiNew.Shortcut = ":this-is-a-tool-long-shortcut:"
 
 			Convey("Too long shortcut or empty shorctcut should return Shortcut error", func() {
-				appError := esi.Update(&emoji, &emojiNew, ds)
+				appError := esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiNew.PreSave", "model.emoji.shortcut.app_error", nil, ""))
 				emojiNew.Shortcut = ""
-				appError = esi.Update(&emoji, &emojiNew, ds)
+				appError = esi.Update(&emoji, &emojiNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Update.emojiNew.PreSave", "model.emoji.shortcut.app_error", nil, ""))
@@ -176,11 +175,11 @@ func TestEmojiStore(t *testing.T) {
 			Shortcut: ":facepalm:",
 			Link:     "emojis/facepalm.svg",
 		}
-		esi.Save(&emoji0, ds)
-		esi.Save(&emoji1, ds)
-		esi.Update(&emoji1, &emoji1New, ds)
-		esi.Save(&emoji2, ds)
-		esi.Save(&emoji3, ds)
+		esi.Save(&emoji0, db)
+		esi.Save(&emoji1, db)
+		esi.Update(&emoji1, &emoji1New, db)
+		esi.Save(&emoji2, db)
+		esi.Save(&emoji3, db)
 		// Have to be after save so ID are up to date :O
 		emojiList := []Emoji{
 			emoji0,
@@ -190,66 +189,66 @@ func TestEmojiStore(t *testing.T) {
 		}
 
 		Convey("We have to be able to find all emojis in the db", func() {
-			emojis := esi.GetAll(ds)
+			emojis := esi.GetAll(db)
 			So(emojis, ShouldNotResemble, &[]Emoji{})
 			So(emojis, ShouldResemble, &emojiList)
 		})
 
 		Convey("We have to be able to find an emoji from is name", func() {
-			emoji := esi.GetByName(emoji0.Name, ds)
+			emoji := esi.GetByName(emoji0.Name, db)
 			So(emoji, ShouldNotResemble, &Emoji{})
 			So(emoji, ShouldResemble, &emoji0)
-			emoji = esi.GetByName(emoji2.Name, ds)
+			emoji = esi.GetByName(emoji2.Name, db)
 			So(emoji, ShouldNotResemble, &Emoji{})
 			So(emoji, ShouldResemble, &emoji2)
-			emoji = esi.GetByName(emoji3.Name, ds)
+			emoji = esi.GetByName(emoji3.Name, db)
 			So(emoji, ShouldNotResemble, &Emoji{})
 			So(emoji, ShouldResemble, &emoji3)
 			Convey("Should also work from updated value", func() {
-				emoji = esi.GetByName(emoji1.Name, ds)
+				emoji = esi.GetByName(emoji1.Name, db)
 				So(emoji, ShouldNotResemble, &Emoji{})
 				So(emoji, ShouldResemble, &emoji1)
 			})
 		})
 
 		Convey("We have to be able to find an emoji from is link", func() {
-			emoji := esi.GetByLink(emoji0.Link, ds)
+			emoji := esi.GetByLink(emoji0.Link, db)
 			So(emoji, ShouldNotResemble, &Emoji{})
 			So(emoji, ShouldResemble, &emoji0)
-			emoji = esi.GetByLink(emoji2.Link, ds)
+			emoji = esi.GetByLink(emoji2.Link, db)
 			So(emoji, ShouldNotResemble, &Emoji{})
 			So(emoji, ShouldResemble, &emoji2)
-			emoji = esi.GetByLink(emoji3.Link, ds)
+			emoji = esi.GetByLink(emoji3.Link, db)
 			So(emoji, ShouldNotResemble, &Emoji{})
 			So(emoji, ShouldResemble, &emoji3)
 			Convey("Should also work from updated value", func() {
-				emoji = esi.GetByLink(emoji1.Link, ds)
+				emoji = esi.GetByLink(emoji1.Link, db)
 				So(emoji, ShouldNotResemble, &Emoji{})
 				So(emoji, ShouldResemble, &emoji1)
 			})
 		})
 
 		Convey("We have to be able to find an emoji from its shortcut", func() {
-			emoji := esi.GetByShortcut(emoji0.Shortcut, ds)
+			emoji := esi.GetByShortcut(emoji0.Shortcut, db)
 			So(emoji, ShouldNotResemble, &Emoji{})
 			So(emoji, ShouldResemble, &emoji0)
-			emoji = esi.GetByShortcut(emoji2.Shortcut, ds)
+			emoji = esi.GetByShortcut(emoji2.Shortcut, db)
 			So(emoji, ShouldNotResemble, &Emoji{})
 			So(emoji, ShouldResemble, &emoji2)
-			emoji = esi.GetByShortcut(emoji3.Shortcut, ds)
+			emoji = esi.GetByShortcut(emoji3.Shortcut, db)
 			So(emoji, ShouldNotResemble, &Emoji{})
 			So(emoji, ShouldResemble, &emoji3)
 			Convey("Should also work from updated value", func() {
-				emoji = esi.GetByShortcut(emoji1.Shortcut, ds)
+				emoji = esi.GetByShortcut(emoji1.Shortcut, db)
 				So(emoji, ShouldNotResemble, &Emoji{})
 				So(emoji, ShouldResemble, &emoji1)
 			})
 		})
 
 		Convey("Searching for non existent emoji should return empty", func() {
-			emoji := esi.GetByLink("The Mask", ds)
+			emoji := esi.GetByLink("The Mask", db)
 			So(emoji, ShouldResemble, &Emoji{})
-			emoji = esi.GetByName("Fantôme", ds)
+			emoji = esi.GetByName("Fantôme", db)
 			So(emoji, ShouldResemble, &Emoji{})
 		})
 
@@ -259,7 +258,7 @@ func TestEmojiStore(t *testing.T) {
 		db.Delete(&emoji3)
 
 		Convey("Searching all in empty table should return empty", func() {
-			emojis := esi.GetAll(ds)
+			emojis := esi.GetAll(db)
 			So(emojis, ShouldResemble, &[]Emoji{})
 		})
 	})
@@ -286,10 +285,10 @@ func TestEmojiStore(t *testing.T) {
 			Shortcut: ":facepalm:",
 			Link:     "emojis/facepalm.svg",
 		}
-		esi.Save(&emoji0, ds)
-		esi.Save(&emoji1, ds)
-		esi.Save(&emoji2, ds)
-		esi.Save(&emoji3, ds)
+		esi.Save(&emoji0, db)
+		esi.Save(&emoji1, db)
+		esi.Save(&emoji2, db)
+		esi.Save(&emoji3, db)
 		emoji3Old := emoji3
 		emojiList1 := []Emoji{
 			emoji0,
@@ -299,37 +298,37 @@ func TestEmojiStore(t *testing.T) {
 		}
 
 		Convey("Deleting a known emoji should work", func() {
-			appError := esi.Delete(&emoji2, ds)
+			appError := esi.Delete(&emoji2, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dberror)
-			So(esi.GetByName("God", ds), ShouldResemble, &Emoji{})
+			So(esi.GetByName("God", db), ShouldResemble, &Emoji{})
 		})
 
 		Convey("Trying to delete from non conform emoji should return specific emoji error and should not delete emojis.", func() {
 			emoji3.Name = ""
 			Convey("Too long or empty Name should return name error", func() {
-				appError := esi.Delete(&emoji3, ds)
+				appError := esi.Delete(&emoji3, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dberror)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Delete.emoji.PreSave", "model.emoji.name.app_error", nil, ""))
-				So(esi.GetAll(ds), ShouldResemble, &emojiList1)
+				So(esi.GetAll(db), ShouldResemble, &emojiList1)
 				emoji3.Name = "thishastobeatoolongname.For this, it need to be more than 64 char lenght .............. So long. Plus it should be alpha numeric. I'll add the test later on."
-				appError = esi.Delete(&emoji3, ds)
+				appError = esi.Delete(&emoji3, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dberror)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Delete.emoji.PreSave", "model.emoji.name.app_error", nil, ""))
-				So(esi.GetAll(ds), ShouldResemble, &emojiList1)
+				So(esi.GetAll(db), ShouldResemble, &emojiList1)
 			})
 
 			emoji3.Name = "nOOb"
 			emoji3.Link = ""
 
 			Convey("Empty link should result in link error", func() {
-				appError := esi.Delete(&emoji3, ds)
+				appError := esi.Delete(&emoji3, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dberror)
 				So(appError, ShouldResemble, u.NewLocAppError("emojiStoreImpl.Delete.emoji.PreSave", "model.emoji.link.app_error", nil, ""))
-				So(esi.GetAll(ds), ShouldResemble, &emojiList1)
+				So(esi.GetAll(db), ShouldResemble, &emojiList1)
 			})
 		})
 

@@ -6,14 +6,12 @@ import (
 )
 
 func initAPI() {
-	apiBase := api.Base{}
-	apiBase.StartAPI("", "3000")
+	api.StartAPI("", "3000")
 }
 
 func initDatastore() {
-	ds := datastores.DbStore{}
-	ds.InitDatabase("root", "popcube_test", "popcube_dev", "0.0.0.0", "")
-	// return ds
+	datastores.NewStore().InitDatabase("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
+	datastores.NewStore().InitConnection("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
 }
 
 func main() {

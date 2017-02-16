@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -8,14 +9,14 @@ import (
 // ParameterStoreImpl implement ParameterStore interface
 type ParameterStoreImpl struct{}
 
-// NewParameterStore Generate the struct for parameter store
-func NewParameterStore() ParameterStore {
+// Parameter Generate the struct for parameter store
+func (s StoreImpl) Parameter() ParameterStore {
 	return &ParameterStoreImpl{}
 }
 
 // Save Use to save parameter in BB
-func (psi ParameterStoreImpl) Save(parameter *models.Parameter, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (psi ParameterStoreImpl) Save(parameter *models.Parameter, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	if appError := parameter.IsValid(); appError != nil {
 		transaction.Rollback()
@@ -34,8 +35,8 @@ func (psi ParameterStoreImpl) Save(parameter *models.Parameter, ds DbStore) *u.A
 }
 
 // Update Used to update parameter in DB
-func (psi ParameterStoreImpl) Update(parameter *models.Parameter, newParameter *models.Parameter, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (psi ParameterStoreImpl) Update(parameter *models.Parameter, newParameter *models.Parameter, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	if appError := parameter.IsValid(); appError != nil {
 		transaction.Rollback()
@@ -54,9 +55,8 @@ func (psi ParameterStoreImpl) Update(parameter *models.Parameter, newParameter *
 }
 
 // Get Used to get parameter from DB
-func (psi ParameterStoreImpl) Get(ds DbStore) *models.Parameter {
-	db := *ds.Db
+func (psi ParameterStoreImpl) Get(db *gorm.DB) models.Parameter {
 	parameter := models.Parameter{}
 	db.First(&parameter)
-	return &parameter
+	return parameter
 }

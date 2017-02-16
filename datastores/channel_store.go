@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -8,14 +9,13 @@ import (
 // ChannelStoreImpl Used to implement ChannelStore interface
 type ChannelStoreImpl struct{}
 
-// NewChannelStore Generate the struct for channel store
-func NewChannelStore() ChannelStore {
+// Channel Generate the struct for channel store
+func (s StoreImpl) Channel() ChannelStore {
 	return &ChannelStoreImpl{}
 }
 
 // Save Use to save channel in BB
-func (csi ChannelStoreImpl) Save(channel *models.Channel, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (csi ChannelStoreImpl) Save(channel *models.Channel, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	channel.PreSave()
 	if appError := channel.IsValid(false); appError != nil {
@@ -35,8 +35,7 @@ func (csi ChannelStoreImpl) Save(channel *models.Channel, ds DbStore) *u.AppErro
 }
 
 // Update Used to update channel in DB
-func (csi ChannelStoreImpl) Update(channel *models.Channel, newChannel *models.Channel, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (csi ChannelStoreImpl) Update(channel *models.Channel, newChannel *models.Channel, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	newChannel.PreUpdate()
 	newChannel.WebID = channel.WebID
@@ -65,48 +64,43 @@ func (csi ChannelStoreImpl) Update(channel *models.Channel, newChannel *models.C
 }
 
 // GetAll Used to get channel from DB
-func (csi ChannelStoreImpl) GetAll(ds DbStore) *[]models.Channel {
-	db := *ds.Db
+func (csi ChannelStoreImpl) GetAll(db *gorm.DB) []models.Channel {
 	channels := []models.Channel{}
 	db.Find(&channels)
-	return &channels
+	return channels
 }
 
 // GetByName Used to get channel from DB
-func (csi ChannelStoreImpl) GetByName(channelName string, ds DbStore) *models.Channel {
-	db := *ds.Db
+func (csi ChannelStoreImpl) GetByName(channelName string, db *gorm.DB) models.Channel {
+
 	channel := models.Channel{}
 	db.Where("channelName = ?", channelName).First(&channel)
-	return &channel
+	return channel
 }
 
 // GetByType allow to find channels by types.
-func (csi ChannelStoreImpl) GetByType(channelType string, ds DbStore) *[]models.Channel {
-	db := *ds.Db
+func (csi ChannelStoreImpl) GetByType(channelType string, db *gorm.DB) []models.Channel {
 	channels := []models.Channel{}
 	db.Where("type = ?", channelType).Find(&channels)
-	return &channels
+	return channels
 }
 
 // GetPublic allow to find publics channels.
-func (csi ChannelStoreImpl) GetPublic(ds DbStore) *[]models.Channel {
-	db := *ds.Db
+func (csi ChannelStoreImpl) GetPublic(db *gorm.DB) []models.Channel {
 	channels := []models.Channel{}
 	db.Where("private = ?", false).Find(&channels)
-	return &channels
+	return channels
 }
 
 // GetPrivate allow to find publics channels.
-func (csi ChannelStoreImpl) GetPrivate(ds DbStore) *[]models.Channel {
-	db := *ds.Db
+func (csi ChannelStoreImpl) GetPrivate(db *gorm.DB) []models.Channel {
 	channels := []models.Channel{}
 	db.Where("private = ?", true).Find(&channels)
-	return &channels
+	return channels
 }
 
 // Delete Used to get channel from DB
-func (csi ChannelStoreImpl) Delete(channel *models.Channel, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (csi ChannelStoreImpl) Delete(channel *models.Channel, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := channel.IsValid(true); appError != nil {
 		transaction.Rollback()

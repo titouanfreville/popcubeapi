@@ -12,15 +12,14 @@ import (
 )
 
 func TestFolderStore(t *testing.T) {
-	ds := DbStore{}
-	ds.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
-	db := *ds.Db
+	store := NewStore()
+	db := store.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
 
-	fsi := NewFolderStore()
-	usi := NewUserStore()
-	rsi := NewRoleStore()
-	csi := NewChannelStore()
-	msi := NewMessageStore()
+	fsi := store.Folder()
+	usi := store.User()
+	rsi := store.Role()
+	csi := store.Channel()
+	msi := store.Message()
 
 	standartRole := Role{
 		RoleName:      "teststandartazd",
@@ -31,7 +30,7 @@ func TestFolderStore(t *testing.T) {
 		CanManage:     false,
 		CanManageUser: false,
 	}
-	rsi.Save(&standartRole, ds)
+	rsi.Save(&standartRole, db)
 
 	userTest := User{
 		Username:  "TesTazd",
@@ -42,7 +41,7 @@ func TestFolderStore(t *testing.T) {
 		LastName:  "L",
 		IDRole:    standartRole.IDRole,
 	}
-	usi.Save(&userTest, ds)
+	usi.Save(&userTest, db)
 
 	channelTest := Channel{
 		ChannelName: "electrasomega",
@@ -52,14 +51,14 @@ func TestFolderStore(t *testing.T) {
 		Subject:     "Sujet",
 		Avatar:      "jesuiscool.svg",
 	}
-	csi.Save(&channelTest, ds)
+	csi.Save(&channelTest, db)
 
 	messageTest := Message{
 		Content:   "Folder test",
 		IDUser:    userTest.IDUser,
 		IDChannel: channelTest.IDChannel,
 	}
-	msi.Save(&messageTest, ds)
+	msi.Save(&messageTest, db)
 
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("folderStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
@@ -72,14 +71,14 @@ func TestFolderStore(t *testing.T) {
 		}
 
 		Convey("Given a correct folder.", func() {
-			appError := fsi.Save(&folder, ds)
+			appError := fsi.Save(&folder, db)
 			Convey("Trying to add it for the first time, should be accepted", func() {
 				So(appError, ShouldBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 			})
 			Convey("Trying to add it a second time should return duplicate error", func() {
-				appError2 := fsi.Save(&folder, ds)
+				appError2 := fsi.Save(&folder, db)
 				So(appError2, ShouldNotBeNil)
 				So(appError2, ShouldResemble, alreadyExistError)
 				So(appError2, ShouldNotResemble, dbError)
@@ -111,13 +110,13 @@ func TestFolderStore(t *testing.T) {
 	// 		IDRole:      adminRole.IDRole,
 	// 	}
 
-	// 	appError := fsi.Save(&folder, ds)
+	// 	appError := fsi.Save(&folder, db)
 	// 	So(appError, ShouldBeNil)
 	// 	So(appError, ShouldNotResemble, dbError)
 	// 	So(appError, ShouldNotResemble, alreadyExistError)
 
 	// 	Convey("Provided correct Folder to modify should not return errors", func() {
-	// 		appError := fsi.Update(&folder, &folderNew, ds)
+	// 		appError := fsi.Update(&folder, &folderNew, db)
 	// 		folderShouldResemble := folderNew
 	// 		folderShouldResemble.WebID = folder.WebID
 	// 		folderShouldResemble.IDFolder = folder.IDFolder
@@ -131,7 +130,7 @@ func TestFolderStore(t *testing.T) {
 	// 	Convey("Provided wrong old Folder to modify should result in old_folder error", func() {
 	// 		folder.WebID = "TesT"
 	// 		Convey("Incorrect ID folder should return a folder invalid id", func() {
-	// 			appError := fsi.Update(&folder, &folderNew, ds)
+	// 			appError := fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -140,37 +139,37 @@ func TestFolderStore(t *testing.T) {
 	// 		folder.WebID = NewID()
 	// 		Convey("Incorrect foldername folder should return error Invalid foldername", func() {
 	// 			folder.Foldername = "CeNomDevraitJelespereEtreBeaucoupTropLongPourLatrailleMaximaleDemandeParcequelaJeSuiunPoilFeneantEtDeboussouleSansnuldouteilnyavaitpersone"
-	// 			appError := fsi.Update(&folder, &folderNew, ds)
+	// 			appError := fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderOld.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folder.WebID))
 	// 			folder.Foldername = ""
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderOld.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folder.WebID))
 	// 			folder.Foldername = "xD/"
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderOld.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folder.WebID))
 	// 			folder.Foldername = "xD\\"
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderOld.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folder.WebID))
 	// 			folder.Foldername = "xD*"
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderOld.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folder.WebID))
 	// 			folder.Foldername = "xD{"
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -179,7 +178,7 @@ func TestFolderStore(t *testing.T) {
 
 	// 		Convey("Password can]t be empty", func() {
 	// 			folder.Password = ""
-	// 			appError := fsi.Update(&folder, &folderNew, ds)
+	// 			appError := fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -190,37 +189,37 @@ func TestFolderStore(t *testing.T) {
 	// 	Convey("Provided wrong new Folder to modify should result in old_folder error", func() {
 	// 		Convey("Incorrect foldername folder should return error Invalid foldername", func() {
 	// 			folderNew.Foldername = "CeNomDevraitJelespereEtreBeaucoupTropLongPourLatrailleMaximaleDemandeParcequelaJeSuiunPoilFeneantEtDeboussouleSansnuldouteilnyavaitpersone"
-	// 			appError := fsi.Update(&folder, &folderNew, ds)
+	// 			appError := fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderNew.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folderNew.WebID))
 	// 			folderNew.Foldername = ""
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderNew.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folderNew.WebID))
 	// 			folderNew.Foldername = "xD/"
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderNew.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folderNew.WebID))
 	// 			folderNew.Foldername = "xD\\"
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderNew.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folderNew.WebID))
 	// 			folderNew.Foldername = "xD*"
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Update.folderNew.PreSave", "model.folder.is_valid.Foldername.app_error", nil, "folder_webID="+folderNew.WebID))
 	// 			folderNew.Foldername = "xD{"
-	// 			appError = fsi.Update(&folder, &folderNew, ds)
+	// 			appError = fsi.Update(&folder, &folderNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -294,12 +293,12 @@ func TestFolderStore(t *testing.T) {
 	// 		IDRole:      guestRole.IDRole,
 	// 	}
 
-	// 	fsi.Save(&folder0, ds)
-	// 	fsi.Save(&folder1, ds)
-	// 	fsi.Update(&folder1, &folder1New, ds)
-	// 	fsi.Save(&folder2, ds)
-	// 	fsi.Save(&folder3, ds)
-	// 	fsi.Save(&folder4, ds)
+	// 	fsi.Save(&folder0, db)
+	// 	fsi.Save(&folder1, db)
+	// 	fsi.Update(&folder1, &folder1New, db)
+	// 	fsi.Save(&folder2, db)
+	// 	fsi.Save(&folder3, db)
+	// 	fsi.Save(&folder4, db)
 
 	// 	// Have to be after save so ID are up to date :O
 	// 	folderList := []Folder{
@@ -315,57 +314,57 @@ func TestFolderStore(t *testing.T) {
 	// 	emptyList := []Folder{}
 
 	// 	Convey("We have to be able to find all folders in the db", func() {
-	// 		folders := fsi.GetAll(ds)
+	// 		folders := fsi.GetAll(db)
 	// 		So(folders, ShouldNotResemble, &emptyList)
 	// 		So(folders, ShouldResemble, &folderList)
 	// 	})
 
 	// 	Convey("We have to be able to find a folder from is name", func() {
-	// 		folder := fsi.GetByFolderName(folder0.Foldername, ds)
+	// 		folder := fsi.GetByFolderName(folder0.Foldername, db)
 	// 		So(folder, ShouldNotResemble, &Folder{})
 	// 		So(folder, ShouldResemble, &folder0)
-	// 		folder = fsi.GetByFolderName(folder2.Foldername, ds)
+	// 		folder = fsi.GetByFolderName(folder2.Foldername, db)
 	// 		So(folder, ShouldNotResemble, &Folder{})
 	// 		So(folder, ShouldResemble, &folder2)
-	// 		folder = fsi.GetByFolderName(folder3.Foldername, ds)
+	// 		folder = fsi.GetByFolderName(folder3.Foldername, db)
 	// 		So(folder, ShouldNotResemble, &Folder{})
 	// 		So(folder, ShouldResemble, &folder3)
-	// 		folder = fsi.GetByFolderName(folder4.Foldername, ds)
+	// 		folder = fsi.GetByFolderName(folder4.Foldername, db)
 	// 		So(folder, ShouldNotResemble, &Folder{})
 	// 		So(folder, ShouldResemble, &folder4)
 	// 		Convey("Should also work from updated value", func() {
-	// 			folder = fsi.GetByFolderName(folder1New.Foldername, ds)
+	// 			folder = fsi.GetByFolderName(folder1New.Foldername, db)
 	// 			So(folder, ShouldNotResemble, &Folder{})
 	// 			So(folder, ShouldResemble, &folder1)
 	// 		})
 	// 	})
 
 	// 	Convey("We have to be able to find a folder from his email", func() {
-	// 		folder := fsi.GetByEmail(folder0.Email, ds)
+	// 		folder := fsi.GetByEmail(folder0.Email, db)
 	// 		So(folder, ShouldNotResemble, &Folder{})
 	// 		So(folder, ShouldResemble, &folder0)
-	// 		folder = fsi.GetByEmail(folder2.Email, ds)
+	// 		folder = fsi.GetByEmail(folder2.Email, db)
 	// 		So(folder, ShouldNotResemble, &Folder{})
 	// 		So(folder, ShouldResemble, &folder2)
-	// 		folder = fsi.GetByEmail(folder3.Email, ds)
+	// 		folder = fsi.GetByEmail(folder3.Email, db)
 	// 		So(folder, ShouldResemble, &folder3)
-	// 		folder = fsi.GetByEmail(folder4.Email, ds)
+	// 		folder = fsi.GetByEmail(folder4.Email, db)
 	// 		So(folder, ShouldNotResemble, &Folder{})
 	// 		So(folder, ShouldResemble, &folder4)
 	// 	})
 
 	// 	Convey("We have to be able to find an folder from his Role", func() {
-	// 		folders := fsi.GetByRole(&adminRole, ds)
+	// 		folders := fsi.GetByRole(&adminRole, db)
 	// 		So(folders, ShouldNotResemble, &Folder{})
 	// 		So(folders, ShouldResemble, &admins)
-	// 		folders = fsi.GetByRole(&guestRole, ds)
+	// 		folders = fsi.GetByRole(&guestRole, db)
 	// 		So(folders, ShouldNotResemble, &Folder{})
 	// 		So(folders, ShouldResemble, &guests)
 
 	// 	})
 
 	// 	Convey("Searching for non existent folder should return empty", func() {
-	// 		folder := fsi.GetByFolderName("fantome", ds)
+	// 		folder := fsi.GetByFolderName("fantome", db)
 	// 		So(folder, ShouldResemble, &Folder{})
 	// 	})
 
@@ -376,7 +375,7 @@ func TestFolderStore(t *testing.T) {
 	// 	db.Delete(&folder3)
 
 	// 	Convey("Searching all in empty table should return empty", func() {
-	// 		folders := fsi.GetAll(ds)
+	// 		folders := fsi.GetAll(db)
 	// 		So(folders, ShouldResemble, &[]Folder{})
 	// 	})
 	// })
@@ -424,10 +423,10 @@ func TestFolderStore(t *testing.T) {
 	// 		IDRole:      standartRole.IDRole,
 	// 	}
 
-	// 	fsi.Save(&folder0, ds)
-	// 	fsi.Save(&folder1, ds)
-	// 	fsi.Save(&folder2, ds)
-	// 	fsi.Save(&folder3, ds)
+	// 	fsi.Save(&folder0, db)
+	// 	fsi.Save(&folder1, db)
+	// 	fsi.Save(&folder2, db)
+	// 	fsi.Save(&folder3, db)
 
 	// 	// Have to be after save so ID are up to date :O
 	// 	// folder3Old := folder3
@@ -439,32 +438,32 @@ func TestFolderStore(t *testing.T) {
 	// 	// }
 
 	// 	Convey("Deleting a known folder should work", func() {
-	// 		appError := fsi.Delete(&folder2, ds)
+	// 		appError := fsi.Delete(&folder2, db)
 	// 		So(appError, ShouldBeNil)
 	// 		So(appError, ShouldNotResemble, dberror)
-	// 		So(fsi.GetByFolderName("moris", ds), ShouldResemble, &Folder{})
+	// 		So(fsi.GetByFolderName("moris", db), ShouldResemble, &Folder{})
 	// 	})
 
 	// 	// Convey("Trying to delete from non conform folder should return specific folder error and should not delete folders.", func() {
 	// 	// 	folder3.FolderName = "Const"
 	// 	// 	Convey("Too long or empty Name should return name error", func() {
-	// 	// 		appError := fsi.Delete(&folder3, ds)
+	// 	// 		appError := fsi.Delete(&folder3, db)
 	// 	// 		So(appError, ShouldNotBeNil)
 	// 	// 		So(appError, ShouldNotResemble, dberror)
 	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Delete.folder.PreSave", "model.folder.foldername.app_error", nil, ""))
-	// 	// 		So(fsi.GetAll(ds), ShouldResemble, &folderList1)
+	// 	// 		So(fsi.GetAll(db), ShouldResemble, &folderList1)
 	// 	// 		folder3.FolderName = "+alpha"
-	// 	// 		appError = fsi.Delete(&folder3, ds)
+	// 	// 		appError = fsi.Delete(&folder3, db)
 	// 	// 		So(appError, ShouldNotBeNil)
 	// 	// 		So(appError, ShouldNotResemble, dberror)
 	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Delete.folder.PreSave", "model.folder.foldername.app_error", nil, ""))
-	// 	// 		So(fsi.GetAll(ds), ShouldResemble, &folderList1)
+	// 	// 		So(fsi.GetAll(db), ShouldResemble, &folderList1)
 	// 	// 		folder3.FolderName = "alpha-numerique"
-	// 	// 		appError = fsi.Delete(&folder3, ds)standartRole
+	// 	// 		appError = fsi.Delete(&folder3, db)standartRole
 	// 	// 		So(appError, ShouldNotBeNil)
 	// 	// 		So(appError, ShouldNotResemble, dberror)
 	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("folderStoreImpl.Delete.folder.PreSave", "model.folder.foldername.app_error", nil, ""))
-	// 	// 		So(fsi.GetAll(ds), ShouldResemble, &folderList1)
+	// 	// 		So(fsi.GetAll(db), ShouldResemble, &folderList1)
 	// 	// 	})
 	// 	// })
 

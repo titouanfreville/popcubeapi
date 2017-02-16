@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/pressly/chi"
-	"github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
+	renderPackage "github.com/unrolled/render"
 )
 
-func (ll Base) initAvatarRoute() {
-	ll.router.Route("/avatar", func(r chi.Router) {
+func initAvatarRoute(router chi.Router) {
+	router.Route("/avatar", func(r chi.Router) {
 		r.With(paginate).Get("/", getAllAvatar)
 	})
 }
@@ -24,14 +24,18 @@ func (ll Base) initAvatarRoute() {
 // }
 
 func getAllAvatar(w http.ResponseWriter, r *http.Request) {
-	ds := BaseConst.ds
-	AvatarStore := datastores.NewAvatarStore()
-	result := AvatarStore.GetAll(ds)
-	avatarList := []models.Avatar{}
-	for _, avatars := range *result {
-		avatarList = append(avatarList, avatars)
+	store := datastores.NewStore()
+	render := renderPackage.New()
+	db := store.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
+	if err := db.DB().Ping(); err == nil {
+		result := store.Avatar().GetAll(db)
+		avatarList := []models.Avatar{}
+		for _, avatars := range *result {
+			avatarList = append(avatarList, avatars)
+		}
+		render.JSON(w, 200, avatarList)
 	}
-	render.JSON(w, r, avatarList)
+	render.JSON(w, 500, "Connection failure : DATABASE")
 }
 
 // paginate is a stub, but very possible to implement middleware logic

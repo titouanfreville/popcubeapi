@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -8,14 +9,13 @@ import (
 // AvatarStoreImpl Used to implement AvatarStore interface
 type AvatarStoreImpl struct{}
 
-// NewAvatarStore Generate the struct for avatar store
-func NewAvatarStore() AvatarStore {
-	return &AvatarStoreImpl{}
+// Avatar Generate the struct for avatar store
+func (s StoreImpl) Avatar() AvatarStore {
+	return AvatarStoreImpl{}
 }
 
-// Save Use to save avatar in BB
-func (asi AvatarStoreImpl) Save(avatar *models.Avatar, ds DbStore) *u.AppError {
-	db := *ds.Db
+// Save Use to save avatar in DB
+func (asi AvatarStoreImpl) Save(avatar *models.Avatar, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := avatar.IsValid(); appError != nil {
 		transaction.Rollback()
@@ -34,8 +34,7 @@ func (asi AvatarStoreImpl) Save(avatar *models.Avatar, ds DbStore) *u.AppError {
 }
 
 // Update Used to update avatar in DB
-func (asi AvatarStoreImpl) Update(avatar *models.Avatar, newAvatar *models.Avatar, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (asi AvatarStoreImpl) Update(avatar *models.Avatar, newAvatar *models.Avatar, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := avatar.IsValid(); appError != nil {
 		transaction.Rollback()
@@ -54,32 +53,28 @@ func (asi AvatarStoreImpl) Update(avatar *models.Avatar, newAvatar *models.Avata
 }
 
 // GetAll Used to get avatar from DB
-func (asi AvatarStoreImpl) GetAll(ds DbStore) *[]models.Avatar {
-	db := *ds.Db
+func (asi AvatarStoreImpl) GetAll(db *gorm.DB) *[]models.Avatar {
 	avatars := []models.Avatar{}
-	db.Find(&avatars)
+	db.Debug().Find(&avatars)
 	return &avatars
 }
 
 // GetByName Used to get avatar from DB
-func (asi AvatarStoreImpl) GetByName(avatarName string, ds DbStore) *models.Avatar {
-	db := *ds.Db
+func (asi AvatarStoreImpl) GetByName(avatarName string, db *gorm.DB) models.Avatar {
 	avatar := models.Avatar{}
 	db.Where("name = ?", avatarName).First(&avatar)
-	return &avatar
+	return avatar
 }
 
 // GetByLink Used to get avatar from DB
-func (asi AvatarStoreImpl) GetByLink(avatarLink string, ds DbStore) *models.Avatar {
-	db := *ds.Db
+func (asi AvatarStoreImpl) GetByLink(avatarLink string, db *gorm.DB) models.Avatar {
 	avatar := models.Avatar{}
 	db.Where("link = ?", avatarLink).First(&avatar)
-	return &avatar
+	return avatar
 }
 
 // Delete Used to get avatar from DB
-func (asi AvatarStoreImpl) Delete(avatar *models.Avatar, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (asi AvatarStoreImpl) Delete(avatar *models.Avatar, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := avatar.IsValid(); appError != nil {
 		transaction.Rollback()

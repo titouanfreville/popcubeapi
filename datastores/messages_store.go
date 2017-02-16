@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -8,14 +9,14 @@ import (
 // MessageStoreImpl Used to implement MessageStore interface
 type MessageStoreImpl struct{}
 
-// NewMessageStore Generate the struct for message store
-func NewMessageStore() MessageStore {
+// Message Generate the struct for message store
+func (s StoreImpl) Message() MessageStore {
 	return &MessageStoreImpl{}
 }
 
 // Save Use to save message in BB
-func (msi MessageStoreImpl) Save(message *models.Message, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (msi MessageStoreImpl) Save(message *models.Message, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	message.PreSave()
 	if appError := message.IsValid(); appError != nil {
@@ -35,8 +36,8 @@ func (msi MessageStoreImpl) Save(message *models.Message, ds DbStore) *u.AppErro
 }
 
 // Update Used to update message in DB
-func (msi MessageStoreImpl) Update(message *models.Message, newMessage *models.Message, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (msi MessageStoreImpl) Update(message *models.Message, newMessage *models.Message, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	newMessage.PreSave()
 	if appError := message.IsValid(); appError != nil {
@@ -56,48 +57,43 @@ func (msi MessageStoreImpl) Update(message *models.Message, newMessage *models.M
 }
 
 // GetAll Used to get message from DB
-func (msi MessageStoreImpl) GetAll(ds DbStore) *[]models.Message {
-	db := *ds.Db
+func (msi MessageStoreImpl) GetAll(db *gorm.DB) []models.Message {
 	messages := []models.Message{}
 	db.Find(&messages)
-	return &messages
+	return messages
 }
 
 // GetByDate Used to get message from DB by specific date
-func (msi MessageStoreImpl) GetByDate(messageDate int, ds DbStore) *[]models.Message {
-	db := *ds.Db
+func (msi MessageStoreImpl) GetByDate(messageDate int, db *gorm.DB) []models.Message {
 	messages := []models.Message{}
 	db.Where("date = ?", messageDate).Find(&messages)
-	return &messages
+	return messages
 }
 
 // GetOrderedByDate get all messages ordered by date
-func (msi MessageStoreImpl) GetOrderedByDate(messageDate int, ds DbStore) *[]models.Message {
-	db := *ds.Db
+func (msi MessageStoreImpl) GetOrderedByDate(messageDate int, db *gorm.DB) []models.Message {
 	messages := []models.Message{}
 	db.Order("lastUpdate, messageName, email").Find(&messages)
-	return &messages
+	return messages
 }
 
 // GetByCreator get message from user
-func (msi MessageStoreImpl) GetByCreator(creator *models.User, ds DbStore) *[]models.Message {
-	db := *ds.Db
+func (msi MessageStoreImpl) GetByCreator(creator *models.User, db *gorm.DB) []models.Message {
 	messages := []models.Message{}
 	db.Table("messages").Select("*").Joins("natural join users").Where("users.idUser = ?", creator.IDUser).Find(&messages)
-	return &messages
+	return messages
 }
 
 // GetByChannel get message from channel
-func (msi MessageStoreImpl) GetByChannel(channel *models.Channel, ds DbStore) *[]models.Message {
-	db := *ds.Db
+func (msi MessageStoreImpl) GetByChannel(channel *models.Channel, db *gorm.DB) []models.Message {
 	messages := []models.Message{}
 	db.Table("messages").Select("*").Joins("natural join channels").Where("channels.idChannel = ?", channel.IDChannel).Find(&messages)
-	return &messages
+	return messages
 }
 
 // Delete Used to get message from DB
-func (msi MessageStoreImpl) Delete(message *models.Message, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (msi MessageStoreImpl) Delete(message *models.Message, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	if appError := message.IsValid(); appError != nil {
 		transaction.Rollback()

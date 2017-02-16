@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -8,14 +9,13 @@ import (
 // MemberStoreImpl Used to implement MemberStore interface
 type MemberStoreImpl struct{}
 
-// NewMemberStore Generate the struct for member store
-func NewMemberStore() MemberStore {
-	return &MemberStoreImpl{}
+// Member Generate the struct for member store
+func (s StoreImpl) Member() MemberStore {
+	return MemberStoreImpl{}
 }
 
 // Save Use to save member in BB
-func (msi MemberStoreImpl) Save(member *models.Member, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (msi MemberStoreImpl) Save(member *models.Member, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := member.IsValid(); appError != nil {
 		transaction.Rollback()
@@ -34,8 +34,7 @@ func (msi MemberStoreImpl) Save(member *models.Member, ds DbStore) *u.AppError {
 }
 
 // Update Used to update member in DB
-func (msi MemberStoreImpl) Update(member *models.Member, newMember *models.Member, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (msi MemberStoreImpl) Update(member *models.Member, newMember *models.Member, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := member.IsValid(); appError != nil {
 		transaction.Rollback()
@@ -54,40 +53,35 @@ func (msi MemberStoreImpl) Update(member *models.Member, newMember *models.Membe
 }
 
 // GetAll Used to get member from DB
-func (msi MemberStoreImpl) GetAll(ds DbStore) *[]models.Member {
-	db := *ds.Db
+func (msi MemberStoreImpl) GetAll(db *gorm.DB) []models.Member {
 	members := []models.Member{}
 	db.Find(&members)
-	return &members
+	return members
 }
 
 // GetByUser get member from user
-func (msi MemberStoreImpl) GetByUser(user *models.User, ds DbStore) *[]models.Member {
-	db := *ds.Db
+func (msi MemberStoreImpl) GetByUser(user *models.User, db *gorm.DB) []models.Member {
 	members := []models.Member{}
 	db.Table("members").Select("*").Joins("natural join users").Where("users.idUser = ?", user.IDUser).Find(&members)
-	return &members
+	return members
 }
 
 // GetByChannel get member from channel
-func (msi MemberStoreImpl) GetByChannel(channel *models.Channel, ds DbStore) *[]models.Member {
-	db := *ds.Db
+func (msi MemberStoreImpl) GetByChannel(channel *models.Channel, db *gorm.DB) []models.Member {
 	members := []models.Member{}
 	db.Table("members").Select("*").Joins("natural join channels").Where("channels.idChannel = ?", channel.IDChannel).Find(&members)
-	return &members
+	return members
 }
 
 // GetByRole get member from role
-func (msi MemberStoreImpl) GetByRole(role *models.Role, ds DbStore) *[]models.Member {
-	db := *ds.Db
+func (msi MemberStoreImpl) GetByRole(role *models.Role, db *gorm.DB) []models.Member {
 	members := []models.Member{}
 	db.Table("members").Select("*").Joins("natural join roles").Where("roles.idRole = ?", role.IDRole).Find(&members)
-	return &members
+	return members
 }
 
 // Delete Used to get member from DB
-func (msi MemberStoreImpl) Delete(member *models.Member, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (msi MemberStoreImpl) Delete(member *models.Member, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := member.IsValid(); appError != nil {
 		transaction.Rollback()

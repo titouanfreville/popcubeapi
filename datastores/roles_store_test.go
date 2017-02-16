@@ -12,10 +12,10 @@ import (
 )
 
 func TestRoleStore(t *testing.T) {
-	ds := DbStore{}
-	 	ds.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
-	db := *ds.Db
-	rsi := NewRoleStore()
+	store := NewStore()
+	db := store.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
+
+	rsi := store.Role()
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("roleStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
 		alreadyExistError := u.NewLocAppError("roleStoreImpl.Save", "save.transaction.create.already_exist", nil, "Role Name: classe")
@@ -29,14 +29,14 @@ func TestRoleStore(t *testing.T) {
 			CanManageUser: true,
 		}
 		Convey("Given a correct role.", func() {
-			appError := rsi.Save(&role, ds)
+			appError := rsi.Save(&role, db)
 			Convey("Trying to add it for the first time, should be accepted", func() {
 				So(appError, ShouldBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 			})
 			Convey("Trying to add it a second time should return duplicate error", func() {
-				appError2 := rsi.Save(&role, ds)
+				appError2 := rsi.Save(&role, db)
 				So(appError2, ShouldNotBeNil)
 				So(appError2, ShouldResemble, alreadyExistError)
 				So(appError2, ShouldNotResemble, dbError)
@@ -67,13 +67,13 @@ func TestRoleStore(t *testing.T) {
 			CanManageUser: false,
 		}
 
-		appError := rsi.Save(&role, ds)
+		appError := rsi.Save(&role, db)
 		So(appError, ShouldBeNil)
 		So(appError, ShouldNotResemble, dbError)
 		So(appError, ShouldNotResemble, alreadyExistError)
 
 		Convey("Provided correct Role to modify should not return errors", func() {
-			appError := rsi.Update(&role, &roleNew, ds)
+			appError := rsi.Update(&role, &roleNew, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dbError)
 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -82,19 +82,19 @@ func TestRoleStore(t *testing.T) {
 		Convey("Provided wrong old Role to modify should result in old_role error", func() {
 			role.RoleName = "testRole"
 			Convey("If rolename is not a lower case char, it should be refused", func() {
-				appError := rsi.Update(&role, &roleNew, ds)
+				appError := rsi.Update(&role, &roleNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("roleStoreImpl.Update.roleOld.PreSave", "model.role.rolename.app_error", nil, ""))
 				role.RoleName = "+alpha"
-				appError = rsi.Update(&role, &roleNew, ds)
+				appError = rsi.Update(&role, &roleNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("roleStoreImpl.Update.roleOld.PreSave", "model.role.rolename.app_error", nil, ""))
 				role.RoleName = "alpha-numerique"
-				appError = rsi.Update(&role, &roleNew, ds)
+				appError = rsi.Update(&role, &roleNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
@@ -104,19 +104,19 @@ func TestRoleStore(t *testing.T) {
 
 		Convey("Provided wrong new Role to modify should result in newRole error", func() {
 			roleNew.RoleName = "testRole"
-			appError := rsi.Update(&role, &roleNew, ds)
+			appError := rsi.Update(&role, &roleNew, db)
 			So(appError, ShouldNotBeNil)
 			So(appError, ShouldNotResemble, dbError)
 			So(appError, ShouldNotResemble, alreadyExistError)
 			So(appError, ShouldResemble, u.NewLocAppError("roleStoreImpl.Update.roleNew.PreSave", "model.role.rolename.app_error", nil, ""))
 			roleNew.RoleName = "+alpha"
-			appError = rsi.Update(&role, &roleNew, ds)
+			appError = rsi.Update(&role, &roleNew, db)
 			So(appError, ShouldNotBeNil)
 			So(appError, ShouldNotResemble, dbError)
 			So(appError, ShouldNotResemble, alreadyExistError)
 			So(appError, ShouldResemble, u.NewLocAppError("roleStoreImpl.Update.roleNew.PreSave", "model.role.rolename.app_error", nil, ""))
 			roleNew.RoleName = "alpha-numerique"
-			appError = rsi.Update(&role, &roleNew, ds)
+			appError = rsi.Update(&role, &roleNew, db)
 			So(appError, ShouldNotBeNil)
 			So(appError, ShouldNotResemble, dbError)
 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -129,7 +129,7 @@ func TestRoleStore(t *testing.T) {
 
 	Convey("Testing Getters", t, func() {
 
-		rsi.GetByName("owner", ds)
+		rsi.GetByName("owner", db)
 
 		role0 := Role{
 			RoleName:      "classe",
@@ -179,11 +179,11 @@ func TestRoleStore(t *testing.T) {
 		rolesCanPrivate := Role{CanUsePrivate: true}
 		rolesCanPrivateNotArchive := Role{CanUsePrivate: true, CanArchive: false}
 
-		rsi.Save(&role0, ds)
-		rsi.Save(&role1, ds)
-		rsi.Update(&role1, &role1New, ds)
-		rsi.Save(&role2, ds)
-		rsi.Save(&role3, ds)
+		rsi.Save(&role0, db)
+		rsi.Save(&role1, db)
+		rsi.Update(&role1, &role1New, db)
+		rsi.Save(&role2, db)
+		rsi.Save(&role3, db)
 
 		// Have to be after save so ID are up to date :O
 		roleList := []Role{
@@ -197,40 +197,40 @@ func TestRoleStore(t *testing.T) {
 		emptyList := []Role{}
 
 		Convey("We have to be able to find all roles in the db", func() {
-			roles := rsi.GetAll(ds)
+			roles := rsi.GetAll(db)
 			So(roles, ShouldNotResemble, &emptyList)
 			So(roles, ShouldResemble, &roleList)
 		})
 
 		Convey("We have to be able to find an role from is name", func() {
-			role := rsi.GetByName(role0.RoleName, ds)
+			role := rsi.GetByName(role0.RoleName, db)
 			So(role, ShouldNotResemble, &Role{})
 			So(role, ShouldResemble, &role0)
-			role = rsi.GetByName(role2.RoleName, ds)
+			role = rsi.GetByName(role2.RoleName, db)
 			So(role, ShouldNotResemble, &Role{})
 			So(role, ShouldResemble, &role2)
-			role = rsi.GetByName(role3.RoleName, ds)
+			role = rsi.GetByName(role3.RoleName, db)
 			So(role, ShouldNotResemble, &Role{})
 			So(role, ShouldResemble, &role3)
 			Convey("Should also work from updated value", func() {
-				role = rsi.GetByName(role1New.RoleName, ds)
+				role = rsi.GetByName(role1New.RoleName, db)
 				So(role, ShouldNotResemble, &Role{})
 				So(role, ShouldResemble, &role1)
 			})
 		})
 
 		Convey("We have to be able to find an role from its rights", func() {
-			roles := rsi.GetByRights(&rolesCanPrivate, ds)
+			roles := rsi.GetByRights(&rolesCanPrivate, db)
 			So(roles, ShouldNotResemble, emptyList)
 			So(roles, ShouldResemble, &canPrivateList)
-			roles = rsi.GetByRights(&rolesCanPrivateNotArchive, ds)
+			roles = rsi.GetByRights(&rolesCanPrivateNotArchive, db)
 			So(roles, ShouldNotResemble, emptyList)
 			So(roles, ShouldResemble, &canPrivateList)
 
 		})
 
 		Convey("Searching for non existent role should return empty", func() {
-			role := rsi.GetByName("fantome", ds)
+			role := rsi.GetByName("fantome", db)
 			So(role, ShouldResemble, &Role{})
 		})
 
@@ -240,7 +240,7 @@ func TestRoleStore(t *testing.T) {
 		db.Delete(&role3)
 
 		Convey("Searching all in empty table should return empty", func() {
-			roles := rsi.GetAll(ds)
+			roles := rsi.GetAll(db)
 			So(roles, ShouldResemble, &[]Role{})
 		})
 	})
@@ -283,10 +283,10 @@ func TestRoleStore(t *testing.T) {
 			CanManage:     false,
 			CanManageUser: true,
 		}
-		rsi.Save(&role0, ds)
-		rsi.Save(&role1, ds)
-		rsi.Save(&role2, ds)
-		rsi.Save(&role3, ds)
+		rsi.Save(&role0, db)
+		rsi.Save(&role1, db)
+		rsi.Save(&role2, db)
+		rsi.Save(&role3, db)
 		role3Old := role3
 		roleList1 := []Role{
 			role0,
@@ -296,32 +296,32 @@ func TestRoleStore(t *testing.T) {
 		}
 
 		Convey("Deleting a known role should work", func() {
-			appError := rsi.Delete(&role2, ds)
+			appError := rsi.Delete(&role2, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dberror)
-			So(rsi.GetByName("God", ds), ShouldResemble, &Role{})
+			So(rsi.GetByName("God", db), ShouldResemble, &Role{})
 		})
 
 		Convey("Trying to delete from non conform role should return specific role error and should not delete roles.", func() {
 			role3.RoleName = "Const"
 			Convey("Too long or empty Name should return name error", func() {
-				appError := rsi.Delete(&role3, ds)
+				appError := rsi.Delete(&role3, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dberror)
 				So(appError, ShouldResemble, u.NewLocAppError("roleStoreImpl.Delete.role.PreSave", "model.role.rolename.app_error", nil, ""))
-				So(rsi.GetAll(ds), ShouldResemble, &roleList1)
+				So(rsi.GetAll(db), ShouldResemble, &roleList1)
 				role3.RoleName = "+alpha"
-				appError = rsi.Delete(&role3, ds)
+				appError = rsi.Delete(&role3, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dberror)
 				So(appError, ShouldResemble, u.NewLocAppError("roleStoreImpl.Delete.role.PreSave", "model.role.rolename.app_error", nil, ""))
-				So(rsi.GetAll(ds), ShouldResemble, &roleList1)
+				So(rsi.GetAll(db), ShouldResemble, &roleList1)
 				role3.RoleName = "alpha-numerique"
-				appError = rsi.Delete(&role3, ds)
+				appError = rsi.Delete(&role3, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dberror)
 				So(appError, ShouldResemble, u.NewLocAppError("roleStoreImpl.Delete.role.PreSave", "model.role.rolename.app_error", nil, ""))
-				So(rsi.GetAll(ds), ShouldResemble, &roleList1)
+				So(rsi.GetAll(db), ShouldResemble, &roleList1)
 			})
 		})
 

@@ -23,14 +23,13 @@ func randStringBytes(n int) string {
 }
 
 func TestMessageStore(t *testing.T) {
-	ds := DbStore{}
-	 	ds.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
-	db := *ds.Db
+	store := NewStore()
+	db := store.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
 
-	msi := NewMessageStore()
-	usi := NewUserStore()
-	rsi := NewRoleStore()
-	csi := NewChannelStore()
+	msi := store.Message()
+	usi := store.User()
+	rsi := store.Role()
+	csi := store.Channel()
 
 	standartRole := Role{
 		RoleName:      randStringBytes(10),
@@ -41,7 +40,7 @@ func TestMessageStore(t *testing.T) {
 		CanManage:     false,
 		CanManageUser: false,
 	}
-	rsi.Save(&standartRole, ds)
+	rsi.Save(&standartRole, db)
 
 	userTest := User{
 		Username:  randStringBytes(10),
@@ -52,7 +51,7 @@ func TestMessageStore(t *testing.T) {
 		LastName:  "L",
 		IDRole:    standartRole.IDRole,
 	}
-	usi.Save(&userTest, ds)
+	usi.Save(&userTest, db)
 
 	channelTest := Channel{
 		ChannelName: randStringBytes(10),
@@ -62,7 +61,7 @@ func TestMessageStore(t *testing.T) {
 		Subject:     "Sujet",
 		Avatar:      "jesuiscool.svg",
 	}
-	csi.Save(&channelTest, ds)
+	csi.Save(&channelTest, db)
 
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("messageStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
@@ -74,14 +73,14 @@ func TestMessageStore(t *testing.T) {
 		}
 
 		Convey("Given a correct message.", func() {
-			appError := msi.Save(&message, ds)
+			appError := msi.Save(&message, db)
 			Convey("Trying to add it for the first time, should be accepted", func() {
 				So(appError, ShouldBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 			})
 			Convey("Trying to add it a second time should return duplicate error", func() {
-				appError2 := msi.Save(&message, ds)
+				appError2 := msi.Save(&message, db)
 				So(appError2, ShouldNotBeNil)
 				So(appError2, ShouldResemble, alreadyExistError)
 				So(appError2, ShouldNotResemble, dbError)
@@ -113,13 +112,13 @@ func TestMessageStore(t *testing.T) {
 	// 		IDRole:      adminRole.IDRole,
 	// 	}
 
-	// 	appError := msi.Save(&message, ds)
+	// 	appError := msi.Save(&message, db)
 	// 	So(appError, ShouldBeNil)
 	// 	So(appError, ShouldNotResemble, dbError)
 	// 	So(appError, ShouldNotResemble, alreadyExistError)
 
 	// 	Convey("Provided correct Message to modify should not return errors", func() {
-	// 		appError := msi.Update(&message, &messageNew, ds)
+	// 		appError := msi.Update(&message, &messageNew, db)
 	// 		messageShouldResemble := messageNew
 	// 		messageShouldResemble.WebID = message.WebID
 	// 		messageShouldResemble.IDMessage = message.IDMessage
@@ -133,7 +132,7 @@ func TestMessageStore(t *testing.T) {
 	// 	Convey("Provided wrong old Message to modify should result in old_message error", func() {
 	// 		message.WebID = "TesT"
 	// 		Convey("Incorrect ID message should return a message invalid id", func() {
-	// 			appError := msi.Update(&message, &messageNew, ds)
+	// 			appError := msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -142,37 +141,37 @@ func TestMessageStore(t *testing.T) {
 	// 		message.WebID = NewID()
 	// 		Convey("Incorrect messagename message should return error Invalid messagename", func() {
 	// 			message.Messagename = "CeNomDevraitJelespereEtreBeaucoupTropLongPourLatrailleMaximaleDemandeParcequelaJeSuiunPoilFeneantEtDeboussouleSansnuldouteilnyavaitpersone"
-	// 			appError := msi.Update(&message, &messageNew, ds)
+	// 			appError := msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageOld.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+message.WebID))
 	// 			message.Messagename = ""
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageOld.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+message.WebID))
 	// 			message.Messagename = "xD/"
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageOld.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+message.WebID))
 	// 			message.Messagename = "xD\\"
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageOld.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+message.WebID))
 	// 			message.Messagename = "xD*"
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageOld.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+message.WebID))
 	// 			message.Messagename = "xD{"
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -181,7 +180,7 @@ func TestMessageStore(t *testing.T) {
 
 	// 		Convey("Password can]t be empty", func() {
 	// 			message.Password = ""
-	// 			appError := msi.Update(&message, &messageNew, ds)
+	// 			appError := msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -192,37 +191,37 @@ func TestMessageStore(t *testing.T) {
 	// 	Convey("Provided wrong new Message to modify should result in old_message error", func() {
 	// 		Convey("Incorrect messagename message should return error Invalid messagename", func() {
 	// 			messageNew.Messagename = "CeNomDevraitJelespereEtreBeaucoupTropLongPourLatrailleMaximaleDemandeParcequelaJeSuiunPoilFeneantEtDeboussouleSansnuldouteilnyavaitpersone"
-	// 			appError := msi.Update(&message, &messageNew, ds)
+	// 			appError := msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageNew.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+messageNew.WebID))
 	// 			messageNew.Messagename = ""
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageNew.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+messageNew.WebID))
 	// 			messageNew.Messagename = "xD/"
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageNew.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+messageNew.WebID))
 	// 			messageNew.Messagename = "xD\\"
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageNew.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+messageNew.WebID))
 	// 			messageNew.Messagename = "xD*"
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Update.messageNew.PreSave", "model.message.is_valid.Messagename.app_error", nil, "message_webID="+messageNew.WebID))
 	// 			messageNew.Messagename = "xD{"
-	// 			appError = msi.Update(&message, &messageNew, ds)
+	// 			appError = msi.Update(&message, &messageNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -296,12 +295,12 @@ func TestMessageStore(t *testing.T) {
 	// 		IDRole:      guestRole.IDRole,
 	// 	}
 
-	// 	msi.Save(&message0, ds)
-	// 	msi.Save(&message1, ds)
-	// 	msi.Update(&message1, &message1New, ds)
-	// 	msi.Save(&message2, ds)
-	// 	msi.Save(&message3, ds)
-	// 	msi.Save(&message4, ds)
+	// 	msi.Save(&message0, db)
+	// 	msi.Save(&message1, db)
+	// 	msi.Update(&message1, &message1New, db)
+	// 	msi.Save(&message2, db)
+	// 	msi.Save(&message3, db)
+	// 	msi.Save(&message4, db)
 
 	// 	// Have to be after save so ID are up to date :O
 	// 	messageList := []Message{
@@ -317,57 +316,57 @@ func TestMessageStore(t *testing.T) {
 	// 	emptyList := []Message{}
 
 	// 	Convey("We have to be able to find all messages in the db", func() {
-	// 		messages := msi.GetAll(ds)
+	// 		messages := msi.GetAll(db)
 	// 		So(messages, ShouldNotResemble, &emptyList)
 	// 		So(messages, ShouldResemble, &messageList)
 	// 	})
 
 	// 	Convey("We have to be able to find a message from is name", func() {
-	// 		message := msi.GetByMessageName(message0.Messagename, ds)
+	// 		message := msi.GetByMessageName(message0.Messagename, db)
 	// 		So(message, ShouldNotResemble, &Message{})
 	// 		So(message, ShouldResemble, &message0)
-	// 		message = msi.GetByMessageName(message2.Messagename, ds)
+	// 		message = msi.GetByMessageName(message2.Messagename, db)
 	// 		So(message, ShouldNotResemble, &Message{})
 	// 		So(message, ShouldResemble, &message2)
-	// 		message = msi.GetByMessageName(message3.Messagename, ds)
+	// 		message = msi.GetByMessageName(message3.Messagename, db)
 	// 		So(message, ShouldNotResemble, &Message{})
 	// 		So(message, ShouldResemble, &message3)
-	// 		message = msi.GetByMessageName(message4.Messagename, ds)
+	// 		message = msi.GetByMessageName(message4.Messagename, db)
 	// 		So(message, ShouldNotResemble, &Message{})
 	// 		So(message, ShouldResemble, &message4)
 	// 		Convey("Should also work from updated value", func() {
-	// 			message = msi.GetByMessageName(message1New.Messagename, ds)
+	// 			message = msi.GetByMessageName(message1New.Messagename, db)
 	// 			So(message, ShouldNotResemble, &Message{})
 	// 			So(message, ShouldResemble, &message1)
 	// 		})
 	// 	})
 
 	// 	Convey("We have to be able to find a message from his email", func() {
-	// 		message := msi.GetByEmail(message0.Email, ds)
+	// 		message := msi.GetByEmail(message0.Email, db)
 	// 		So(message, ShouldNotResemble, &Message{})
 	// 		So(message, ShouldResemble, &message0)
-	// 		message = msi.GetByEmail(message2.Email, ds)
+	// 		message = msi.GetByEmail(message2.Email, db)
 	// 		So(message, ShouldNotResemble, &Message{})
 	// 		So(message, ShouldResemble, &message2)
-	// 		message = msi.GetByEmail(message3.Email, ds)
+	// 		message = msi.GetByEmail(message3.Email, db)
 	// 		So(message, ShouldResemble, &message3)
-	// 		message = msi.GetByEmail(message4.Email, ds)
+	// 		message = msi.GetByEmail(message4.Email, db)
 	// 		So(message, ShouldNotResemble, &Message{})
 	// 		So(message, ShouldResemble, &message4)
 	// 	})
 
 	// 	Convey("We have to be able to find an message from his Role", func() {
-	// 		messages := msi.GetByRole(&adminRole, ds)
+	// 		messages := msi.GetByRole(&adminRole, db)
 	// 		So(messages, ShouldNotResemble, &Message{})
 	// 		So(messages, ShouldResemble, &admins)
-	// 		messages = msi.GetByRole(&guestRole, ds)
+	// 		messages = msi.GetByRole(&guestRole, db)
 	// 		So(messages, ShouldNotResemble, &Message{})
 	// 		So(messages, ShouldResemble, &guests)
 
 	// 	})
 
 	// 	Convey("Searching for non existent message should return empty", func() {
-	// 		message := msi.GetByMessageName("fantome", ds)
+	// 		message := msi.GetByMessageName("fantome", db)
 	// 		So(message, ShouldResemble, &Message{})
 	// 	})
 
@@ -378,7 +377,7 @@ func TestMessageStore(t *testing.T) {
 	// 	db.Delete(&message3)
 
 	// 	Convey("Searching all in empty table should return empty", func() {
-	// 		messages := msi.GetAll(ds)
+	// 		messages := msi.GetAll(db)
 	// 		So(messages, ShouldResemble, &[]Message{})
 	// 	})
 	// })
@@ -426,10 +425,10 @@ func TestMessageStore(t *testing.T) {
 	// 		IDRole:      standartRole.IDRole,
 	// 	}
 
-	// 	msi.Save(&message0, ds)
-	// 	msi.Save(&message1, ds)
-	// 	msi.Save(&message2, ds)
-	// 	msi.Save(&message3, ds)
+	// 	msi.Save(&message0, db)
+	// 	msi.Save(&message1, db)
+	// 	msi.Save(&message2, db)
+	// 	msi.Save(&message3, db)
 
 	// 	// Have to be after save so ID are up to date :O
 	// 	// message3Old := message3
@@ -441,32 +440,32 @@ func TestMessageStore(t *testing.T) {
 	// 	// }
 
 	// 	Convey("Deleting a known message should work", func() {
-	// 		appError := msi.Delete(&message2, ds)
+	// 		appError := msi.Delete(&message2, db)
 	// 		So(appError, ShouldBeNil)
 	// 		So(appError, ShouldNotResemble, dberror)
-	// 		So(msi.GetByMessageName("moris", ds), ShouldResemble, &Message{})
+	// 		So(msi.GetByMessageName("moris", db), ShouldResemble, &Message{})
 	// 	})
 
 	// 	// Convey("Trying to delete from non conform message should return specific message error and should not delete messages.", func() {
 	// 	// 	message3.MessageName = "Const"
 	// 	// 	Convey("Too long or empty Name should return name error", func() {
-	// 	// 		appError := msi.Delete(&message3, ds)
+	// 	// 		appError := msi.Delete(&message3, db)
 	// 	// 		So(appError, ShouldNotBeNil)
 	// 	// 		So(appError, ShouldNotResemble, dberror)
 	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Delete.message.PreSave", "model.message.messagename.app_error", nil, ""))
-	// 	// 		So(msi.GetAll(ds), ShouldResemble, &messageList1)
+	// 	// 		So(msi.GetAll(db), ShouldResemble, &messageList1)
 	// 	// 		message3.MessageName = "+alpha"
-	// 	// 		appError = msi.Delete(&message3, ds)
+	// 	// 		appError = msi.Delete(&message3, db)
 	// 	// 		So(appError, ShouldNotBeNil)
 	// 	// 		So(appError, ShouldNotResemble, dberror)
 	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Delete.message.PreSave", "model.message.messagename.app_error", nil, ""))
-	// 	// 		So(msi.GetAll(ds), ShouldResemble, &messageList1)
+	// 	// 		So(msi.GetAll(db), ShouldResemble, &messageList1)
 	// 	// 		message3.MessageName = "alpha-numerique"
-	// 	// 		appError = msi.Delete(&message3, ds)standartRole
+	// 	// 		appError = msi.Delete(&message3, db)standartRole
 	// 	// 		So(appError, ShouldNotBeNil)
 	// 	// 		So(appError, ShouldNotResemble, dberror)
 	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("messageStoreImpl.Delete.message.PreSave", "model.message.messagename.app_error", nil, ""))
-	// 	// 		So(msi.GetAll(ds), ShouldResemble, &messageList1)
+	// 	// 		So(msi.GetAll(db), ShouldResemble, &messageList1)
 	// 	// 	})
 	// 	// })
 

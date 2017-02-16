@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -8,14 +9,14 @@ import (
 // FolderStoreImpl Used to implement FolderStore interface
 type FolderStoreImpl struct{}
 
-// NewFolderStore Generate the struct for folder store
-func NewFolderStore() FolderStore {
+// Folder Generate the struct for folder store
+func (s StoreImpl) Folder() FolderStore {
 	return &FolderStoreImpl{}
 }
 
 // Save Use to save folder in BB
-func (fsi FolderStoreImpl) Save(folder *models.Folder, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (fsi FolderStoreImpl) Save(folder *models.Folder, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	if appError := folder.IsValid(); appError != nil {
 		transaction.Rollback()
@@ -34,8 +35,8 @@ func (fsi FolderStoreImpl) Save(folder *models.Folder, ds DbStore) *u.AppError {
 }
 
 // Update Used to update folder in DB
-func (fsi FolderStoreImpl) Update(folder *models.Folder, newFolder *models.Folder, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (fsi FolderStoreImpl) Update(folder *models.Folder, newFolder *models.Folder, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	if appError := folder.IsValid(); appError != nil {
 		transaction.Rollback()
@@ -54,56 +55,50 @@ func (fsi FolderStoreImpl) Update(folder *models.Folder, newFolder *models.Folde
 }
 
 // GetAll Used to get folder from DB
-func (fsi FolderStoreImpl) GetAll(ds DbStore) *[]models.Folder {
-	db := *ds.Db
+func (fsi FolderStoreImpl) GetAll(db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
 	db.Find(&folders)
-	return &folders
+	return folders
 }
 
 // GetByName Used to get folder from DB by specific name
-func (fsi FolderStoreImpl) GetByName(folderName string, ds DbStore) *[]models.Folder {
-	db := *ds.Db
+func (fsi FolderStoreImpl) GetByName(folderName string, db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
 	db.Where("name = ?", folderName).Find(&folders)
-	return &folders
+	return folders
 }
 
 // GetByType get all folders from specific type
-func (fsi FolderStoreImpl) GetByType(messageType string, ds DbStore) *[]models.Folder {
-	db := *ds.Db
+func (fsi FolderStoreImpl) GetByType(messageType string, db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
 	db.Where("type = ?", messageType).Find(&folders)
-	return &folders
+	return folders
 }
 
 // GetOrderedByDate get all folders having link
-func (fsi FolderStoreImpl) GetByLink(messageLink string, ds DbStore) *[]models.Folder {
-	db := *ds.Db
+func (fsi FolderStoreImpl) GetByLink(messageLink string, db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
 	db.Where("link = ?", messageLink).Find(&folders)
-	return &folders
+	return folders
 }
 
 // GetByCreator get folder from user
-func (fsi FolderStoreImpl) GetByMessage(message *models.Message, ds DbStore) *[]models.Folder {
-	db := *ds.Db
+func (fsi FolderStoreImpl) GetByMessage(message *models.Message, db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
 	db.Table("folders").Select("*").Joins("natural join messages").Where("messages.idMessage = ?", message.IDMessage).Find(&folders)
-	return &folders
+	return folders
 }
 
 // GetByChannel get folder from channel
-func (fsi FolderStoreImpl) GetByChannel(channel *models.Channel, ds DbStore) *[]models.Folder {
-	db := *ds.Db
+func (fsi FolderStoreImpl) GetByChannel(channel *models.Channel, db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
 	db.Table("folders").Select("*").Joins("natural join channels").Where("channels.idChannel = ?", channel.IDChannel).Find(&folders)
-	return &folders
+	return folders
 }
 
 // Delete Used to get folder from DB
-func (fsi FolderStoreImpl) Delete(folder *models.Folder, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (fsi FolderStoreImpl) Delete(folder *models.Folder, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	if appError := folder.IsValid(); appError != nil {
 		transaction.Rollback()
