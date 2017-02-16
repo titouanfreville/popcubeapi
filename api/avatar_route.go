@@ -6,6 +6,7 @@ import (
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
+	"github.com/titouanfreville/popcubeapi/models"
 )
 
 func (ll Base) initAvatarRoute() {
@@ -25,13 +26,12 @@ func (ll Base) initAvatarRoute() {
 func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 	ds := BaseConst.ds
 	AvatarStore := datastores.NewAvatarStore()
-	avatarListPointer := AvatarStore.GetAll(ds)
-	// avatarList := []*models.Avatar{}
-	// for _, avatars := range avatarListPointer {
-	// 	avatarList = append(avatarList, &avatars)
-	// }
-	// json := models.AvatarListToJSON(avatarList)
-	render.JSON(w, r, *avatarListPointer)
+	result := AvatarStore.GetAll(ds)
+	avatarList := []models.Avatar{}
+	for _, avatars := range *result {
+		avatarList = append(avatarList, avatars)
+	}
+	render.JSON(w, r, avatarList)
 }
 
 // paginate is a stub, but very possible to implement middleware logic

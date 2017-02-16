@@ -25,10 +25,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// DbStore Struct to manage Db knowledge
-type DbStore struct {
-	Db  *gorm.DB
-	Err error
+// Store interface the Stores and usefull DB functions
+type Store interface {
+	Organisation() OrganisationStore
+	Avatar() AvatarStore
+	Emoji() EmojiStore
+	InitConnection()
+	InitDatabase()
+	CloseConnection()
 }
 
 // InitConnection init Database connection && database models
@@ -90,15 +94,6 @@ func (ds *DbStore) CloseConnection() {
 	db := *ds.Db
 	defer db.Close()
 	ds.Db = &gorm.DB{}
-}
-
-// Store interface the Stores and usefull DB functions
-type Store interface {
-	Organisation() OrganisationStore
-	Avatar() AvatarStore
-	Emoji() EmojiStore
-	InitConnection()
-	CloseConnection()
 }
 
 /*AvatarStore interface the avatar communication */
