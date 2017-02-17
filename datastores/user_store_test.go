@@ -5,12 +5,10 @@ package datastores
 
 import (
 	"testing"
-	"time"
-
-	. "github.com/titouanfreville/popcubeapi/models"
-	u "github.com/titouanfreville/popcubeapi/utils"
 
 	. "github.com/smartystreets/goconvey/convey"
+	. "github.com/titouanfreville/popcubeapi/models"
+	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
 func TestUserStore(t *testing.T) {
@@ -20,8 +18,6 @@ func TestUserStore(t *testing.T) {
 
 	usi := NewUserStore()
 	rsi := NewRoleStore()
-
-	time.Sleep(100 * 100)
 
 	ownerRole := Role{
 		RoleName:      "testowner",
@@ -479,5 +475,9 @@ func TestUserStore(t *testing.T) {
 		db.Delete(&user1)
 		db.Delete(&user2)
 		db.Delete(&user3)
+		db.Delete(&adminRole)
+		db.Delete(&standartRole)
+		db.Delete(&ownerRole)
+		db.Delete(&guestRole)
 	})
 }

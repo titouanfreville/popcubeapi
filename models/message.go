@@ -12,8 +12,10 @@ type Message struct {
 	IDMessage uint64  `gorm:"primary_key;column:idMessage;AUTO_INCREMENT" json:"-"`
 	Date      int64   `gorm:"column:date;not null" json:"date"`
 	Content   string  `gorm:"column:content;type:longtext" json:"content"`
-	Creator   User    `gorm:"column:creator; not null;ForeignKey:IDUser;" json:"-"`
-	Channel   Channel `gorm:"column:channel; not null;ForeignKey:IDChannel;" json:"-"`
+	Creator   User    `gorm:"column:creator; not null;ForeignKey:IDUser;" db:"-" json:"-"`
+	IDUser    uint64  `gorm:"column:idUser; not null;" json:"idUser"`
+	Channel   Channel `gorm:"column:channel; not null;ForeignKey:IDChannel;" db:"-" json:"-"`
+	IDChannel uint64  `gorm:"column:idChannel; not null;" json:"idChannel"`
 }
 
 // IsValid function is used to check that the provided message correspond to the message model. It has to be use before tring to store it in the db.
@@ -21,12 +23,12 @@ func (message *Message) IsValid() *u.AppError {
 	if message.Date == 0 {
 		return u.NewLocAppError("Message.IsValid", "model.message.date.app_error", nil, "")
 	}
-	if message.Creator == (User{}) {
-		return u.NewLocAppError("Message.IsValid", "model.message.creator.app_error", nil, "")
-	}
-	if message.Channel == (Channel{}) {
-		return u.NewLocAppError("Message.IsValid", "model.message.channel.app_error", nil, "")
-	}
+	// if message.Creator == (User{}) {
+	// 	return u.NewLocAppError("Message.IsValid", "model.message.creator.app_error", nil, "")
+	// }
+	// if message.Channel == (Channel{}) {
+	// 	return u.NewLocAppError("Message.IsValid", "model.message.channel.app_error", nil, "")
+	// }
 
 	return nil
 }
