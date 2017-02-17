@@ -9,9 +9,9 @@ import (
 
 // Avatar type is a DB model for avatar storage
 type Avatar struct {
-	IDAvatar uint64 `gorm:"primary_key;column:idAvatar;AUTO_INCREMENT" json:"-"`
-	Name     string `gorm:"column:name;not null;unique" json:"name"`
-	Link     string `gorm:"column:link;not null;unique" json:"link"`
+	IDAvatar uint64 `gorm:"primary_key;column:idAvatar;AUTO_INCREMENT" json:"id,omitempty"`
+	Name     string `gorm:"column:name;not null;unique" json:"name,omitempty"`
+	Link     string `gorm:"column:link;not null;unique" json:"link,omitempty"`
 }
 
 // IsValid check the validity of on Avatar object before saving it to DB in update or creation process
