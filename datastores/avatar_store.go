@@ -53,10 +53,10 @@ func (asi AvatarStoreImpl) Update(avatar *models.Avatar, newAvatar *models.Avata
 }
 
 // GetAll Used to get avatar from DB
-func (asi AvatarStoreImpl) GetAll(db *gorm.DB) *[]models.Avatar {
+func (asi AvatarStoreImpl) GetAll(db *gorm.DB) []models.Avatar {
 	avatars := []models.Avatar{}
-	db.Debug().Find(&avatars)
-	return &avatars
+	db.Find(&avatars)
+	return avatars
 }
 
 // GetByName Used to get avatar from DB

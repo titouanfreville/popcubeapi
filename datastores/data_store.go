@@ -92,8 +92,6 @@ func (store StoreImpl) InitDatabase(user string, dbname string, password string,
 		models.Member{}, &models.Message{}, &models.Organisation{}, &models.Parameter{},
 		&models.Role{}, &models.User{})
 
-	// db = store.InitConnection(user, dbname, password, host, port)
-
 	// Will not set CreatedAt and LastUpdate on .Create() call
 	db.Callback().Create().Remove("gorm:update_time_stamp")
 	db.Callback().Create().Remove("gorm:save_associations")
@@ -102,21 +100,15 @@ func (store StoreImpl) InitDatabase(user string, dbname string, password string,
 	db.Callback().Update().Remove("gorm:update_time_stamp")
 	db.Callback().Update().Remove("gorm:save_associations")
 
-	// db = store.InitConnection(user, dbname, password, host, port)
-
-	// if db.NewRecord(models.Owner) {
-	// 	store.roleInitSave(models.Owner, db)
-	// }
-	// if db.NewRecord(&models.Admin) {
-	// 	store.roleInitSave(models.Admin, db)
-	// }
-	// if db.NewRecord(&models.Standart) {
-	// 	store.roleInitSave(models.Standart, db)
-	// }
-
-	// if (err.ID == u.AppError{}.ID) {
-	// 	store.CloseConnection(db)
-	// }
+	if db.NewRecord(models.Owner) {
+		store.roleInitSave(models.Owner, db)
+	}
+	if db.NewRecord(&models.Admin) {
+		store.roleInitSave(models.Admin, db)
+	}
+	if db.NewRecord(&models.Standart) {
+		store.roleInitSave(models.Standart, db)
+	}
 }
 
 // CloseConnection close database connection
@@ -130,7 +122,7 @@ type AvatarStore interface {
 	Update(avatar *models.Avatar, newAvatar *models.Avatar, db *gorm.DB) *u.AppError
 	GetByName(avatarName string, db *gorm.DB) models.Avatar
 	GetByLink(avatarLink string, db *gorm.DB) models.Avatar
-	GetAll(db *gorm.DB) *[]models.Avatar
+	GetAll(db *gorm.DB) []models.Avatar
 	Delete(avatar *models.Avatar, db *gorm.DB) *u.AppError
 }
 

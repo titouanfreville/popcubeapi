@@ -11,7 +11,6 @@ func initAPI() {
 
 func initDatastore() {
 	datastores.NewStore().InitDatabase("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
-	datastores.NewStore().InitConnection("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
 }
 
 func main() {
