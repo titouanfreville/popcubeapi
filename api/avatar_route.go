@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-
 	"strconv"
 
 	"github.com/pressly/chi"
@@ -35,7 +34,7 @@ func initAvatarRoute(router chi.Router) {
 		r.Post("/new", newAvatar)
 		r.Route("/:avatarID", func(r chi.Router) {
 			r.Use(avatarContext)
-			r.Post("/update", updateAvatar)
+			r.Put("/update", updateAvatar)
 			r.Delete("/delete", deleteAvatar)
 		})
 	})

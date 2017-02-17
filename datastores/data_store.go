@@ -146,6 +146,7 @@ type EmojiStore interface {
 	GetByName(emojiName string, db *gorm.DB) models.Emoji
 	GetByShortcut(emojiShortcut string, db *gorm.DB) models.Emoji
 	GetByLink(emojiLink string, db *gorm.DB) models.Emoji
+	GetByID(ID uint64, db *gorm.DB) models.Emoji
 	GetAll(db *gorm.DB) []models.Emoji
 	Delete(emoji *models.Emoji, db *gorm.DB) *u.AppError
 }

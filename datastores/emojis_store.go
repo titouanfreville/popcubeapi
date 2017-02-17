@@ -61,6 +61,13 @@ func (esi EmojiStoreImpl) GetAll(db *gorm.DB) []models.Emoji {
 	return emojis
 }
 
+// GetByID Used to get emoji from DB
+func (asi EmojiStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Emoji {
+	emoji := models.Emoji{}
+	db.Where("idEmoji = ?", ID).First(&emoji)
+	return emoji
+}
+
 // GetByName Used to get emoji from DB
 func (esi EmojiStoreImpl) GetByName(emojiName string, db *gorm.DB) models.Emoji {
 	emoji := models.Emoji{}
