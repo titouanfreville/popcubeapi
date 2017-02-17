@@ -3,10 +3,17 @@ package api
 import (
 	"net/http"
 
+	"github.com/jinzhu/gorm"
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/middleware"
 	"github.com/titouanfreville/popcubeapi/datastores"
 )
+
+type testDb struct {
+	db *gorm.DB
+}
+
+var dbStore = testDb{}
 
 // newRouter initialise api serveur.
 func newRouter() *chi.Mux {
@@ -42,7 +49,7 @@ func basicRoutes(router *chi.Mux) {
 // StartAPI initialise the api with provided host and port.
 func StartAPI(hostname string, port string) {
 	router := newRouter()
-	datastores.NewStore().InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
+	dbStore.db = datastores.NewStore().InitConnection("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
 	initMiddleware(router)
 	basicRoutes(router)
 	initAvatarRoute(router)

@@ -26,7 +26,8 @@ func initAvatarRoute(router chi.Router) {
 func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 	store := datastores.NewStore()
 	render := renderPackage.New()
-	db := store.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
+	// db := store.InitConnection("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
+	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Avatar().GetAll(db)
 		avatarList := []models.Avatar{}
@@ -34,8 +35,9 @@ func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 			avatarList = append(avatarList, avatars)
 		}
 		render.JSON(w, 200, avatarList)
+	} else {
+		render.JSON(w, 500, "Connection failure : DATABASE")
 	}
-	render.JSON(w, 500, "Connection failure : DATABASE")
 }
 
 // paginate is a stub, but very possible to implement middleware logic
