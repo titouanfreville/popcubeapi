@@ -59,6 +59,13 @@ func (asi AvatarStoreImpl) GetAll(db *gorm.DB) []models.Avatar {
 	return avatars
 }
 
+// GetByID Used to get avatar from DB
+func (asi AvatarStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Avatar {
+	avatar := models.Avatar{}
+	db.Where("id = ?", ID).First(&avatar)
+	return avatar
+}
+
 // GetByName Used to get avatar from DB
 func (asi AvatarStoreImpl) GetByName(avatarName string, db *gorm.DB) models.Avatar {
 	avatar := models.Avatar{}

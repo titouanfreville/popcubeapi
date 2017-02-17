@@ -122,6 +122,7 @@ type AvatarStore interface {
 	Update(avatar *models.Avatar, newAvatar *models.Avatar, db *gorm.DB) *u.AppError
 	GetByName(avatarName string, db *gorm.DB) models.Avatar
 	GetByLink(avatarLink string, db *gorm.DB) models.Avatar
+	GetByID(ID uint64, db *gorm.DB) models.Avatar
 	GetAll(db *gorm.DB) []models.Avatar
 	Delete(avatar *models.Avatar, db *gorm.DB) *u.AppError
 }

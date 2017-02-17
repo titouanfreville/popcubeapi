@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/pressly/chi"
@@ -12,18 +13,34 @@ import (
 
 func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
-		r.Get("/", getAllAvatar)
+		r.Route("/get", func(r chi.Router) {
+			r.Use(avatarContext)
+			r.Get("/", getAllAvatar)
+			r.Get("/all", getAllAvatar)
+			// r.Get("/fromlink/:link", getAvatarFromLink)
+			r.Get("/fromname/:avatarname/", getAvatarFromName)
+		})
 		r.Post("/new", newAvatar)
+		// r.Route("/:avatarID", func(r chi.Router) {
+		// 	r.Get("/", getAvatarFromID)
+		// 	r.Get("/get", getAvatarFromID)
+		// 	r.Put("/update", updateAvatar)
+		// 	r.Delete("/delete", deleteAvatar)
+		// })
 	})
 }
 
-// func AvatarContext(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		avatarID := chi.URLParam(r, "id_avatar")
-// 		ctx := context.WithValue(r.Context(), "article", article)
-// 		next.ServeHTTP(w, r.WithContext())
-// 	})
-// }
+func avatarContext(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// avatarID := chi.URLParam(r, "avatarID")
+		name := chi.URLParam(r, "avatarname")
+		// link := chi.URLParam(r, "link")
+		// ctx := context.WithValue(r.Context(), "avatar_id", avatarID)
+		ctx := context.WithValue(r.Context(), "avatar_name", name)
+		// ctx = context.WithValue(ctx, "avatar_link", link)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
 
 func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 	store := datastores.NewStore()
@@ -31,10 +48,19 @@ func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Avatar().GetAll(db)
-		// avatarList := []models.Avatar{}
-		// for _, avatars := range *result {
-		// 	avatarList = append(avatarList, avatars)
-		// }
+		render.JSON(w, 200, result)
+	} else {
+		render.JSON(w, 500, "Connection failure : DATABASE")
+	}
+}
+
+func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
+	store := datastores.NewStore()
+	render := renderPackage.New()
+	db := dbStore.db
+	avatarName := r.Context().Value("avatar_name").(*string)
+	if err := db.DB().Ping(); err == nil {
+		result := store.Avatar().GetByName(*avatarName, db)
 		render.JSON(w, 200, result)
 	} else {
 		render.JSON(w, 500, "Connection failure : DATABASE")
@@ -42,18 +68,14 @@ func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 }
 
 func newAvatar(w http.ResponseWriter, r *http.Request) {
-
 	var data struct {
 		Avatar *models.Avatar
 		OmitID interface{} `json:"id,omitempty"`
 	}
-
 	store := datastores.NewStore()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
-	// decoder := json.NewDecoder(request)
-	// avatar := models.Avatar{}
 	err := chiRender.Bind(request, &data)
 	if err != nil {
 		render.JSON(w, 500, "Internal server error")
@@ -70,6 +92,32 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+// func updateAvatar(w http.ResponseWriter, r *http.Request) {
+// 	var data struct {
+// 		newAvatar *models.Avatar
+// 		OmitID    interface{} `json:"id,omitempty"`
+// 	}
+// 	store := datastores.NewStore()
+// 	render := renderPackage.New()
+// 	db := dbStore.db
+// 	request := r.Body
+// 	err := chiRender.Bind(request, &data)
+// 	if err != nil {
+// 		render.JSON(w, 500, "Internal server error")
+// 	} else {
+// 		if err := db.DB().Ping(); err == nil {
+// 			err := store.Avatar().Update(data.newAvatar, db)
+// 			if err == nil {
+// 				render.JSON(w, 200, data.newAvatar)
+// 			} else {
+// 				render.JSON(w, err.StatusCode, err)
+// 			}
+// 		} else {
+// 			render.JSON(w, 500, "Connection failure : DATABASE")
+// 		}
+// 	}
+// }
 
 // paginate is a stub, but very possible to implement middleware logic
 // to handle the request params for handling a paginated request.
