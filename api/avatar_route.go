@@ -49,10 +49,8 @@ func avatarContext(next http.Handler) http.Handler {
 		avatar := models.Avatar{}
 		ctx := context.WithValue(r.Context(), "avatarName", name)
 		ctx = context.WithValue(r.Context(), "avatarLink", link)
-		log.Printf("Avatar ID is : %d \n", avatarID)
 		if err == nil {
 			avatar = datastores.NewStore().Avatar().GetByID(avatarID, dbStore.db)
-			log.Printf("Avatar In Context : Id : %d // Name : %s // Link : %s \n", avatar.IDAvatar, avatar.Name, avatar.Link)
 		}
 		ctx = context.WithValue(r.Context(), "avatar", avatar)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -125,7 +123,6 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
-
 	log.Printf("Avatar to Update : Id : %d // Name : %s // Link : %s \n", avatar.IDAvatar, avatar.Name, avatar.Link)
 	err := chiRender.Bind(request, &data)
 	log.Printf("New Avatar : Id : %d // Name : %s // Link : %s \n", data.newAvatar.IDAvatar, data.newAvatar.Name, data.newAvatar.Link)
@@ -161,13 +158,3 @@ func deleteAvatar(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, 500, "Connection failure : DATABASE")
 	}
 }
-
-// paginate is a stub, but very possible to implement middleware logic
-// to handle the request params for handling a paginated request.
-// func paginate(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		// just a stub.. some ideas are to look at URL query params for something like
-// 		// the page number, or the limit, and send a query cursor down the chain
-// 		next.ServeHTTP(w, r)
-// 	})
-// }
