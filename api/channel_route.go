@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -50,12 +49,12 @@ func channelContext(next http.Handler) http.Handler {
 		shortcut := chi.URLParam(r, "channelShortcut")
 		channel := models.Channel{}
 		ctx := context.WithValue(r.Context(), "channelName", name)
-		ctx = context.WithValue(r.Context(), "channelType", channelType)
-		ctx = context.WithValue(r.Context(), "channelShortcut", shortcut)
+		ctx = context.WithValue(ctx, "channelType", channelType)
+		ctx = context.WithValue(ctx, "channelShortcut", shortcut)
 		if err == nil {
 			channel = datastores.NewStore().Channel().GetByID(channelID, dbStore.db)
 		}
-		ctx = context.WithValue(r.Context(), "channel", channel)
+		ctx = context.WithValue(ctx, "channel", channel)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -105,15 +104,6 @@ func getChannelFromName(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, 200, channel)
 }
 
-func getChannelFromShortcut(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
-	render := renderPackage.New()
-	db := dbStore.db
-	channelType := r.Context().Value("channelShortcut").(string)
-	channel := store.Channel().GetByShortcut(channelType, db)
-	render.JSON(w, 200, channel)
-}
-
 func getChannelFromType(w http.ResponseWriter, r *http.Request) {
 	store := datastores.NewStore()
 	render := renderPackage.New()
@@ -159,9 +149,7 @@ func updateChannel(w http.ResponseWriter, r *http.Request) {
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
-	log.Printf("Channel to Update : Id : %d // Name : %s // Type : %s \n", channel.IDChannel, channel.Name, channel.Type)
 	err := chiRender.Bind(request, &data)
-	log.Printf("New Channel : Id : %d // Name : %s // Type : %s \n", data.newChannel.IDChannel, data.newChannel.Name, data.newChannel.Type)
 	if err != nil {
 		render.JSON(w, 500, "Internal server error")
 	} else {

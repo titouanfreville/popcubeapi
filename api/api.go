@@ -26,6 +26,10 @@ func initMiddleware(router *chi.Mux) {
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
+	router.Use(middleware.StripSlashes)
+	// router.Use(middleware.Timeout(5 * 1000))
+	// router.Use(middleware.DefaultCompress)
+	// router.Use(middleware.Heartbeat("/ping"))
 	// When a client closes their connection midway through a request, the
 	// http.CloseNotifier will cancel the request context (ctx).
 	router.Use(middleware.CloseNotify)

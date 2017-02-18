@@ -1,4 +1,4 @@
- package api
+package api
 
 import (
 	"context"
@@ -54,12 +54,16 @@ func emojiContext(next http.Handler) http.Handler {
 		shortcut := chi.URLParam(r, "emojiShortcut")
 		emoji := models.Emoji{}
 		ctx := context.WithValue(r.Context(), "emojiName", name)
-		ctx = context.WithValue(r.Context(), "emojiLink", link)
-		ctx = context.WithValue(r.Context(), "emojiShortcut", shortcut)
+		ctx = context.WithValue(ctx, "emojiLink", link)
+		ctx = context.WithValue(ctx, "emojiShortcut", shortcut)
 		if err == nil {
 			emoji = datastores.NewStore().Emoji().GetByID(emojiID, dbStore.db)
 		}
-		ctx = context.WithValue(r.Context(), "emoji", emoji)
+		ctx = context.WithValue(ctx, "emoji", emoji)
+
+		log.Printf("ctx is :>>>>>>>>>>>>>>>>>>>>>>>>>>> \n ")
+		log.Print(ctx)
+		log.Printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> \n ")
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

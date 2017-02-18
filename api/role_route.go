@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -44,7 +43,7 @@ func roleContext(next http.Handler) http.Handler {
 		if err == nil {
 			role = datastores.NewStore().Role().GetByID(roleID, dbStore.db)
 		}
-		ctx = context.WithValue(r.Context(), "role", role)
+		ctx = context.WithValue(ctx, "role", role)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -128,9 +127,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
-	log.Printf("Role to Update : Id : %d // Name : %s // Link : %s \n", role.IDRole, role.Name, role.Link)
 	err := chiRender.Bind(request, &data)
-	log.Printf("New Role : Id : %d // Name : %s // Link : %s \n", data.newRole.IDRole, data.newRole.Name, data.newRole.Link)
 	if err != nil {
 		render.JSON(w, 500, "Internal server error")
 	} else {

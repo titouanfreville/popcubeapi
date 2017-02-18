@@ -181,7 +181,7 @@ type MemberStore interface {
 type MessageStore interface {
 	Save(message *models.Message, db *gorm.DB) *u.AppError
 	Update(message *models.Message, newMessage *models.Message, db *gorm.DB) *u.AppError
-	GetByID(ID uint64, db *gorm.DB) models.Member
+	GetByID(ID uint64, db *gorm.DB) models.Message
 	GetByDate(messageDate int, db *gorm.DB) []models.Message
 	GetByCreator(creator *models.User, db *gorm.DB) []models.Message
 	GetByChannel(channel *models.Channel, db *gorm.DB) []models.Message

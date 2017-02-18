@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -45,13 +44,13 @@ func avatarContext(next http.Handler) http.Handler {
 		avatarID, err := strconv.ParseUint(chi.URLParam(r, "avatarID"), 10, 64)
 		name := chi.URLParam(r, "avatarName")
 		link := chi.URLParam(r, "avatarLink")
-		avatar := models.Avatar{}
+		oldAvatar := models.Avatar{}
 		ctx := context.WithValue(r.Context(), "avatarName", name)
-		ctx = context.WithValue(r.Context(), "avatarLink", link)
+		ctx = context.WithValue(ctx, "avatarLink", link)
 		if err == nil {
-			avatar = datastores.NewStore().Avatar().GetByID(avatarID, dbStore.db)
+			oldAvatar = datastores.NewStore().Avatar().GetByID(avatarID, dbStore.db)
 		}
-		ctx = context.WithValue(r.Context(), "avatar", avatar)
+		ctx = context.WithValue(ctx, "oldAvatar", oldAvatar)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -113,23 +112,21 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateAvatar(w http.ResponseWriter, r *http.Request) {
-	avatar := r.Context().Value("avatar").(models.Avatar)
-	data := struct {
-		newAvatar *models.Avatar
-		OmitID    interface{} `json:"id,omitempty"`
-	}{newAvatar: &avatar}
+	var data struct {
+		Avatar *models.Avatar
+		OmitID interface{} `json:"id,omitempty"`
+	}
 	store := datastores.NewStore()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
-	log.Printf("Avatar to Update : Id : %d // Name : %s // Link : %s \n", avatar.IDAvatar, avatar.Name, avatar.Link)
 	err := chiRender.Bind(request, &data)
-	log.Printf("New Avatar : Id : %d // Name : %s // Link : %s \n", data.newAvatar.IDAvatar, data.newAvatar.Name, data.newAvatar.Link)
+	avatar := r.Context().Value("oldAvatar").(models.Avatar)
 	if err != nil {
 		render.JSON(w, 500, "Internal server error")
 	} else {
 		if err := db.DB().Ping(); err == nil {
-			err := store.Avatar().Update(&avatar, data.newAvatar, db)
+			err := store.Avatar().Update(&avatar, data.Avatar, db)
 			if err == nil {
 				render.JSON(w, 200, avatar)
 			} else {
