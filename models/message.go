@@ -13,9 +13,9 @@ type Message struct {
 	Date      int64   `gorm:"column:date;not null" json:"date,omitempty"`
 	Content   string  `gorm:"column:content;type:longtext" json:"content,omitempty"`
 	Creator   User    `gorm:"column:creator; not null;ForeignKey:IDUser;" db:"-" json:"-"`
-	IDUser    uint64  `gorm:"column:idUser; not null;" json:"idUser,omitempty"`
+	IDUser    uint64  `gorm:"column:idUser; not null;" json:"id_user,omitempty"`
 	Channel   Channel `gorm:"column:channel; not null;ForeignKey:IDChannel;" db:"-" json:"-"`
-	IDChannel uint64  `gorm:"column:idChannel; not null;" json:"idChannel,omitempty"`
+	IDChannel uint64  `gorm:"column:idChannel; not null;" json:"id_channel,omitempty"`
 }
 
 // IsValid function is used to check that the provided message correspond to the message model. It has to be use before tring to store it in the db.

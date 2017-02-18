@@ -1,10 +1,13 @@
 package api
 
 import (
+	"flag"
+	"log"
 	"net/http"
 
 	"github.com/jinzhu/gorm"
 	"github.com/pressly/chi"
+	"github.com/pressly/chi/docgen"
 	"github.com/pressly/chi/middleware"
 	"github.com/titouanfreville/popcubeapi/datastores"
 )
@@ -13,7 +16,10 @@ type testDb struct {
 	db *gorm.DB
 }
 
-var dbStore = testDb{}
+var (
+	routes  = flag.Bool("routes", false, "Generate router documentation")
+	dbStore = testDb{}
+)
 
 // newRouter initialise api serveur.
 func newRouter() *chi.Mux {
@@ -57,9 +63,21 @@ func StartAPI(hostname string, port string) {
 	initAvatarRoute(router)
 	initChannelRoute(router)
 	initEmojiRoute(router)
+	initFolderRoute(router)
+	initMessageRoute(router)
 	initOrganisationRoute(router)
 	initParameterRoute(router)
 	initRoleRoute(router)
 	initUserRoute(router)
+
+	// Passing -routes to the program will generate docs for the above
+	// router definition. See the `routes.json` file in this folder for
+	// the output.
+	log.Println(docgen.JSONRoutesDoc(router))
+	log.Println(docgen.MarkdownRoutesDoc(router, docgen.MarkdownOpts{
+		ProjectPath: "github.com/titouanfreville/popcubeapi",
+		Intro:       "Welcomme to popcube user api.",
+	}))
+
 	http.ListenAndServe(hostname+":"+port, router)
 }
