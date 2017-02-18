@@ -63,6 +63,13 @@ func (msi MessageStoreImpl) GetAll(db *gorm.DB) []models.Message {
 	return messages
 }
 
+// GetByID Used to get message from DB
+func (msi MessageStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Message {
+	message := models.Message{}
+	db.Where("idMessage = ?", ID).First(&message)
+	return message
+}
+
 // GetByDate Used to get message from DB by specific date
 func (msi MessageStoreImpl) GetByDate(messageDate int, db *gorm.DB) []models.Message {
 	messages := []models.Message{}

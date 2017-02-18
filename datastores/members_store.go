@@ -59,6 +59,13 @@ func (msi MemberStoreImpl) GetAll(db *gorm.DB) []models.Member {
 	return members
 }
 
+// GetByID Used to get member from DB
+func (msi MemberStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Member {
+	member := models.Member{}
+	db.Where("idMember = ?", ID).First(&member)
+	return member
+}
+
 // GetByUser get member from user
 func (msi MemberStoreImpl) GetByUser(user *models.User, db *gorm.DB) []models.Member {
 	members := []models.Member{}

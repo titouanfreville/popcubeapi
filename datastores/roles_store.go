@@ -11,7 +11,7 @@ import (
 // RoleStoreImpl Used to implement RoleStore interface
 type RoleStoreImpl struct{}
 
-// Role Generate the struct for avatar store
+// Role Generate the struct for role store
 func (s StoreImpl) Role() RoleStore {
 	return RoleStoreImpl{}
 }
@@ -66,6 +66,13 @@ func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, db *gor
 	}
 	transaction.Commit()
 	return nil
+}
+
+// GetByID Used to get role from DB
+func (rsi RoleStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Role {
+	role := models.Role{}
+	db.Where("idRole = ?", ID).First(&role)
+	return role
 }
 
 // GetAll Used to get role from DB

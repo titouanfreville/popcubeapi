@@ -131,6 +131,7 @@ type AvatarStore interface {
 type ChannelStore interface {
 	Save(channel *models.Channel, db *gorm.DB) *u.AppError
 	Update(channel *models.Channel, newChannel *models.Channel, db *gorm.DB) *u.AppError
+	GetByID(ID uint64, db *gorm.DB) models.Channel
 	GetByName(channelName string, db *gorm.DB) models.Channel
 	GetByType(channelType string, db *gorm.DB) []models.Channel
 	GetPublic(db *gorm.DB) []models.Channel
@@ -155,6 +156,7 @@ type EmojiStore interface {
 type FolderStore interface {
 	Save(message *models.Folder, db *gorm.DB) *u.AppError
 	Update(message *models.Folder, newFolder *models.Folder, db *gorm.DB) *u.AppError
+	GetByID(ID uint64, db *gorm.DB) models.Folder
 	GetByName(messageName string, db *gorm.DB) []models.Folder
 	GetByType(messageType string, db *gorm.DB) []models.Folder
 	GetByLink(messageLink string, db *gorm.DB) []models.Folder
@@ -167,6 +169,7 @@ type FolderStore interface {
 type MemberStore interface {
 	Save(member *models.Member, db *gorm.DB) *u.AppError
 	Update(member *models.Member, newMember *models.Member, db *gorm.DB) *u.AppError
+	GetByID(ID uint64, db *gorm.DB) models.Member
 	GetByUser(user *models.User, db *gorm.DB) []models.Member
 	GetByChannel(channel *models.Channel, db *gorm.DB) []models.Member
 	GetByRole(role *models.Role, db *gorm.DB) []models.Member
@@ -178,6 +181,7 @@ type MemberStore interface {
 type MessageStore interface {
 	Save(message *models.Message, db *gorm.DB) *u.AppError
 	Update(message *models.Message, newMessage *models.Message, db *gorm.DB) *u.AppError
+	GetByID(ID uint64, db *gorm.DB) models.Member
 	GetByDate(messageDate int, db *gorm.DB) []models.Message
 	GetByCreator(creator *models.User, db *gorm.DB) []models.Message
 	GetByChannel(channel *models.Channel, db *gorm.DB) []models.Message
@@ -206,6 +210,7 @@ type ParameterStore interface {
 type RoleStore interface {
 	Save(role *models.Role, db *gorm.DB) *u.AppError
 	Update(role *models.Role, newRole *models.Role, db *gorm.DB) *u.AppError
+	GetByID(ID uint64, db *gorm.DB) models.Role
 	GetByName(roleName string, db *gorm.DB) models.Role
 	GetByRights(roleRights *models.Role, db *gorm.DB) []models.Role
 	GetAll(db *gorm.DB) []models.Role
@@ -216,6 +221,7 @@ type RoleStore interface {
 type UserStore interface {
 	Save(user *models.User, db *gorm.DB) *u.AppError
 	Update(user *models.User, newUser *models.User, db *gorm.DB) *u.AppError
+	GetByID(ID uint64, db *gorm.DB) models.User
 	GetByUserName(userName string, db *gorm.DB) models.User
 	GetByEmail(userEmail string, db *gorm.DB) models.User
 	GetOrderedByDate(userDate int, db *gorm.DB) []models.User

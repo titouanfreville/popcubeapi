@@ -9,13 +9,13 @@ import (
 
 // Message describe the message table for  PovpCube project. It is linked to User table and Channel table
 type Message struct {
-	IDMessage uint64  `gorm:"primary_key;column:idMessage;AUTO_INCREMENT" json:"-"`
-	Date      int64   `gorm:"column:date;not null" json:"date"`
-	Content   string  `gorm:"column:content;type:longtext" json:"content"`
+	IDMessage uint64  `gorm:"primary_key;column:idMessage;AUTO_INCREMENT" json:"id,omitempty"`
+	Date      int64   `gorm:"column:date;not null" json:"date,omitempty"`
+	Content   string  `gorm:"column:content;type:longtext" json:"content,omitempty"`
 	Creator   User    `gorm:"column:creator; not null;ForeignKey:IDUser;" db:"-" json:"-"`
-	IDUser    uint64  `gorm:"column:idUser; not null;" json:"idUser"`
+	IDUser    uint64  `gorm:"column:idUser; not null;" json:"idUser,omitempty"`
 	Channel   Channel `gorm:"column:channel; not null;ForeignKey:IDChannel;" db:"-" json:"-"`
-	IDChannel uint64  `gorm:"column:idChannel; not null;" json:"idChannel"`
+	IDChannel uint64  `gorm:"column:idChannel; not null;" json:"idChannel,omitempty"`
 }
 
 // IsValid function is used to check that the provided message correspond to the message model. It has to be use before tring to store it in the db.

@@ -9,10 +9,10 @@ import (
 
 // Emoji Type descibe the Emoji table for Popcube DB
 type Emoji struct {
-	IDEmoji  uint64 `gorm:"primary_key;column:idEmoji;AUTO_INCREMENT" json:"-"`
-	Name     string `gorm:"column:name;not null;unique" json:"name"`
-	Shortcut string `gorm:"column:shortcut;not null;unique" json:"shortcut"`
-	Link     string `gorm:"column:link;not null;unique" json:"link"`
+	IDEmoji  uint64 `gorm:"primary_key;column:idEmoji;AUTO_INCREMENT" json:"id,omitempty"`
+	Name     string `gorm:"column:name;not null;unique" json:"name,omitempty"`
+	Shortcut string `gorm:"column:shortcut;not null;unique" json:"shortcut,omitempty"`
+	Link     string `gorm:"column:link;not null;unique" json:"link,omitempty"`
 }
 
 // IsValid is used to check validity of Emoji objects

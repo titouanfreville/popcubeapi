@@ -54,5 +54,7 @@ func StartAPI(hostname string, port string) {
 	basicRoutes(router)
 	initAvatarRoute(router)
 	initEmojiRoute(router)
+	initOrganisationRoute(router)
+	initParameterRoute(router)
 	http.ListenAndServe(hostname+":"+port, router)
 }

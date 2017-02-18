@@ -61,6 +61,13 @@ func (fsi FolderStoreImpl) GetAll(db *gorm.DB) []models.Folder {
 	return folders
 }
 
+// GetByID Used to get folder from DB
+func (fsi FolderStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Folder {
+	folder := models.Folder{}
+	db.Where("idFolder = ?", ID).First(&folder)
+	return folder
+}
+
 // GetByName Used to get folder from DB by specific name
 func (fsi FolderStoreImpl) GetByName(folderName string, db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
@@ -89,10 +96,10 @@ func (fsi FolderStoreImpl) GetByMessage(message *models.Message, db *gorm.DB) []
 	return folders
 }
 
-// GetByChannel get folder from channel
-func (fsi FolderStoreImpl) GetByChannel(channel *models.Channel, db *gorm.DB) []models.Folder {
+// GetByFolder get folder from folder
+func (fsi FolderStoreImpl) GetByFolder(folder *models.Folder, db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
-	db.Table("folders").Select("*").Joins("natural join channels").Where("channels.idChannel = ?", channel.IDChannel).Find(&folders)
+	db.Table("folders").Select("*").Joins("natural join folders").Where("folders.idFolder = ?", folder.IDFolder).Find(&folders)
 	return folders
 }
 

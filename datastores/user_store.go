@@ -62,6 +62,13 @@ func (usi UserStoreImpl) GetAll(db *gorm.DB) []models.User {
 	return users
 }
 
+// GetByID Used to get user from DB
+func (usi UserStoreImpl) GetByID(ID uint64, db *gorm.DB) models.User {
+	user := models.User{}
+	db.Where("idUser = ?", ID).First(&user)
+	return user
+}
+
 // GetByUserName Used to get user from DB
 func (usi UserStoreImpl) GetByUserName(userName string, db *gorm.DB) models.User {
 	user := models.User{}
