@@ -40,10 +40,10 @@ func (asi AvatarStoreImpl) Update(avatar *models.Avatar, newAvatar *models.Avata
 		transaction.Rollback()
 		return u.NewLocAppError("avatarStoreImpl.Update.avatarOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newAvatar.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("avatarStoreImpl.Update.avatarNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newAvatar.IsValid(); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("avatarStoreImpl.Update.avatarNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 	if err := transaction.Model(&avatar).Updates(&newAvatar).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("avatarStoreImpl.Update", "update.transaction.updates.encounterError :"+err.Error(), nil, "")

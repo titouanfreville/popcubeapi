@@ -42,10 +42,10 @@ func (fsi FolderStoreImpl) Update(folder *models.Folder, newFolder *models.Folde
 		transaction.Rollback()
 		return u.NewLocAppError("folderStoreImpl.Update.folderOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newFolder.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("folderStoreImpl.Update.folderNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newFolder.IsValid(); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("folderStoreImpl.Update.folderNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 	if err := transaction.Model(&folder).Updates(&newFolder).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("folderStoreImpl.Update", "update.transaction.updates.encounterError :"+err.Error(), nil, "")

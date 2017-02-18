@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -52,18 +51,14 @@ func emojiContext(next http.Handler) http.Handler {
 		name := chi.URLParam(r, "emojiName")
 		link := chi.URLParam(r, "emojiLink")
 		shortcut := chi.URLParam(r, "emojiShortcut")
-		emoji := models.Emoji{}
+		oldEmoji := models.Emoji{}
 		ctx := context.WithValue(r.Context(), "emojiName", name)
 		ctx = context.WithValue(ctx, "emojiLink", link)
 		ctx = context.WithValue(ctx, "emojiShortcut", shortcut)
 		if err == nil {
-			emoji = datastores.NewStore().Emoji().GetByID(emojiID, dbStore.db)
+			oldEmoji = datastores.NewStore().Emoji().GetByID(emojiID, dbStore.db)
 		}
-		ctx = context.WithValue(ctx, "emoji", emoji)
-
-		log.Printf("ctx is :>>>>>>>>>>>>>>>>>>>>>>>>>>> \n ")
-		log.Print(ctx)
-		log.Printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> \n ")
+		ctx = context.WithValue(ctx, "oldEmoji", oldEmoji)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -134,23 +129,21 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateEmoji(w http.ResponseWriter, r *http.Request) {
-	emoji := r.Context().Value("emoji").(models.Emoji)
-	data := struct {
-		newEmoji *models.Emoji
-		OmitID   interface{} `json:"id,omitempty"`
-	}{newEmoji: &emoji}
+	var data struct {
+		Emoji  *models.Emoji
+		OmitID interface{} `json:"id,omitempty"`
+	}
 	store := datastores.NewStore()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
-	log.Printf("Emoji to Update : Id : %d // Name : %s // Link : %s \n", emoji.IDEmoji, emoji.Name, emoji.Link)
 	err := chiRender.Bind(request, &data)
-	log.Printf("New Emoji : Id : %d // Name : %s // Link : %s \n", data.newEmoji.IDEmoji, data.newEmoji.Name, data.newEmoji.Link)
+	emoji := r.Context().Value("oldEmoji").(models.Emoji)
 	if err != nil {
 		render.JSON(w, 500, "Internal server error")
 	} else {
 		if err := db.DB().Ping(); err == nil {
-			err := store.Emoji().Update(&emoji, data.newEmoji, db)
+			err := store.Emoji().Update(&emoji, data.Emoji, db)
 			if err == nil {
 				render.JSON(w, 200, emoji)
 			} else {

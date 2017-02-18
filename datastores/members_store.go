@@ -40,10 +40,10 @@ func (msi MemberStoreImpl) Update(member *models.Member, newMember *models.Membe
 		transaction.Rollback()
 		return u.NewLocAppError("memberStoreImpl.Update.memberOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newMember.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("memberStoreImpl.Update.memberNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newMember.IsValid(); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("memberStoreImpl.Update.memberNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 	if err := transaction.Model(&member).Updates(&newMember).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("memberStoreImpl.Update", "update.transaction.updates.encounterError :"+err.Error(), nil, "")

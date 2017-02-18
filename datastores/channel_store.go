@@ -43,10 +43,10 @@ func (csi ChannelStoreImpl) Update(channel *models.Channel, newChannel *models.C
 		transaction.Rollback()
 		return u.NewLocAppError("channelStoreImpl.Update.channelOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newChannel.IsValid(true); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newChannel.IsValid(true); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 
 	if err := transaction.Model(&channel).Update(&newChannel).Error; err != nil {
 		transaction.Rollback()

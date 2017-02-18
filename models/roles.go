@@ -12,12 +12,12 @@ import (
 type Role struct {
 	IDRole        uint64 `gorm:"primary_key;column:idRole;AUTO_INCREMENT" json:"id,omitempty"`
 	RoleName      string `gorm:"column:roleName;unique_index;not null;unique" json:"name,omitempty"`
-	CanUsePrivate bool   `gorm:"column:canUsePrivate;not null" json:"canUsePrivate,omitempty"`
-	CanModerate   bool   `gorm:"column:canModerate;not null" json:"canModerate,omitempty"`
-	CanArchive    bool   `gorm:"column:canArchive;not null" json:"canArchive,omitempty"`
-	CanInvite     bool   `gorm:"column:canInvite;not null" json:"canInvite,omitempty"`
-	CanManage     bool   `gorm:"column:canManage;not null" json:"canManage,omitempty"`
-	CanManageUser bool   `gorm:"column:canManageUser;not null" json:"canManageUser,omitempty"`
+	CanUsePrivate bool   `gorm:"column:canUsePrivate;not null" json:"can_use_private,omitempty"`
+	CanModerate   bool   `gorm:"column:canModerate;not null" json:"can_moderate,omitempty"`
+	CanArchive    bool   `gorm:"column:canArchive;not null" json:"can_archive,omitempty"`
+	CanInvite     bool   `gorm:"column:canInvite;not null" json:"can_invite,omitempty"`
+	CanManage     bool   `gorm:"column:canManage;not null" json:"can_manage,omitempty"`
+	CanManageUser bool   `gorm:"column:canManageUser;not null" json:"can_manage_user,omitempty"`
 }
 
 var (

@@ -44,10 +44,10 @@ func (msi MessageStoreImpl) Update(message *models.Message, newMessage *models.M
 		transaction.Rollback()
 		return u.NewLocAppError("messageStoreImpl.Update.messageOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newMessage.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("messageStoreImpl.Update.messageNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newMessage.IsValid(); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("messageStoreImpl.Update.messageNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 	if err := transaction.Model(&message).Updates(&newMessage).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("messageStoreImpl.Update", "update.transaction.updates.encounterError :"+err.Error(), nil, "")

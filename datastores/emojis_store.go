@@ -42,10 +42,6 @@ func (esi EmojiStoreImpl) Update(emoji *models.Emoji, newEmoji *models.Emoji, db
 		transaction.Rollback()
 		return u.NewLocAppError("emojiStoreImpl.Update.emojiOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newEmoji.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("emojiStoreImpl.Update.emojiNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
 	if err := transaction.Model(&emoji).Updates(&newEmoji).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("emojiStoreImpl.Update", "update.transaction.updates.encounterError :"+err.Error(), nil, "")

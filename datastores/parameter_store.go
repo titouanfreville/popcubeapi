@@ -18,6 +18,7 @@ func (s StoreImpl) Parameter() ParameterStore {
 func (psi ParameterStoreImpl) Save(parameter *models.Parameter, db *gorm.DB) *u.AppError {
 
 	transaction := db.Begin()
+	parameter.PreSave()
 	if appError := parameter.IsValid(); appError != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("parameterStoreImpl.Save.parameter.PreSave", appError.ID, nil, appError.DetailedError)
@@ -42,10 +43,10 @@ func (psi ParameterStoreImpl) Update(parameter *models.Parameter, newParameter *
 		transaction.Rollback()
 		return u.NewLocAppError("parameterStoreImpl.Update.parameterOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newParameter.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("parameterStoreImpl.Update.parameterNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newParameter.IsValid(); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("parameterStoreImpl.Update.parameterNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 	if err := transaction.Model(&parameter).Updates(&newParameter).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("parameterStoreImpl.Update", "update.transaction.updates.encounterError :"+err.Error(), nil, "")

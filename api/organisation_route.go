@@ -29,11 +29,11 @@ func initOrganisationRoute(router chi.Router) {
 func organisationContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := strconv.ParseUint(chi.URLParam(r, "organisationID"), 10, 64)
-		organisation := models.Organisation{}
+		oldOrganisation := models.Organisation{}
 		if err == nil {
-			organisation = datastores.NewStore().Organisation().Get(dbStore.db)
+			oldOrganisation = datastores.NewStore().Organisation().Get(dbStore.db)
 		}
-		ctx := context.WithValue(r.Context(), "organisation", organisation)
+		ctx := context.WithValue(r.Context(), "oldOrganisation", oldOrganisation)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -77,21 +77,21 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateOrganisation(w http.ResponseWriter, r *http.Request) {
-	organisation := r.Context().Value("organisation").(models.Organisation)
-	data := struct {
-		newOrganisation *models.Organisation
-		OmitID          interface{} `json:"id,omitempty"`
-	}{newOrganisation: &organisation}
+	var data struct {
+		Organisation *models.Organisation
+		OmitID       interface{} `json:"id,omitempty"`
+	}
 	store := datastores.NewStore()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
+	organisation := r.Context().Value("oldOrganisation").(models.Organisation)
 	if err != nil {
 		render.JSON(w, 500, "Internal server error")
 	} else {
 		if err := db.DB().Ping(); err == nil {
-			err := store.Organisation().Update(&organisation, data.newOrganisation, db)
+			err := store.Organisation().Update(&organisation, data.Organisation, db)
 			if err == nil {
 				render.JSON(w, 200, organisation)
 			} else {

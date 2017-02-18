@@ -44,10 +44,10 @@ func (osi OrganisationStoreImpl) Update(organisation *models.Organisation, newOr
 		transaction.Rollback()
 		return u.NewLocAppError("organisationStoreImpl.Update.organisationOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newOrganisation.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newOrganisation.IsValid(); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 	if err := transaction.Model(&organisation).Updates(&newOrganisation).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("organisationStoreImpl.Update", "update.transaction.updates.encounterError: "+err.Error(), nil, "")

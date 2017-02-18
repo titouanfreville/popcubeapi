@@ -61,7 +61,7 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, 500, err)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Parameter().Save(data.Parameter, db)
@@ -77,21 +77,21 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateParameter(w http.ResponseWriter, r *http.Request) {
-	parameter := r.Context().Value("parameter").(models.Parameter)
-	data := struct {
-		newParameter *models.Parameter
-		OmitID       interface{} `json:"id,omitempty"`
-	}{newParameter: &parameter}
+	var data struct {
+		Parameter *models.Parameter
+		OmitID    interface{} `json:"id,omitempty"`
+	}
 	store := datastores.NewStore()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
+	parameter := r.Context().Value("parameter").(models.Parameter)
 	if err != nil {
 		render.JSON(w, 500, "Internal server error")
 	} else {
 		if err := db.DB().Ping(); err == nil {
-			err := store.Parameter().Update(&parameter, data.newParameter, db)
+			err := store.Parameter().Update(&parameter, data.Parameter, db)
 			if err == nil {
 				render.JSON(w, 200, parameter)
 			} else {

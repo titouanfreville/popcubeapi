@@ -47,14 +47,14 @@ func channelContext(next http.Handler) http.Handler {
 		name := chi.URLParam(r, "channelName")
 		channelType := chi.URLParam(r, "channelType")
 		shortcut := chi.URLParam(r, "channelShortcut")
-		channel := models.Channel{}
+		oldChannel := models.Channel{}
 		ctx := context.WithValue(r.Context(), "channelName", name)
 		ctx = context.WithValue(ctx, "channelType", channelType)
 		ctx = context.WithValue(ctx, "channelShortcut", shortcut)
 		if err == nil {
-			channel = datastores.NewStore().Channel().GetByID(channelID, dbStore.db)
+			oldChannel = datastores.NewStore().Channel().GetByID(channelID, dbStore.db)
 		}
-		ctx = context.WithValue(ctx, "channel", channel)
+		ctx = context.WithValue(ctx, "oldChannel", oldChannel)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -140,21 +140,21 @@ func newChannel(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateChannel(w http.ResponseWriter, r *http.Request) {
-	channel := r.Context().Value("channel").(models.Channel)
-	data := struct {
-		newChannel *models.Channel
-		OmitID     interface{} `json:"id,omitempty"`
-	}{newChannel: &channel}
+	var data struct {
+		Channel *models.Channel
+		OmitID  interface{} `json:"id,omitempty"`
+	}
 	store := datastores.NewStore()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
+	channel := r.Context().Value("oldChannel").(models.Channel)
 	if err != nil {
 		render.JSON(w, 500, "Internal server error")
 	} else {
 		if err := db.DB().Ping(); err == nil {
-			err := store.Channel().Update(&channel, data.newChannel, db)
+			err := store.Channel().Update(&channel, data.Channel, db)
 			if err == nil {
 				render.JSON(w, 200, channel)
 			} else {

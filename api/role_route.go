@@ -38,12 +38,12 @@ func roleContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		roleID, err := strconv.ParseUint(chi.URLParam(r, "roleID"), 10, 64)
 		name := chi.URLParam(r, "roleName")
-		role := models.Role{}
+		oldRole := models.Role{}
 		ctx := context.WithValue(r.Context(), "roleName", name)
 		if err == nil {
-			role = datastores.NewStore().Role().GetByID(roleID, dbStore.db)
+			oldRole = datastores.NewStore().Role().GetByID(roleID, dbStore.db)
 		}
-		ctx = context.WithValue(ctx, "role", role)
+		ctx = context.WithValue(ctx, "oldRole", oldRole)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -118,21 +118,21 @@ func newRole(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateRole(w http.ResponseWriter, r *http.Request) {
-	role := r.Context().Value("role").(models.Role)
-	data := struct {
-		newRole *models.Role
-		OmitID  interface{} `json:"id,omitempty"`
-	}{newRole: &role}
+	var data struct {
+		Role   *models.Role
+		OmitID interface{} `json:"id,omitempty"`
+	}
 	store := datastores.NewStore()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
+	role := r.Context().Value("oldRole").(models.Role)
 	if err != nil {
 		render.JSON(w, 500, "Internal server error")
 	} else {
 		if err := db.DB().Ping(); err == nil {
-			err := store.Role().Update(&role, data.newRole, db)
+			err := store.Role().Update(&role, data.Role, db)
 			if err == nil {
 				render.JSON(w, 200, role)
 			} else {

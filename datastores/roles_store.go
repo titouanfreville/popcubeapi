@@ -42,10 +42,10 @@ func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, db *gor
 		transaction.Rollback()
 		return u.NewLocAppError("roleStoreImpl.Update.roleOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newRole.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("roleStoreImpl.Update.roleNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newRole.IsValid(); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("roleStoreImpl.Update.roleNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 	transitionRole := models.Role{
 		CanUsePrivate: newRole.CanUsePrivate,
 		CanModerate:   newRole.CanModerate,
