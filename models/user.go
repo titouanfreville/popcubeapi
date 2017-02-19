@@ -82,19 +82,19 @@ var (
 - lastActivityAt: Date && Time of the last activity of the user.
 */
 type User struct {
-	IDUser             uint64 `gorm:"primary_key;column:idUser;AUTO_INCREMENT" json:"-"`
-	WebID              string `gorm:"column:webId; not null; unique;" json:"web_id"`
-	Username           string `gorm:"column:userName; not null; unique;" json:"username"`
-	Email              string `gorm:"column:email; not null; unique;" json:"email"`
-	EmailVerified      bool   `gorm:"column:emailVerified; not null;" json:"email_verified"`
-	LastUpdate         int64  `gorm:"column:lastUpdate; not null;" json:"last_update"`
-	Deleted            bool   `gorm:"column:deleted; not null;" json:"deleted"`
-	Password           string `gorm:"column:password; not null;" json:"password"`
-	LastPasswordUpdate int64  `gorm:"column:lastPasswordUpdate; not null;" json:"last_password_update"`
-	FailedAttempts     int    `gorm:"column:failedAttempts; not null;" json:"failed_attempts"`
-	Locale             string `gorm:"column:locale; not null;" json:"locale"`
+	IDUser             uint64 `gorm:"primary_key;column:idUser;AUTO_INCREMENT" json:"id,omitempty"`
+	WebID              string `gorm:"column:webId; not null; unique;" json:"web_id,omitempty"`
+	Username           string `gorm:"column:userName; not null; unique;" json:"username,omitempty"`
+	Email              string `gorm:"column:email; not null; unique;" json:"email,omitempty"`
+	EmailVerified      bool   `gorm:"column:emailVerified; not null;" json:"email_verified,omitempty"`
+	LastUpdate         int64  `gorm:"column:lastUpdate; not null;" json:"last_update,omitempty"`
+	Deleted            bool   `gorm:"column:deleted; not null;" json:"deleted,omitempty"`
+	Password           string `gorm:"column:password; not null;" json:"password,omitempty"`
+	LastPasswordUpdate int64  `gorm:"column:lastPasswordUpdate; not null;" json:"last_password_update,omitempty"`
+	FailedAttempts     int    `gorm:"column:failedAttempts; not null;" json:"failed_attempts,omitempty"`
+	Locale             string `gorm:"column:locale; not null;" json:"locale,omitempty"`
 	Role               Role   `gorm:"ForeignKey:IDRole;" db:"-" json:"-"`
-	IDRole             uint64 `gorm:"column:idRole; not null;" json:"idRole"`
+	IDRole             uint64 `gorm:"column:idRole; not null;" json:"id_role,omitempty"`
 	Avatar             string `gorm:"column:avatar;" json:"avatar, omitempty"`
 	NickName           string `gorm:"column:nickName; unique" json:"nickname, omitempty"`
 	FirstName          string `gorm:"column:firstName;" json:"first_name, omitempty"`
@@ -109,13 +109,21 @@ func (user *User) IsValid(isUpdate bool) *u.AppError {
 		if len(user.WebID) != 26 {
 			return u.NewLocAppError("user.IsValid", "model.user.is_valid.WebID.app_error", nil, "")
 		}
+
+		if len(user.Email) == 0 {
+			return u.NewLocAppError("user.IsValid", "model.user.is_valid.Email.app_error", nil, "user_webID="+user.WebID)
+		}
+
+		if len(user.Password) == 0 {
+			return u.NewLocAppError("user.IsValid", "model.user.is_valid.auth_data_pwd.app_error", nil, "user_webID="+user.WebID)
+		}
 	}
 
 	if !IsValidUsername(user.Username) {
 		return u.NewLocAppError("user.IsValid", "model.user.is_valid.Username.app_error", nil, "user_webID="+user.WebID)
 	}
 
-	if len(user.Email) == 0 || len(user.Email) > 128 || !IsValidEmail(user.Email) {
+	if len(user.Email) > 128 || !IsValidEmail(user.Email) {
 		return u.NewLocAppError("user.IsValid", "model.user.is_valid.Email.app_error", nil, "user_webID="+user.WebID)
 	}
 
@@ -129,12 +137,6 @@ func (user *User) IsValid(isUpdate bool) *u.AppError {
 
 	if utf8.RuneCountInString(user.LastName) > 64 {
 		return u.NewLocAppError("user.IsValid", "model.user.is_valid.last_name.app_error", nil, "user_webID="+user.WebID)
-	}
-
-	if !isUpdate {
-		if len(user.Password) == 0 {
-			return u.NewLocAppError("user.IsValid", "model.user.is_valid.auth_data_pwd.app_error", nil, "user_webID="+user.WebID)
-		}
 	}
 
 	return nil

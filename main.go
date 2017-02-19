@@ -1,19 +1,19 @@
 package main
 
 import (
-	myapi "github.com/titouanfreville/popcubeapi/api"
-	datastores "github.com/titouanfreville/popcubeapi/datastores"
+	"github.com/titouanfreville/popcubeapi/api"
+	"github.com/titouanfreville/popcubeapi/datastores"
 )
 
-func api() {
-	myapi.API()
+func initAPI() {
+	api.StartAPI("", "3000")
 }
 
-func init() {
-	ds := datastores.DbStore{}
-	ds.InitConnection("root", "popcube_test", "popcube_dev")
+func initDatastore() {
+	datastores.NewStore().InitDatabase("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
 }
 
 func main() {
-
+	initDatastore()
+	initAPI()
 }

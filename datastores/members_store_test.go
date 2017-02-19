@@ -12,14 +12,13 @@ import (
 )
 
 func TestMemberStore(t *testing.T) {
-	ds := DbStore{}
-	ds.InitConnection("root", "popcube_test", "popcube_dev")
-	db := *ds.Db
+	store := NewStore()
+	db := store.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
 
-	msi := NewMemberStore()
-	usi := NewUserStore()
-	rsi := NewRoleStore()
-	csi := NewChannelStore()
+	msi := store.Member()
+	usi := store.User()
+	rsi := store.Role()
+	csi := store.Channel()
 
 	standartRole := Role{
 		RoleName:      randStringBytes(10),
@@ -30,7 +29,7 @@ func TestMemberStore(t *testing.T) {
 		CanManage:     false,
 		CanManageUser: false,
 	}
-	rsi.Save(&standartRole, ds)
+	rsi.Save(&standartRole, db)
 
 	channelRole := Role{
 		RoleName:      randStringBytes(10),
@@ -41,7 +40,7 @@ func TestMemberStore(t *testing.T) {
 		CanManage:     false,
 		CanManageUser: false,
 	}
-	rsi.Save(&channelRole, ds)
+	rsi.Save(&channelRole, db)
 
 	userTest := User{
 		Username:  randStringBytes(10),
@@ -52,7 +51,7 @@ func TestMemberStore(t *testing.T) {
 		LastName:  "L",
 		IDRole:    standartRole.IDRole,
 	}
-	usi.Save(&userTest, ds)
+	usi.Save(&userTest, db)
 
 	channelTest := Channel{
 		ChannelName: randStringBytes(10),
@@ -62,7 +61,7 @@ func TestMemberStore(t *testing.T) {
 		Subject:     "Sujet",
 		Avatar:      "jesuiscool.svg",
 	}
-	csi.Save(&channelTest, ds)
+	csi.Save(&channelTest, db)
 
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("memberStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
@@ -74,14 +73,14 @@ func TestMemberStore(t *testing.T) {
 		}
 
 		Convey("Given a correct member.", func() {
-			appError := msi.Save(&member, ds)
+			appError := msi.Save(&member, db)
 			Convey("Trying to add it for the first time, should be accepted", func() {
 				So(appError, ShouldBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 			})
 			Convey("Trying to add it a second time should return duplicate error", func() {
-				appError2 := msi.Save(&member, ds)
+				appError2 := msi.Save(&member, db)
 				So(appError2, ShouldNotBeNil)
 				// So(appError2, ShouldResemble, alreadyExistError)
 				So(appError2, ShouldNotResemble, dbError)
@@ -113,13 +112,13 @@ func TestMemberStore(t *testing.T) {
 	// 		IDRole:      adminRole.IDRole,
 	// 	}
 
-	// 	appError := msi.Save(&member, ds)
+	// 	appError := msi.Save(&member, db)
 	// 	So(appError, ShouldBeNil)
 	// 	So(appError, ShouldNotResemble, dbError)
 	// 	So(appError, ShouldNotResemble, alreadyExistError)
 
 	// 	Convey("Provided correct Member to modify should not return errors", func() {
-	// 		appError := msi.Update(&member, &memberNew, ds)
+	// 		appError := msi.Update(&member, &memberNew, db)
 	// 		memberShouldResemble := memberNew
 	// 		memberShouldResemble.WebID = member.WebID
 	// 		memberShouldResemble.IDMember = member.IDMember
@@ -133,7 +132,7 @@ func TestMemberStore(t *testing.T) {
 	// 	Convey("Provided wrong old Member to modify should result in old_member error", func() {
 	// 		member.WebID = "TesT"
 	// 		Convey("Incorrect ID member should return a member invalid id", func() {
-	// 			appError := msi.Update(&member, &memberNew, ds)
+	// 			appError := msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -142,37 +141,37 @@ func TestMemberStore(t *testing.T) {
 	// 		member.WebID = NewID()
 	// 		Convey("Incorrect membername member should return error Invalid membername", func() {
 	// 			member.Membername = "CeNomDevraitJelespereEtreBeaucoupTropLongPourLatrailleMaximaleDemandeParcequelaJeSuiunPoilFeneantEtDeboussouleSansnuldouteilnyavaitpersone"
-	// 			appError := msi.Update(&member, &memberNew, ds)
+	// 			appError := msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberOld.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+member.WebID))
 	// 			member.Membername = ""
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberOld.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+member.WebID))
 	// 			member.Membername = "xD/"
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberOld.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+member.WebID))
 	// 			member.Membername = "xD\\"
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberOld.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+member.WebID))
 	// 			member.Membername = "xD*"
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberOld.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+member.WebID))
 	// 			member.Membername = "xD{"
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -181,7 +180,7 @@ func TestMemberStore(t *testing.T) {
 
 	// 		Convey("Password can]t be empty", func() {
 	// 			member.Password = ""
-	// 			appError := msi.Update(&member, &memberNew, ds)
+	// 			appError := msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -192,37 +191,37 @@ func TestMemberStore(t *testing.T) {
 	// 	Convey("Provided wrong new Member to modify should result in old_member error", func() {
 	// 		Convey("Incorrect membername member should return error Invalid membername", func() {
 	// 			memberNew.Membername = "CeNomDevraitJelespereEtreBeaucoupTropLongPourLatrailleMaximaleDemandeParcequelaJeSuiunPoilFeneantEtDeboussouleSansnuldouteilnyavaitpersone"
-	// 			appError := msi.Update(&member, &memberNew, ds)
+	// 			appError := msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberNew.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+memberNew.WebID))
 	// 			memberNew.Membername = ""
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberNew.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+memberNew.WebID))
 	// 			memberNew.Membername = "xD/"
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberNew.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+memberNew.WebID))
 	// 			memberNew.Membername = "xD\\"
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberNew.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+memberNew.WebID))
 	// 			memberNew.Membername = "xD*"
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
 	// 			So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Update.memberNew.PreSave", "model.member.is_valid.Membername.app_error", nil, "member_webID="+memberNew.WebID))
 	// 			memberNew.Membername = "xD{"
-	// 			appError = msi.Update(&member, &memberNew, ds)
+	// 			appError = msi.Update(&member, &memberNew, db)
 	// 			So(appError, ShouldNotBeNil)
 	// 			So(appError, ShouldNotResemble, dbError)
 	// 			So(appError, ShouldNotResemble, alreadyExistError)
@@ -296,12 +295,12 @@ func TestMemberStore(t *testing.T) {
 	// 		IDRole:      guestRole.IDRole,
 	// 	}
 
-	// 	msi.Save(&member0, ds)
-	// 	msi.Save(&member1, ds)
-	// 	msi.Update(&member1, &member1New, ds)
-	// 	msi.Save(&member2, ds)
-	// 	msi.Save(&member3, ds)
-	// 	msi.Save(&member4, ds)
+	// 	msi.Save(&member0, db)
+	// 	msi.Save(&member1, db)
+	// 	msi.Update(&member1, &member1New, db)
+	// 	msi.Save(&member2, db)
+	// 	msi.Save(&member3, db)
+	// 	msi.Save(&member4, db)
 
 	// 	// Have to be after save so ID are up to date :O
 	// 	memberList := []Member{
@@ -317,57 +316,57 @@ func TestMemberStore(t *testing.T) {
 	// 	emptyList := []Member{}
 
 	// 	Convey("We have to be able to find all members in the db", func() {
-	// 		members := msi.GetAll(ds)
+	// 		members := msi.GetAll(db)
 	// 		So(members, ShouldNotResemble, &emptyList)
 	// 		So(members, ShouldResemble, &memberList)
 	// 	})
 
 	// 	Convey("We have to be able to find a member from is name", func() {
-	// 		member := msi.GetByMemberName(member0.Membername, ds)
+	// 		member := msi.GetByMemberName(member0.Membername, db)
 	// 		So(member, ShouldNotResemble, &Member{})
 	// 		So(member, ShouldResemble, &member0)
-	// 		member = msi.GetByMemberName(member2.Membername, ds)
+	// 		member = msi.GetByMemberName(member2.Membername, db)
 	// 		So(member, ShouldNotResemble, &Member{})
 	// 		So(member, ShouldResemble, &member2)
-	// 		member = msi.GetByMemberName(member3.Membername, ds)
+	// 		member = msi.GetByMemberName(member3.Membername, db)
 	// 		So(member, ShouldNotResemble, &Member{})
 	// 		So(member, ShouldResemble, &member3)
-	// 		member = msi.GetByMemberName(member4.Membername, ds)
+	// 		member = msi.GetByMemberName(member4.Membername, db)
 	// 		So(member, ShouldNotResemble, &Member{})
 	// 		So(member, ShouldResemble, &member4)
 	// 		Convey("Should also work from updated value", func() {
-	// 			member = msi.GetByMemberName(member1New.Membername, ds)
+	// 			member = msi.GetByMemberName(member1New.Membername, db)
 	// 			So(member, ShouldNotResemble, &Member{})
 	// 			So(member, ShouldResemble, &member1)
 	// 		})
 	// 	})
 
 	// 	Convey("We have to be able to find a member from his email", func() {
-	// 		member := msi.GetByEmail(member0.Email, ds)
+	// 		member := msi.GetByEmail(member0.Email, db)
 	// 		So(member, ShouldNotResemble, &Member{})
 	// 		So(member, ShouldResemble, &member0)
-	// 		member = msi.GetByEmail(member2.Email, ds)
+	// 		member = msi.GetByEmail(member2.Email, db)
 	// 		So(member, ShouldNotResemble, &Member{})
 	// 		So(member, ShouldResemble, &member2)
-	// 		member = msi.GetByEmail(member3.Email, ds)
+	// 		member = msi.GetByEmail(member3.Email, db)
 	// 		So(member, ShouldResemble, &member3)
-	// 		member = msi.GetByEmail(member4.Email, ds)
+	// 		member = msi.GetByEmail(member4.Email, db)
 	// 		So(member, ShouldNotResemble, &Member{})
 	// 		So(member, ShouldResemble, &member4)
 	// 	})
 
 	// 	Convey("We have to be able to find an member from his Role", func() {
-	// 		members := msi.GetByRole(&adminRole, ds)
+	// 		members := msi.GetByRole(&adminRole, db)
 	// 		So(members, ShouldNotResemble, &Member{})
 	// 		So(members, ShouldResemble, &admins)
-	// 		members = msi.GetByRole(&guestRole, ds)
+	// 		members = msi.GetByRole(&guestRole, db)
 	// 		So(members, ShouldNotResemble, &Member{})
 	// 		So(members, ShouldResemble, &guests)
 
 	// 	})
 
 	// 	Convey("Searching for non existent member should return empty", func() {
-	// 		member := msi.GetByMemberName("fantome", ds)
+	// 		member := msi.GetByMemberName("fantome", db)
 	// 		So(member, ShouldResemble, &Member{})
 	// 	})
 
@@ -378,7 +377,7 @@ func TestMemberStore(t *testing.T) {
 	// 	db.Delete(&member3)
 
 	// 	Convey("Searching all in empty table should return empty", func() {
-	// 		members := msi.GetAll(ds)
+	// 		members := msi.GetAll(db)
 	// 		So(members, ShouldResemble, &[]Member{})
 	// 	})
 	// })
@@ -426,10 +425,10 @@ func TestMemberStore(t *testing.T) {
 	// 		IDRole:      standartRole.IDRole,
 	// 	}
 
-	// 	msi.Save(&member0, ds)
-	// 	msi.Save(&member1, ds)
-	// 	msi.Save(&member2, ds)
-	// 	msi.Save(&member3, ds)
+	// 	msi.Save(&member0, db)
+	// 	msi.Save(&member1, db)
+	// 	msi.Save(&member2, db)
+	// 	msi.Save(&member3, db)
 
 	// 	// Have to be after save so ID are up to date :O
 	// 	// member3Old := member3
@@ -441,32 +440,32 @@ func TestMemberStore(t *testing.T) {
 	// 	// }
 
 	// 	Convey("Deleting a known member should work", func() {
-	// 		appError := msi.Delete(&member2, ds)
+	// 		appError := msi.Delete(&member2, db)
 	// 		So(appError, ShouldBeNil)
 	// 		So(appError, ShouldNotResemble, dberror)
-	// 		So(msi.GetByMemberName("moris", ds), ShouldResemble, &Member{})
+	// 		So(msi.GetByMemberName("moris", db), ShouldResemble, &Member{})
 	// 	})
 
 	// 	// Convey("Trying to delete from non conform member should return specific member error and should not delete members.", func() {
 	// 	// 	member3.MemberName = "Const"
 	// 	// 	Convey("Too long or empty Name should return name error", func() {
-	// 	// 		appError := msi.Delete(&member3, ds)
+	// 	// 		appError := msi.Delete(&member3, db)
 	// 	// 		So(appError, ShouldNotBeNil)
 	// 	// 		So(appError, ShouldNotResemble, dberror)
 	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Delete.member.PreSave", "model.member.membername.app_error", nil, ""))
-	// 	// 		So(msi.GetAll(ds), ShouldResemble, &memberList1)
+	// 	// 		So(msi.GetAll(db), ShouldResemble, &memberList1)
 	// 	// 		member3.MemberName = "+alpha"
-	// 	// 		appError = msi.Delete(&member3, ds)
+	// 	// 		appError = msi.Delete(&member3, db)
 	// 	// 		So(appError, ShouldNotBeNil)
 	// 	// 		So(appError, ShouldNotResemble, dberror)
 	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Delete.member.PreSave", "model.member.membername.app_error", nil, ""))
-	// 	// 		So(msi.GetAll(ds), ShouldResemble, &memberList1)
+	// 	// 		So(msi.GetAll(db), ShouldResemble, &memberList1)
 	// 	// 		member3.MemberName = "alpha-numerique"
-	// 	// 		appError = msi.Delete(&member3, ds)standartRole
+	// 	// 		appError = msi.Delete(&member3, db)standartRole
 	// 	// 		So(appError, ShouldNotBeNil)
 	// 	// 		So(appError, ShouldNotResemble, dberror)
 	// 	// 		So(appError, ShouldResemble, u.NewLocAppError("memberStoreImpl.Delete.member.PreSave", "model.member.membername.app_error", nil, ""))
-	// 	// 		So(msi.GetAll(ds), ShouldResemble, &memberList1)
+	// 	// 		So(msi.GetAll(db), ShouldResemble, &memberList1)
 	// 	// 	})
 	// 	// })
 

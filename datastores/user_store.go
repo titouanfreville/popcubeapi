@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -8,14 +9,14 @@ import (
 // UserStoreImpl Used to implement UserStore interface
 type UserStoreImpl struct{}
 
-// NewUserStore Generate the struct for user store
-func NewUserStore() UserStore {
-	return &UserStoreImpl{}
+// User Generate the struct for user store
+func (s StoreImpl) User() UserStore {
+	return UserStoreImpl{}
 }
 
 // Save Use to save user in BB
-func (usi UserStoreImpl) Save(user *models.User, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (usi UserStoreImpl) Save(user *models.User, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	user.PreSave()
 	if appError := user.IsValid(false); appError != nil {
@@ -35,8 +36,7 @@ func (usi UserStoreImpl) Save(user *models.User, ds DbStore) *u.AppError {
 }
 
 // Update Used to update user in DB
-func (usi UserStoreImpl) Update(user *models.User, newUser *models.User, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (usi UserStoreImpl) Update(user *models.User, newUser *models.User, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	newUser.PreUpdate()
 	if appError := user.IsValid(false); appError != nil {
@@ -56,88 +56,84 @@ func (usi UserStoreImpl) Update(user *models.User, newUser *models.User, ds DbSt
 }
 
 // GetAll Used to get user from DB
-func (usi UserStoreImpl) GetAll(ds DbStore) *[]models.User {
-	db := *ds.Db
+func (usi UserStoreImpl) GetAll(db *gorm.DB) []models.User {
 	users := []models.User{}
 	db.Find(&users)
-	return &users
+	return users
+}
+
+// GetByID Used to get user from DB
+func (usi UserStoreImpl) GetByID(ID uint64, db *gorm.DB) models.User {
+	user := models.User{}
+	db.Where("idUser = ?", ID).First(&user)
+	return user
 }
 
 // GetByUserName Used to get user from DB
-func (usi UserStoreImpl) GetByUserName(userName string, ds DbStore) *models.User {
-	db := *ds.Db
+func (usi UserStoreImpl) GetByUserName(userName string, db *gorm.DB) models.User {
 	user := models.User{}
 	db.Where("userName = ?", userName).First(&user)
-	return &user
+	return user
 }
 
 // GetByEmail Used to get user from DB by email
-func (usi UserStoreImpl) GetByEmail(userEmail string, ds DbStore) *models.User {
-	db := *ds.Db
+func (usi UserStoreImpl) GetByEmail(userEmail string, db *gorm.DB) models.User {
 	user := models.User{}
 	db.Where("email = ?", userEmail).First(&user)
-	return &user
+	return user
 }
 
 // GetOrderedByDate get all users ordered by date
-func (usi UserStoreImpl) GetOrderedByDate(userDate int, ds DbStore) *[]models.User {
-	db := *ds.Db
+func (usi UserStoreImpl) GetOrderedByDate(userDate int, db *gorm.DB) []models.User {
 	users := []models.User{}
 	db.Order("lastUpdate, userName, email").Find(&users)
-	return &users
+	return users
 }
 
 // GetDeleted get deleted users
-func (usi UserStoreImpl) GetDeleted(ds DbStore) *[]models.User {
-	db := *ds.Db
+func (usi UserStoreImpl) GetDeleted(db *gorm.DB) []models.User {
 	users := []models.User{}
 	db.Where("deleted = ?", true).First(&users)
-	return &users
+	return users
 }
 
 // GetByNickName get user from nick name
-func (usi UserStoreImpl) GetByNickName(nickName string, ds DbStore) *models.User {
-	db := *ds.Db
+func (usi UserStoreImpl) GetByNickName(nickName string, db *gorm.DB) models.User {
 	user := models.User{}
 	db.Where("nickName = ?", nickName).First(&user)
-	return &user
+	return user
 }
 
 // GetByFirstName get user by first name
-func (usi UserStoreImpl) GetByFirstName(firstName string, ds DbStore) *[]models.User {
-	db := *ds.Db
+func (usi UserStoreImpl) GetByFirstName(firstName string, db *gorm.DB) []models.User {
 	users := []models.User{}
 	db.Where("firstName = ?", firstName).Find(&users)
-	return &users
+	return users
 }
 
 // GetByLastName get user from last name
-func (usi UserStoreImpl) GetByLastName(lastName string, ds DbStore) *[]models.User {
-	db := *ds.Db
+func (usi UserStoreImpl) GetByLastName(lastName string, db *gorm.DB) []models.User {
 	users := []models.User{}
 	db.Where("lastName = ?", lastName).Find(&users)
-	return &users
+	return users
 }
 
 // GetByRole get user from rolme
-func (usi UserStoreImpl) GetByRole(role *models.Role, ds DbStore) *[]models.User {
-	db := *ds.Db
+func (usi UserStoreImpl) GetByRole(role *models.Role, db *gorm.DB) []models.User {
 	users := []models.User{}
 	db.Table("users").Select("*").Joins("natural join roles").Where("roles.idRole = ?", role.IDRole).Find(&users)
-	return &users
+	return users
 }
 
 // Need MEMEBER functions to do it
 // GetByChannel Get user in a channem
-// func (usi UserStoreImpl) GetByChannel(channel *models.Channel, ds DbStore) *[]models.User {
-
+// func (usi UserStoreImpl) GetByChannel(channel *models.Channel, db *gorm.DB) *[]models.User {
 // }
 
 //
 
 // Delete Used to get user from DB
-func (usi UserStoreImpl) Delete(user *models.User, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (usi UserStoreImpl) Delete(user *models.User, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := user.IsValid(true); appError != nil {
 		transaction.Rollback()

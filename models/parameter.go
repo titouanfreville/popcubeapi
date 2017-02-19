@@ -19,11 +19,11 @@ const (
 
 // Parameter Type descibe the Parameter table for Popcube DB
 type Parameter struct {
-	IDParameter uint64 `gorm:"primary_key;column:idParameter;AUTO_INCREMENT" json:"-"`
-	Local       string `gorm:"column:local;not null; unique" json:"local"`
-	TimeZone    string `gorm:"column:timeZone;not null; unique;" json:"time_zone"`
-	SleepStart  int    `gorm:"column:sleepStart;not null;unique" json:"sleep_start"`
-	SleepEnd    int    `gorm:"column:sleepEnd;not null;unique" json:"sleep_end"`
+	IDParameter uint64 `gorm:"primary_key;column:idParameter;AUTO_INCREMENT" json:"id,omitempty"`
+	Local       string `gorm:"column:local;not null; unique" json:"local,omitempty"`
+	TimeZone    string `gorm:"column:timeZone;not null; unique;" json:"time_zone,omitempty"`
+	SleepStart  int    `gorm:"column:sleepStart;not null;unique" json:"sleep_start,omitempty"`
+	SleepEnd    int    `gorm:"column:sleepEnd;not null;unique" json:"sleep_end,omitempty"`
 }
 
 // ToJSON transfoorm an Parameter into JSON

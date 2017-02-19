@@ -12,12 +12,12 @@ import (
 )
 
 func TestUserStore(t *testing.T) {
-	ds := DbStore{}
-	ds.InitConnection("root", "popcube_test", "popcube_dev")
-	db := *ds.Db
+	store := NewStore()
+	 	db := store.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
+	
 
-	usi := NewUserStore()
-	rsi := NewRoleStore()
+	usi := store.User()
+	rsi := store.Role()
 
 	ownerRole := Role{
 		RoleName:      "testowner",
@@ -28,7 +28,7 @@ func TestUserStore(t *testing.T) {
 		CanManage:     true,
 		CanManageUser: true,
 	}
-	rsi.Save(&ownerRole, ds)
+	rsi.Save(&ownerRole, db)
 
 	adminRole := Role{
 		RoleName:      "testadmin",
@@ -39,7 +39,7 @@ func TestUserStore(t *testing.T) {
 		CanManage:     true,
 		CanManageUser: true,
 	}
-	rsi.Save(&adminRole, ds)
+	rsi.Save(&adminRole, db)
 	standartRole := Role{
 		RoleName:      "teststandart",
 		CanUsePrivate: true,
@@ -49,7 +49,7 @@ func TestUserStore(t *testing.T) {
 		CanManage:     false,
 		CanManageUser: false,
 	}
-	rsi.Save(&standartRole, ds)
+	rsi.Save(&standartRole, db)
 	guestRole := Role{
 		RoleName:      "testguest",
 		CanUsePrivate: false,
@@ -59,7 +59,7 @@ func TestUserStore(t *testing.T) {
 		CanManage:     false,
 		CanManageUser: false,
 	}
-	rsi.Save(&guestRole, ds)
+	rsi.Save(&guestRole, db)
 
 	Convey("Testing save function", t, func() {
 		dbError := u.NewLocAppError("userStoreImpl.Save", "save.transaction.create.encounterError", nil, "")
@@ -75,14 +75,14 @@ func TestUserStore(t *testing.T) {
 		}
 
 		Convey("Given a correct user.", func() {
-			appError := usi.Save(&user, ds)
+			appError := usi.Save(&user, db)
 			Convey("Trying to add it for the first time, should be accepted", func() {
 				So(appError, ShouldBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 			})
 			Convey("Trying to add it a second time should return duplicate error", func() {
-				appError2 := usi.Save(&user, ds)
+				appError2 := usi.Save(&user, db)
 				So(appError2, ShouldNotBeNil)
 				So(appError2, ShouldResemble, alreadyExistError)
 				So(appError2, ShouldNotResemble, dbError)
@@ -114,13 +114,13 @@ func TestUserStore(t *testing.T) {
 			IDRole:    adminRole.IDRole,
 		}
 
-		appError := usi.Save(&user, ds)
+		appError := usi.Save(&user, db)
 		So(appError, ShouldBeNil)
 		So(appError, ShouldNotResemble, dbError)
 		So(appError, ShouldNotResemble, alreadyExistError)
 
 		Convey("Provided correct User to modify should not return errors", func() {
-			appError := usi.Update(&user, &userNew, ds)
+			appError := usi.Update(&user, &userNew, db)
 			userShouldResemble := userNew
 			userShouldResemble.WebID = user.WebID
 			userShouldResemble.IDUser = user.IDUser
@@ -134,7 +134,7 @@ func TestUserStore(t *testing.T) {
 		Convey("Provided wrong old User to modify should result in old_user error", func() {
 			user.WebID = "TesT"
 			Convey("Incorrect ID user should return a message invalid id", func() {
-				appError := usi.Update(&user, &userNew, ds)
+				appError := usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
@@ -143,37 +143,37 @@ func TestUserStore(t *testing.T) {
 			user.WebID = NewID()
 			Convey("Incorrect username user should return error Invalid username", func() {
 				user.Username = "CeNomDevraitJelespereEtreBeaucoupTropLongPourLatrailleMaximaleDemandeParcequelaJeSuiunPoilFeneantEtDeboussouleSansnuldouteilnyavaitpersone"
-				appError := usi.Update(&user, &userNew, ds)
+				appError := usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userOld.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+user.WebID))
 				user.Username = ""
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userOld.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+user.WebID))
 				user.Username = "xD/"
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userOld.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+user.WebID))
 				user.Username = "xD\\"
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userOld.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+user.WebID))
 				user.Username = "xD*"
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userOld.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+user.WebID))
 				user.Username = "xD{"
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
@@ -182,7 +182,7 @@ func TestUserStore(t *testing.T) {
 
 			Convey("Password can]t be empty", func() {
 				user.Password = ""
-				appError := usi.Update(&user, &userNew, ds)
+				appError := usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
@@ -193,37 +193,37 @@ func TestUserStore(t *testing.T) {
 		Convey("Provided wrong new User to modify should result in old_user error", func() {
 			Convey("Incorrect username user should return error Invalid username", func() {
 				userNew.Username = "CeNomDevraitJelespereEtreBeaucoupTropLongPourLatrailleMaximaleDemandeParcequelaJeSuiunPoilFeneantEtDeboussouleSansnuldouteilnyavaitpersone"
-				appError := usi.Update(&user, &userNew, ds)
+				appError := usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userNew.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+userNew.WebID))
 				userNew.Username = ""
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userNew.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+userNew.WebID))
 				userNew.Username = "xD/"
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userNew.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+userNew.WebID))
 				userNew.Username = "xD\\"
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userNew.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+userNew.WebID))
 				userNew.Username = "xD*"
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
 				So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Update.userNew.PreSave", "model.user.is_valid.Username.app_error", nil, "user_webID="+userNew.WebID))
 				userNew.Username = "xD{"
-				appError = usi.Update(&user, &userNew, ds)
+				appError = usi.Update(&user, &userNew, db)
 				So(appError, ShouldNotBeNil)
 				So(appError, ShouldNotResemble, dbError)
 				So(appError, ShouldNotResemble, alreadyExistError)
@@ -297,12 +297,12 @@ func TestUserStore(t *testing.T) {
 			IDRole:    guestRole.IDRole,
 		}
 
-		usi.Save(&user0, ds)
-		usi.Save(&user1, ds)
-		usi.Update(&user1, &user1New, ds)
-		usi.Save(&user2, ds)
-		usi.Save(&user3, ds)
-		usi.Save(&user4, ds)
+		usi.Save(&user0, db)
+		usi.Save(&user1, db)
+		usi.Update(&user1, &user1New, db)
+		usi.Save(&user2, db)
+		usi.Save(&user3, db)
+		usi.Save(&user4, db)
 
 		// Have to be after save so ID are up to date :O
 		userList := []User{
@@ -318,57 +318,57 @@ func TestUserStore(t *testing.T) {
 		emptyList := []User{}
 
 		Convey("We have to be able to find all users in the db", func() {
-			users := usi.GetAll(ds)
+			users := usi.GetAll(db)
 			So(users, ShouldNotResemble, &emptyList)
 			So(users, ShouldResemble, &userList)
 		})
 
 		Convey("We have to be able to find a user from is name", func() {
-			user := usi.GetByUserName(user0.Username, ds)
+			user := usi.GetByUserName(user0.Username, db)
 			So(user, ShouldNotResemble, &User{})
 			So(user, ShouldResemble, &user0)
-			user = usi.GetByUserName(user2.Username, ds)
+			user = usi.GetByUserName(user2.Username, db)
 			So(user, ShouldNotResemble, &User{})
 			So(user, ShouldResemble, &user2)
-			user = usi.GetByUserName(user3.Username, ds)
+			user = usi.GetByUserName(user3.Username, db)
 			So(user, ShouldNotResemble, &User{})
 			So(user, ShouldResemble, &user3)
-			user = usi.GetByUserName(user4.Username, ds)
+			user = usi.GetByUserName(user4.Username, db)
 			So(user, ShouldNotResemble, &User{})
 			So(user, ShouldResemble, &user4)
 			Convey("Should also work from updated value", func() {
-				user = usi.GetByUserName(user1New.Username, ds)
+				user = usi.GetByUserName(user1New.Username, db)
 				So(user, ShouldNotResemble, &User{})
 				So(user, ShouldResemble, &user1)
 			})
 		})
 
 		Convey("We have to be able to find a user from his email", func() {
-			user := usi.GetByEmail(user0.Email, ds)
+			user := usi.GetByEmail(user0.Email, db)
 			So(user, ShouldNotResemble, &User{})
 			So(user, ShouldResemble, &user0)
-			user = usi.GetByEmail(user2.Email, ds)
+			user = usi.GetByEmail(user2.Email, db)
 			So(user, ShouldNotResemble, &User{})
 			So(user, ShouldResemble, &user2)
-			user = usi.GetByEmail(user3.Email, ds)
+			user = usi.GetByEmail(user3.Email, db)
 			So(user, ShouldResemble, &user3)
-			user = usi.GetByEmail(user4.Email, ds)
+			user = usi.GetByEmail(user4.Email, db)
 			So(user, ShouldNotResemble, &User{})
 			So(user, ShouldResemble, &user4)
 		})
 
 		Convey("We have to be able to find an user from his Role", func() {
-			users := usi.GetByRole(&adminRole, ds)
+			users := usi.GetByRole(&adminRole, db)
 			So(users, ShouldNotResemble, &User{})
 			So(users, ShouldResemble, &admins)
-			users = usi.GetByRole(&guestRole, ds)
+			users = usi.GetByRole(&guestRole, db)
 			So(users, ShouldNotResemble, &User{})
 			So(users, ShouldResemble, &guests)
 
 		})
 
 		Convey("Searching for non existent user should return empty", func() {
-			user := usi.GetByUserName("fantome", ds)
+			user := usi.GetByUserName("fantome", db)
 			So(user, ShouldResemble, &User{})
 		})
 
@@ -379,7 +379,7 @@ func TestUserStore(t *testing.T) {
 		db.Delete(&user3)
 
 		Convey("Searching all in empty table should return empty", func() {
-			users := usi.GetAll(ds)
+			users := usi.GetAll(db)
 			So(users, ShouldResemble, &[]User{})
 		})
 	})
@@ -427,10 +427,10 @@ func TestUserStore(t *testing.T) {
 			IDRole:    standartRole.IDRole,
 		}
 
-		usi.Save(&user0, ds)
-		usi.Save(&user1, ds)
-		usi.Save(&user2, ds)
-		usi.Save(&user3, ds)
+		usi.Save(&user0, db)
+		usi.Save(&user1, db)
+		usi.Save(&user2, db)
+		usi.Save(&user3, db)
 
 		// Have to be after save so ID are up to date :O
 		// user3Old := user3
@@ -442,32 +442,32 @@ func TestUserStore(t *testing.T) {
 		// }
 
 		Convey("Deleting a known user should work", func() {
-			appError := usi.Delete(&user2, ds)
+			appError := usi.Delete(&user2, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dberror)
-			So(usi.GetByUserName("moris", ds), ShouldResemble, &User{})
+			So(usi.GetByUserName("moris", db), ShouldResemble, &User{})
 		})
 
 		// Convey("Trying to delete from non conform user should return specific user error and should not delete users.", func() {
 		// 	user3.UserName = "Const"
 		// 	Convey("Too long or empty Name should return name error", func() {
-		// 		appError := usi.Delete(&user3, ds)
+		// 		appError := usi.Delete(&user3, db)
 		// 		So(appError, ShouldNotBeNil)
 		// 		So(appError, ShouldNotResemble, dberror)
 		// 		So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Delete.user.PreSave", "model.user.username.app_error", nil, ""))
-		// 		So(usi.GetAll(ds), ShouldResemble, &userList1)
+		// 		So(usi.GetAll(db), ShouldResemble, &userList1)
 		// 		user3.UserName = "+alpha"
-		// 		appError = usi.Delete(&user3, ds)
+		// 		appError = usi.Delete(&user3, db)
 		// 		So(appError, ShouldNotBeNil)
 		// 		So(appError, ShouldNotResemble, dberror)
 		// 		So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Delete.user.PreSave", "model.user.username.app_error", nil, ""))
-		// 		So(usi.GetAll(ds), ShouldResemble, &userList1)
+		// 		So(usi.GetAll(db), ShouldResemble, &userList1)
 		// 		user3.UserName = "alpha-numerique"
-		// 		appError = usi.Delete(&user3, ds)standartRole
+		// 		appError = usi.Delete(&user3, db)standartRole
 		// 		So(appError, ShouldNotBeNil)
 		// 		So(appError, ShouldNotResemble, dberror)
 		// 		So(appError, ShouldResemble, u.NewLocAppError("userStoreImpl.Delete.user.PreSave", "model.user.username.app_error", nil, ""))
-		// 		So(usi.GetAll(ds), ShouldResemble, &userList1)
+		// 		So(usi.GetAll(db), ShouldResemble, &userList1)
 		// 	})
 		// })
 

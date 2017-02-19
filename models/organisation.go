@@ -19,12 +19,12 @@ const (
 
 // Organisation Type descibe the Organisation table for Popcube DB
 type Organisation struct {
-	IDOrganisation   uint64 `gorm:"primary_key;column:idOrganisation;AUTO_INCREMENT" json:"-"`
-	DockerStack      int    `gorm:"column:dockerStack;not null;unique" json:"docker_stack"`
-	OrganisationName string `gorm:"column:organisationName;not null;unique" json:"display_name"`
-	Description      string `gorm:"column:desciption" json:"description,omitempty"`
+	IDOrganisation   uint64 `gorm:"primary_key;column:idOrganisation;AUTO_INCREMENT" json:"id,omitempty"`
+	DockerStack      int    `gorm:"column:dockerStack;not null;unique" json:"docker_stack,omitempty"`
+	OrganisationName string `gorm:"column:organisationName;not null;unique" json:"name,omitempty"`
+	Description      string `gorm:"column:description" json:"description,omitempty"`
 	Avatar           string `gorm:"column:avatar" json:"avatar,omitempty"`
-	Domain           string `gorm:"column:domain" json:"avatar,omitempty"`
+	Domain           string `gorm:"column:domain" json:"domain,omitempty"`
 }
 
 // ToJSON transfoorm an Organisation into JSON
