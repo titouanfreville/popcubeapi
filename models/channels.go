@@ -26,7 +26,7 @@ var (
 type Channel struct {
 	IDChannel   uint64 `gorm:"primary_key;column:idChannel;AUTO_INCREMENT" json:"id,omitempty"`
 	WebID       string `gorm:"column:webId;not null;unique" json:"web_id,omitempty"`
-	ChannelName string `gorm:"column:channelName;not null;unique" json:"display_name,omitempty"`
+	ChannelName string `gorm:"column:channelName;not null;unique" json:"name,omitempty"`
 	Type        string `gorm:"column:type;not null" json:"type,omitempty"`
 	LastUpdate  int64  `gorm:"column:lastUpdate;not null;" json:"last_update,omitempty"`
 	Private     bool   `gorm:"column:private;not null" json:"private,omitempty"`
