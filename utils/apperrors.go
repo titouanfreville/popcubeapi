@@ -2,10 +2,11 @@ package utils
 
 import (
 	"encoding/json"
-	goi18n "github.com/nicksnyder/go-i18n/i18n"
 	"io"
 	"io/ioutil"
 	"strings"
+
+	goi18n "github.com/nicksnyder/go-i18n/i18n"
 )
 
 // AppError Type used to structure error reporting for popcube chat project.
@@ -79,5 +80,14 @@ func NewLocAppError(where string, id string, params map[string]interface{}, deta
 	ap.DetailedError = details
 	ap.StatusCode = 500
 	ap.IsOAuth = false
+	return ap
+}
+
+// NewApiError is used to generate server errors
+func NewApiError(statusCode int, id string, message string) *AppError {
+	ap := &AppError{}
+	ap.ID = id
+	ap.Message = message
+	ap.StatusCode = statusCode
 	return ap
 }

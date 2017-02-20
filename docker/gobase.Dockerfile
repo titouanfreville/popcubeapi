@@ -40,4 +40,4 @@ RUN set -x \
     
 # RUN mv /tmp/go/* /go/ && ls /go && rm -rf /tmp/go
 #
-ENTRYPOINT go run /$GOCOPYPATH/api/api.go
+ENTRYPOINT go install && popcubeapi

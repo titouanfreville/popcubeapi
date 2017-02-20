@@ -1,0 +1,448 @@
+swagger: '2.0'
+info:
+  title: Popcube Inner API
+  description: This is the inner API for popcube project (api used when you are logged into specific corporation chat).
+  version: "1.0.0"
+# the domain of the service
+host: popcube.xyz:3000/
+# array of all schemes that your API supports
+schemes:
+  - https
+  - http
+# will be prefixed to all paths
+basePath: /
+produces:
+  - application/json
+paths:
+  /:
+    get:
+      summary: Say hello
+      responses:
+        200:
+          description: Hello world
+  /avatar:
+    get:
+      summary: Product Types
+      description: |
+        The Products endpoint returns information about the *Uber* products
+        offered at a given location. The response includes the display name
+        and other details about each product, and lists the products in the
+        proper display order.
+      parameters:
+        - name: latitude
+          in: query
+          description: Latitude component of location.
+          required: true
+          type: number
+          format: double
+        - name: longitude
+          in: query
+          description: Longitude component of location.
+          required: true
+          type: number
+          format: double
+      tags:
+        - Products
+      responses:
+        200:
+          description: An array of products
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /estimates/price:
+    get:
+      summary: Price Estimates
+      description: |
+        The Price Estimates endpoint returns an estimated price range
+        for each product offered at a given location. The price estimate is
+        provided as a formatted string with the full price range and the localized
+        currency symbol.<br><br>The response also includes low and high estimates,
+        and the [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code for
+        situations requiring currency conversion. When surge is active for a particular
+        product, its surge_multiplier will be greater than 1, but the price estimate
+        already factors in this multiplier.
+      parameters:
+        - name: start_latitude
+          in: query
+          description: Latitude component of start location.
+          required: true
+          type: number
+          format: double
+        - name: start_longitude
+          in: query
+          description: Longitude component of start location.
+          required: true
+          type: number
+          format: double
+        - name: end_latitude
+          in: query
+          description: Latitude component of end location.
+          required: true
+          type: number
+          format: double
+        - name: end_longitude
+          in: query
+          description: Longitude component of end location.
+          required: true
+          type: number
+          format: double
+      tags:
+        - Estimates
+      responses:
+        200:
+          description: An array of price estimates by product
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PriceEstimate'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /estimates/time:
+    get:
+      summary: Time Estimates
+      description: The Time Estimates endpoint returns ETAs for all products offered at a given location, with the responses expressed as integers in seconds. We recommend that this endpoint be called every minute to provide the most accurate, up-to-date ETAs.
+      parameters:
+        - name: start_latitude
+          in: query
+          description: Latitude component of start location.
+          required: true
+          type: number
+          format: double
+        - name: start_longitude
+          in: query
+          description: Longitude component of start location.
+          required: true
+          type: number
+          format: double
+        - name: customer_uuid
+          in: query
+          type: string
+          format: uuid
+          description: Unique customer identifier to be used for experience customization.
+        - name: product_id
+          in: query
+          type: string
+          description: Unique identifier representing a specific product for a given latitude & longitude.
+      tags:
+        - Estimates
+      responses:
+        200:
+          description: An array of products
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /me:
+    get:
+      summary: User Profile
+      description: The User Profile endpoint returns information about the Uber user that has authorized with the application.
+      tags:
+        - User
+      responses:
+        200:
+          description: Profile information for a user
+          schema:
+            $ref: '#/definitions/Profile'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /history:
+    get:
+      summary: User Activity
+      description: The User Activity endpoint returns data about a user's lifetime activity with Uber. The response will include pickup locations and times, dropoff locations and times, the distance of past requests, and information about which products were requested.<br><br>The history array in the response will have a maximum length based on the limit parameter. The response value count may exceed limit, therefore subsequent API requests may be necessary.
+      parameters:
+        - name: offset
+          in: query
+          type: integer
+          format: int32
+          description: Offset the list of returned results by this amount. Default is zero.
+        - name: limit
+          in: query
+          type: integer
+          format: int32
+          description: Number of items to retrieve. Default is 5, maximum is 100.
+      tags:
+        - User
+      responses:
+        200:
+          description: History information for the given user
+          schema:
+            $ref: '#/definitions/Activities'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Avatar:
+    type: object
+    properties:
+      id:
+        type: unsigned integer
+        format: uint64
+        description: Avatar ID in database.
+      name:
+        type: string
+        description: Avatar name.
+      link:
+        type: string
+        description: Avatar location on the data server.
+  Channel:
+    type: object
+    properties:
+      id:
+        type: unsigned integer
+        format: uint64
+        description: Channel ID in database..
+      web_id:
+        type: string
+        description: String id used for cookies and cache variables.
+      name:
+        type: string
+        description: Channel name.
+      type:
+        type: string
+        description: Channel type (in audio/video/text/direct)
+      last_update:
+        type: integer
+        format: int64
+        description: TimeStamp of last update for channel informations.
+      private:
+        type: boolean
+        description: Say if channel is private or public.
+      description:
+        type: string
+        description: Channel description.
+      subject:
+        type: string
+        description: Channel subject.
+      avatar:
+        type: string
+        description: Avatar name for the channel.
+  Emoji:
+    type: object
+    properties:
+      id:
+        type: unsigned integer
+        format: uint64
+        description: Emoji ID in database.
+      name:
+        type: string
+        description: Emoji name.
+      shortcut:
+        type: string
+        description: Emoji shortcut in chat message.
+      link:
+        type: string
+        description: Emoji location on the data server.
+  Folder:
+    type: object
+    properties:
+      id:
+        type: unsigned integer
+        format: uint64
+        description: Folder ID in database.
+      name:
+        type: string
+        description: Folder name.
+      link:
+        type: string
+        description: Folder location on the data server.
+      type:
+        type: string
+        description: Folder type (can be extention).
+      id_message:
+        type: unsigned integer
+        format: uint64
+        description: Id of the message containing the folder.
+  Member:
+    type: object
+    properties:
+      id_user:
+        type: unsigned integer
+        format: uint64
+        description: Id of the member.
+      id_channel:
+        type: unsigned integer
+        format: uint64
+        description: Id of the channel member is in.
+      id_role:
+        type: unsigned integer
+        format: uint64
+        description: Id of the role of the member into channel.
+  Message:
+    type: object
+    properties:
+      id:
+        type: unsigned integer
+        format: uint64
+        description: Message ID in database..
+      date:
+        type: integer
+        format: int64
+        description: Date of the message (time-stamp in ms).
+      content:
+        type: string
+        description: Content of the message
+      id_user:
+        type: unsigned integer
+        format: uint64
+        description: Id of the member.
+      id_channel:
+        type: unsigned integer
+        format: uint64
+        description: Id of the channel member is in.
+  Organisation:
+    type: object
+    properties:
+      id:
+        type: unsigned integer
+        format: uint64
+        description: Organisation ID in database..
+      docker_stack:
+        type: integer
+        format: int64
+        description: Stack of the containers running the organisation inside of docker cluster
+      name:
+        type: string
+        description: Organisation name.
+      description:
+        type: string
+        description: Channel description.
+      avatar:
+        type: string
+        description: Organisation name for the organisation.
+      domain:
+        type: string
+        description: Organisation domain.
+  Parameter:
+    type: object
+    properties:
+      id:
+        type: unsigned integer
+        format: uint64
+        description: Parameter ID in database..
+      local:
+        type: local string
+        description: Default langage local for the Organisation (xx_XX code)
+      time_zone:
+        type: utc string
+        description: Default time zone for the organisation (UTC-timezoneid)
+      sleep_start:
+        type: integer
+        format: int64
+        description: Default sleeping time start
+      sleep_end:
+        type: integer
+        format: int64
+        description: Default sleeping time end
+  Role:
+    type: object
+    properties:
+      id:
+        type: unsigned integer
+        format: uint64
+        description: Role ID in database..
+      name:
+        type: string
+        description: Role name
+      can_use_private:
+        type: boolean
+        description: User having this role can use private channels from organisation.
+      can_moderate:
+        type: boolean
+        description: User having this role can moderate channels from organisation.
+      can_archive:
+        type: boolean
+        description: User having this role can archive channels from organisation.
+      can_invite:
+        type: boolean
+        description: User having this role can invite users into organisation.
+      can_manage:
+        type: boolean
+        description: User having this role can manage organisation.
+      can_manage_user:
+        type: boolean
+        description: User having this role can manage organisation's users.
+  User:
+    type: object
+    properties:
+      id:
+        type: unsigned integer
+        format: uint64
+        description: ChanUsernel ID in database..
+      web_id:
+        type: string
+        description: String id used for cookies and cache variables.
+      username:
+        type: string
+        description: User name.
+      email:
+        type: string
+        description: User email.
+      email_verified:
+        type: boolean
+        description: State if user email was verified.
+      last_update:
+        type: integer
+        format: int64
+        description: TimeStamp of last update for user informations.
+      deleted:
+        type: boolean
+        description: State if user was deleted from organisation.
+      password:
+        type: string
+        description: Encoded user password.
+      last_password_update:
+        type: integer
+        format: int64
+        description: TimeStamp of last update for user password.
+      failed_attempts:
+        type: integer
+        description: User failed password attempts.
+      locale:
+        type: string
+        description: User language.
+      id_role:
+        type: integer
+        format: int64
+        description: User role inside organisation.
+      avatar:
+        type: string
+        description: Avatar name for the user.
+      nickname:
+        type: string
+        description: User nickname.
+      first_name:
+        type: string
+        description: User first name.
+      last_name:
+        type: string
+        description: User last name.
+  Error:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Error key.
+      status_code:
+        type: integer
+        format: int32
+        decription: Return code
+      message:
+        type: string
+      detailed_error:
+        type: string
+      request_id:
+        type: integer

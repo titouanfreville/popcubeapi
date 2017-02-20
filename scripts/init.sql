@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `popcube_test`.`users` (
   `deleted` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'User deleted ? ',
   `password` VARCHAR(200) NOT NULL COMMENT 'User password. Stored encrypted\n',
   `lastPasswordUpdate` BIGINT(20) NOT NULL COMMENT 'Last time password was updated (in MS)\n',
-  `failedAttemprs` INT NOT NULL DEFAULT 0 COMMENT 'Number of failed attempts for user login.\n',
+  `failedAttempts` INT NOT NULL DEFAULT 0 COMMENT 'Number of failed attempts for user login.\n',
   `locale` VARCHAR(5) NOT NULL DEFAULT 'fr_FR' COMMENT 'Langage code (fr_FR, en_US, en_EN .... )\n',
   `idRole` INT UNSIGNED NOT NULL,
   `avatar` VARCHAR(45) NULL,
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `popcube_test`.`organisations` (
   `idOrganisation` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `dockerStack` INT UNSIGNED NOT NULL,
   `organisationName` VARCHAR(45) NOT NULL,
-  `description` VARCHAR(45) NULL,
+  `description` VARCHAR(100) NULL,
   `avatar` VARCHAR(45) NULL,
   `domain` VARCHAR(45) NULL,
   PRIMARY KEY (`idOrganisation`))

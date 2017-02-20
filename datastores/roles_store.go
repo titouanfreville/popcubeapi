@@ -3,6 +3,7 @@ package datastores
 import (
 	"strings"
 
+	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -10,14 +11,13 @@ import (
 // RoleStoreImpl Used to implement RoleStore interface
 type RoleStoreImpl struct{}
 
-// NewRoleStore Generate the struct for avatar store
-func NewRoleStore() RoleStore {
-	return &RoleStoreImpl{}
+// Role Generate the struct for role store
+func (s StoreImpl) Role() RoleStore {
+	return RoleStoreImpl{}
 }
 
 // Save Use to save role in BB
-func (rsi RoleStoreImpl) Save(role *models.Role, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (rsi RoleStoreImpl) Save(role *models.Role, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := role.IsValid(); appError != nil {
 		transaction.Rollback()
@@ -36,17 +36,16 @@ func (rsi RoleStoreImpl) Save(role *models.Role, ds DbStore) *u.AppError {
 }
 
 // Update Used to update role in DB
-func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := role.IsValid(); appError != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("roleStoreImpl.Update.roleOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newRole.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("roleStoreImpl.Update.roleNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newRole.IsValid(); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("roleStoreImpl.Update.roleNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 	transitionRole := models.Role{
 		CanUsePrivate: newRole.CanUsePrivate,
 		CanModerate:   newRole.CanModerate,
@@ -69,34 +68,37 @@ func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, ds DbSt
 	return nil
 }
 
+// GetByID Used to get role from DB
+func (rsi RoleStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Role {
+	role := models.Role{}
+	db.Where("idRole = ?", ID).First(&role)
+	return role
+}
+
 // GetAll Used to get role from DB
-func (rsi RoleStoreImpl) GetAll(ds DbStore) *[]models.Role {
-	db := *ds.Db
+func (rsi RoleStoreImpl) GetAll(db *gorm.DB) []models.Role {
 	roles := []models.Role{}
 	db.Find(&roles)
-	return &roles
+	return roles
 }
 
 // GetByName Used to get role from DB
-func (rsi RoleStoreImpl) GetByName(roleName string, ds DbStore) *models.Role {
-	db := *ds.Db
+func (rsi RoleStoreImpl) GetByName(roleName string, db *gorm.DB) models.Role {
 	role := models.Role{}
 	db.Where("roleName = ?", roleName).First(&role)
-	return &role
+	return role
 }
 
 // GetByRights Used to get role from DB
 // You can only search for roles set to true.
-func (rsi RoleStoreImpl) GetByRights(roleRights *models.Role, ds DbStore) *[]models.Role {
-	db := *ds.Db
+func (rsi RoleStoreImpl) GetByRights(roleRights *models.Role, db *gorm.DB) []models.Role {
 	roles := []models.Role{}
 	db.Where(&roleRights).Find(&roles)
-	return &roles
+	return roles
 }
 
 // Delete Used to get role from DB
-func (rsi RoleStoreImpl) Delete(role *models.Role, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (rsi RoleStoreImpl) Delete(role *models.Role, db *gorm.DB) *u.AppError {
 	transaction := db.Begin()
 	if appError := role.IsValid(); appError != nil {
 		transaction.Rollback()

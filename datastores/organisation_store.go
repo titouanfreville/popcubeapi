@@ -1,6 +1,7 @@
 package datastores
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
@@ -8,14 +9,14 @@ import (
 // OrganisationStoreImpl implements OrganisationSotre interface
 type OrganisationStoreImpl struct{}
 
-// NewOrganisationStore Generate the struct for avatar store
-func NewOrganisationStore() OrganisationStore {
+// Organisation Generate the struct for avatar store
+func (s StoreImpl) Organisation() OrganisationStore {
 	return &OrganisationStoreImpl{}
 }
 
 // Save Use to save data in BB
-func (osi OrganisationStoreImpl) Save(organisation *models.Organisation, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (osi OrganisationStoreImpl) Save(organisation *models.Organisation, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	organisation.PreSave()
 	if appError := organisation.IsValid(); appError != nil {
@@ -35,18 +36,18 @@ func (osi OrganisationStoreImpl) Save(organisation *models.Organisation, ds DbSt
 }
 
 // Update Used to update data in DB
-func (osi OrganisationStoreImpl) Update(organisation *models.Organisation, newOrganisation *models.Organisation, ds DbStore) *u.AppError {
-	db := *ds.Db
+func (osi OrganisationStoreImpl) Update(organisation *models.Organisation, newOrganisation *models.Organisation, db *gorm.DB) *u.AppError {
+
 	transaction := db.Begin()
 	newOrganisation.PreSave()
 	if appError := organisation.IsValid(); appError != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("organisationStoreImpl.Update.organisationOld.PreSave", appError.ID, nil, appError.DetailedError)
 	}
-	if appError := newOrganisation.IsValid(); appError != nil {
-		transaction.Rollback()
-		return u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", appError.ID, nil, appError.DetailedError)
-	}
+	// if appError := newOrganisation.IsValid(); appError != nil {
+	// 	transaction.Rollback()
+	// 	return u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", appError.ID, nil, appError.DetailedError)
+	// }
 	if err := transaction.Model(&organisation).Updates(&newOrganisation).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("organisationStoreImpl.Update", "update.transaction.updates.encounterError: "+err.Error(), nil, "")
@@ -56,9 +57,8 @@ func (osi OrganisationStoreImpl) Update(organisation *models.Organisation, newOr
 }
 
 // Get Used to get organisation from DB
-func (osi OrganisationStoreImpl) Get(ds DbStore) *models.Organisation {
-	db := *ds.Db
+func (osi OrganisationStoreImpl) Get(db *gorm.DB) models.Organisation {
 	organisation := models.Organisation{}
 	db.First(&organisation)
-	return &organisation
+	return organisation
 }
