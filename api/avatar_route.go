@@ -18,13 +18,13 @@ func initAvatarRoute(router chi.Router) {
 		r.Post("/", newAvatar)
 		r.Get("/all", getAllAvatar)
 		r.Post("/new", newAvatar)
-		r.Route("/fromlink/", func(r chi.Router) {
+		r.Route("/link/", func(r chi.Router) {
 			r.Route("/:avatarLink", func(r chi.Router) {
 				r.Use(avatarContext)
 				r.Get("/", getAvatarFromLink)
 			})
 		})
-		r.Route("/fromname/", func(r chi.Router) {
+		r.Route("/name/", func(r chi.Router) {
 			r.Route("/:avatarName", func(r chi.Router) {
 				r.Use(avatarContext)
 				r.Get("/", getAvatarFromName)
@@ -149,13 +149,20 @@ func deleteAvatar(w http.ResponseWriter, r *http.Request) {
 	avatar := r.Context().Value("avatar").(models.Avatar)
 	store := datastores.NewStore()
 	render := renderPackage.New()
+	message := deleteMessage{
+		Object: avatar,
+	}
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		err := store.Avatar().Delete(&avatar, db)
 		if err == nil {
-			render.JSON(w, 200, "Avatar correctly removed.")
+			message.Success = true
+			message.Message = "Avatar well removed."
+			render.JSON(w, 200, message)
 		} else {
-			render.JSON(w, err.StatusCode, err)
+			message.Success = false
+			message.Message = err.Message
+			render.JSON(w, err.StatusCode, message.Message)
 		}
 	} else {
 		render.JSON(w, 503, error503)

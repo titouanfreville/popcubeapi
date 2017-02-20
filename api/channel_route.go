@@ -14,25 +14,24 @@ import (
 
 func initChannelRoute(router chi.Router) {
 	router.Route("/channel", func(r chi.Router) {
-		r.Route("/get", func(r chi.Router) {
-			r.Get("/", getAllChannel)
-			r.Get("/all", getAllChannel)
-			r.Get("/public", getPublicChannel)
-			r.Get("/private", getPrivateChannel)
-			r.Route("/fromtype/", func(r chi.Router) {
-				r.Route("/:channelType", func(r chi.Router) {
-					r.Use(channelContext)
-					r.Get("/", getChannelFromType)
-				})
-			})
-			r.Route("/fromname/", func(r chi.Router) {
-				r.Route("/:channelName", func(r chi.Router) {
-					r.Use(channelContext)
-					r.Get("/", getChannelFromName)
-				})
+		r.Get("/", getAllChannel)
+		r.Post("/", newChannel)
+		r.Get("/all", getAllChannel)
+		r.Post("/new", newChannel)
+		r.Get("/public", getPublicChannel)
+		r.Get("/private", getPrivateChannel)
+		r.Route("/type/", func(r chi.Router) {
+			r.Route("/:channelType", func(r chi.Router) {
+				r.Use(channelContext)
+				r.Get("/", getChannelFromType)
 			})
 		})
-		r.Post("/new", newChannel)
+		r.Route("/name/", func(r chi.Router) {
+			r.Route("/:channelName", func(r chi.Router) {
+				r.Use(channelContext)
+				r.Get("/", getChannelFromName)
+			})
+		})
 		r.Route("/:channelID", func(r chi.Router) {
 			r.Use(channelContext)
 			r.Put("/update", updateChannel)
@@ -170,15 +169,22 @@ func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	channel := r.Context().Value("channel").(models.Channel)
 	store := datastores.NewStore()
 	render := renderPackage.New()
+	message := deleteMessage{
+		Object: channel,
+	}
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		err := store.Channel().Delete(&channel, db)
 		if err == nil {
-			render.JSON(w, 200, "Channel correctly removed.")
+			message.Success = true
+			message.Message = "Channel well removed."
+			render.JSON(w, 200, message)
 		} else {
-			render.JSON(w, err.StatusCode, err)
+			message.Success = false
+			message.Message = err.Message
+			render.JSON(w, err.StatusCode, message.Message)
 		}
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, 503, error503)
 	}
 }

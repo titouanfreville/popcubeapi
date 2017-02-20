@@ -17,6 +17,12 @@ type testDb struct {
 	db *gorm.DB
 }
 
+type deleteMessage struct {
+	Success bool        `json:"success"`
+	Message string      `json:"message,omitempty"`
+	Object  interface{} `json:"removed_object, omitempty"`
+}
+
 var (
 	routes   = flag.Bool("routes", false, "Generate router documentation")
 	dbStore  = testDb{}
@@ -37,7 +43,6 @@ func initMiddleware(router *chi.Mux) {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.StripSlashes)
 	router.Use(middleware.Timeout(5 * 1000))
-	// router.Use(middleware.DefaultCompress)
 	router.Use(middleware.Heartbeat("/ping"))
 	router.Use(middleware.CloseNotify)
 }
@@ -77,6 +82,7 @@ func StartAPI(hostname string, port string) {
 	// router definition. See the `routes.json` file in this folder for
 	// the output.
 	log.Println(docgen.JSONRoutesDoc(router))
+	log.Println(docgen.BuildDoc(router))
 	log.Println(docgen.MarkdownRoutesDoc(router, docgen.MarkdownOpts{
 		ProjectPath: "github.com/titouanfreville/popcubeapi",
 		Intro:       "Welcomme to popcube user api.",

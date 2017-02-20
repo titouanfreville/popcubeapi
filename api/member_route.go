@@ -14,13 +14,12 @@ import (
 
 func initMemberRoute(router chi.Router) {
 	router.Route("/member", func(r chi.Router) {
-		r.Route("/get", func(r chi.Router) {
-			r.Get("/", getAllMember)
-			r.Get("/all", getAllMember)
-			r.Post("/channel", getMemberFromChannel)
-			r.Post("/user", getMemberFromUser)
-			r.Post("/role", getMemberFromRole)
-		})
+		r.Get("/", getAllMember)
+		r.Post("/", newMember)
+		r.Get("/all", getAllMember)
+		r.Post("/channel", getMemberFromChannel)
+		r.Post("/user", getMemberFromUser)
+		r.Post("/role", getMemberFromRole)
 		r.Post("/new", newMember)
 		r.Route("/:memberID", func(r chi.Router) {
 			r.Use(memberContext)
@@ -177,15 +176,22 @@ func deleteMember(w http.ResponseWriter, r *http.Request) {
 	member := r.Context().Value("member").(models.Member)
 	store := datastores.NewStore()
 	render := renderPackage.New()
+	message := deleteMessage{
+		Object: member,
+	}
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		err := store.Member().Delete(&member, db)
 		if err == nil {
-			render.JSON(w, 200, "Member correctly removed.")
+			message.Success = true
+			message.Message = "Member well removed."
+			render.JSON(w, 200, message)
 		} else {
-			render.JSON(w, err.StatusCode, err)
+			message.Success = false
+			message.Message = err.Message
+			render.JSON(w, err.StatusCode, message.Message)
 		}
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, 503, error503)
 	}
 }
