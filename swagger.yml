@@ -4,7 +4,7 @@ info:
   description: This is the inner API for popcube project (api used when you are logged into specific corporation chat).
   version: "1.0.0"
 # the domain of the service
-host: popcube.xyz:3000/
+host: popcube.xyz:3000
 # array of all schemes that your API supports
 schemes:
   - https
@@ -20,176 +20,2847 @@ paths:
       responses:
         200:
           description: Hello world
+  # Avatar route definition        
   /avatar:
     get:
-      summary: Product Types
+      summary: Get all avatars
       description: |
-        The Products endpoint returns information about the *Uber* products
-        offered at a given location. The response includes the display name
-        and other details about each product, and lists the products in the
-        proper display order.
-      parameters:
-        - name: latitude
-          in: query
-          description: Latitude component of location.
-          required: true
-          type: number
-          format: double
-        - name: longitude
-          in: query
-          description: Longitude component of location.
-          required: true
-          type: number
-          format: double
+        Return an array containing all avatars in the database.
       tags:
-        - Products
+        - Avatar
       responses:
         200:
-          description: An array of products
+          description: |
+            *success* An array of avatars
           schema:
             type: array
             items:
-              $ref: '#/definitions/Product'
-        default:
-          description: Unexpected error
+              $ref: '#/definitions/Avatar'
+        503:
+          description: |
+            *error* Unable to connect to database
           schema:
             $ref: '#/definitions/Error'
-  /estimates/price:
-    get:
-      summary: Price Estimates
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new avatar
       description: |
-        The Price Estimates endpoint returns an estimated price range
-        for each product offered at a given location. The price estimate is
-        provided as a formatted string with the full price range and the localized
-        currency symbol.<br><br>The response also includes low and high estimates,
-        and the [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code for
-        situations requiring currency conversion. When surge is active for a particular
-        product, its surge_multiplier will be greater than 1, but the price estimate
-        already factors in this multiplier.
+        Add new avatar to database.
       parameters:
-        - name: start_latitude
-          in: query
-          description: Latitude component of start location.
+        - name: avatar
+          in: body
+          description: Avatar object to create in database
           required: true
-          type: number
-          format: double
-        - name: start_longitude
-          in: query
-          description: Longitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: end_latitude
-          in: query
-          description: Latitude component of end location.
-          required: true
-          type: number
-          format: double
-        - name: end_longitude
-          in: query
-          description: Longitude component of end location.
-          required: true
-          type: number
-          format: double
+          schema:
+            $ref: '#/definitions/Avatar'
       tags:
-        - Estimates
+        - Avatar
       responses:
         200:
-          description: An array of price estimates by product
+          description: |
+            *success* The created avatar object
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/PriceEstimate'
+            $ref: '#/definitions/Avatar'
+        422:
+          description: |
+            *error* Avatar object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /estimates/time:
+  /avatar/all:
     get:
-      summary: Time Estimates
-      description: The Time Estimates endpoint returns ETAs for all products offered at a given location, with the responses expressed as integers in seconds. We recommend that this endpoint be called every minute to provide the most accurate, up-to-date ETAs.
-      parameters:
-        - name: start_latitude
-          in: query
-          description: Latitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: start_longitude
-          in: query
-          description: Longitude component of start location.
-          required: true
-          type: number
-          format: double
-        - name: customer_uuid
-          in: query
-          type: string
-          format: uuid
-          description: Unique customer identifier to be used for experience customization.
-        - name: product_id
-          in: query
-          type: string
-          description: Unique identifier representing a specific product for a given latitude & longitude.
+      summary: Get all avatars
+      description: |
+        Return an array containing all avatars in the database.
       tags:
-        - Estimates
+        - Avatar
       responses:
         200:
-          description: An array of products
+          description: |
+            *success* An array of avatars
           schema:
             type: array
             items:
-              $ref: '#/definitions/Product'
+              $ref: '#/definitions/Avatar'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /avatar/new:
+    post:
+      description: |
+        Add new avatar to database.
+      parameters:
+        - name: avatar
+          in: body
+          description: Avatar object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Avatar'
+      tags:
+        - Avatar
+      responses:
+        200:
+          description: |
+            *success* The created avatar object
+          schema:
+            $ref: '#/definitions/Avatar'
+        422:
+          description: |
+            *error* Avatar object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /me:
+  # /avatar/link/{avatarLink}:
+  #   get:
+  #     summary: Get avatar by link
+  #     description: |
+  #       Return an array of avatar corresponding to provided link.
+  #     parameters:
+  #       - name: avatarLink
+  #         in: path
+  #         description: Link to avatar
+  #         required: false
+  #         type: string
+  #     tags:
+  #       - Avatar
+  #     responses:
+  #       200:
+  #         description: |
+  #           *success* An array of avatars
+  #         schema:
+  #           type: array
+  #           items:
+  #             $ref: '#/definitions/Avatar'
+  #       503:
+  #         description: |
+  #           *error* Unable to connect to database
+  #         schema:
+  #           $ref: '#/definitions/Error'
+  #       default:
+  #         description: |
+  #           *error* Unexpected error
+  #         schema:
+  #           $ref: '#/definitions/Error'
+  /avatar/name/{avatarName}:
     get:
-      summary: User Profile
-      description: The User Profile endpoint returns information about the Uber user that has authorized with the application.
+      summary: Get avatar by name
+      description: |
+        Return an array of avatar corresponding to provided name
+      parameters:
+        - name: avatarLink
+          in: path
+          description: Link to avatar
+          required: false
+          type: string
+      tags:
+        - Avatar
+      responses:
+        200:
+          description: |
+            *success* An array of avatars
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Avatar'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /avatar/{avatarId}:
+    put:
+      summary: Update specified avatar
+      description: |
+        Update avatar corresponding to provided id with provided values. 
+      parameters:
+        - name: avatar
+          in: body
+          description: Avatar object to update in database
+          required: true
+          schema:
+            $ref: '#/definitions/Avatar'
+        - name: avatarId
+          in: path
+          description: Avatar ID to update
+          type: integer
+          required: true
+      tags:
+        - Avatar
+      responses:
+        200:
+          description: |
+            *success* The updated avatar object
+          schema:
+            $ref: '#/definitions/Avatar'
+        422:
+          description: |
+            *error* Avatar object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete avatar
+      description: |
+        Delete provided avatar from database
+      parameters:
+        - name: avatarId
+          in: path
+          description: Avatar ID to update
+          type: integer
+          required: true
+      tags: 
+        - Avatar
+      responses:
+        200:
+          description: |
+            *success* Avatar well deleted.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Delete'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Delete'
+  # Channel routes definition.
+  /channel:
+    get:
+      summary: Get all channels
+      description: |
+        Return an array containing all channels in the database.
+      tags:
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* An array of channels
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Channel'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new channel
+      description: |
+        Add new channel to database.
+      parameters:
+        - name: channel
+          in: body
+          description: Channel object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Channel'
+      tags:
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* The created channel object
+          schema:
+            $ref: '#/definitions/Channel'
+        422:
+          description: |
+            *error* Channel object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /channel/all:
+    get:
+      summary: Get all channels
+      description: |
+        Return an array containing all channels in the database.
+      tags:
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* An array of channels
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Channel'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /channel/new:
+    post:
+      description: |
+        Add new channel to database.
+      parameters:
+        - name: channel
+          in: body
+          description: Channel object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Channel'
+      tags:
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* The created channel object
+          schema:
+            $ref: '#/definitions/Channel'
+        422:
+          description: |
+            *error* Channel object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /channel/public:
+    get:
+      summary: Get public channel
+      description: |
+        Return an array containing only public channel
+      tags:
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* An array of channels
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Channel'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /channel/private:
+    get:
+      summary: Get private channel
+      description:  |
+        Return an array containing only private channel
+      tags:
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* An array of channels
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Channel'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /channel/type/{channelType}:
+    get:
+      summary: Get channel from type
+      description: |
+        Return an array of avatar having specified type.
+      parameters:
+        - name: channelType
+          in: path
+          description: Type to channel
+          required: false
+          type: string
+      tags:
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* An array of channels
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Channel'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /channel/name/{channelName}:
+    get:
+      summary: Get channel from name
+      description: |
+        Return an array from specified name
+      parameters:
+        - name: channelName
+          in: path
+          description: Name of channel
+          required: false
+          type: string
+      tags:
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* An array of channels
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Channel'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /channel/{channelId}:
+    put:
+      summary: Update channel
+      description: |
+        Update provided channel
+      parameters:
+        - name: channel
+          in: body
+          description: Channel object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Channel'
+        - name: channelId
+          in: path
+          description: Channel ID to update
+          type: integer
+      tags:
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* The created channel object
+          schema:
+            $ref: '#/definitions/Channel'
+        422:
+          description: |
+            *error* Channel object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete channel
+      description: |
+        Delete provided channel.
+      parameters:
+        - name: channelId
+          in: path
+          description: Channel ID to update
+          type: integer
+      tags: 
+        - Channel
+      responses:
+        200:
+          description: |
+            *success* Channel well deleted.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Delete'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Delete'
+  # Emoji routes definition
+  /emoji:
+    get:
+      summary: Get all emojis
+      description: |
+        Return an array containing all emojis in the database.
+      tags:
+        - Emoji
+      responses:
+        200:
+          description: |
+            *success* An array of emojis
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Emoji'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new emoji
+      description: |
+        Add new emoji to database.
+      parameters:
+        - name: emoji
+          in: body
+          description: Emoji object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Emoji'
+      tags:
+        - Emoji
+      responses:
+        200:
+          description: |
+            *success* The created emoji object
+          schema:
+            $ref: '#/definitions/Emoji'
+        422:
+          description: |
+            *error* Emoji object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /emoji/all:
+    get:
+      summary: Get all emojis
+      description: |
+        Return an array containing all emojis in the database.
+      tags:
+        - Emoji
+      responses:
+        200:
+          description: |
+            *success* An array of emojis
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Emoji'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /emoji/new:
+    post:
+      description: |
+        Add new emoji to database.
+      parameters:
+        - name: emoji
+          in: body
+          description: Emoji object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Emoji'
+      tags:
+        - Emoji
+      responses:
+        200:
+          description: |
+            *success* The created emoji object
+          schema:
+            $ref: '#/definitions/Emoji'
+        422:
+          description: |
+            *error* Emoji object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  # /emoji/link/{emojiLink}:
+  #   get:
+  #     summary: Emoji type
+  #     description: The emoji endpoint is to be used to manage emojis in the database.
+  #     parameters:
+  #       - name: emojiLink
+  #         in: path
+  #         description: Link to emoji
+  #         required: false
+  #         type: string
+  #     tags:
+  #       - Emoji
+  #     responses:
+  #       200:
+  #         description: The created emoji object
+  #         schema:
+  #           $ref: '#/definitions/Emoji'
+  #       503:
+  #         description: Unable to connect to database
+  #         schema:
+  #           $ref: '#/definitions/Error'
+  #       default:
+  #         description: Unexpected error
+  #         schema:
+  #           $ref: '#/definitions/Error'
+  /emoji/name/{emojiName}:
+    get:
+      summary: Emoji type
+      description: The emoji endpoint is to be used to manage emojis in the database.
+      parameters:
+        - name: emojiName
+          in: path
+          description: Name of emoji
+          required: false
+          type: string
+      tags:
+        - Emoji
+      responses:
+        200:
+          description: |
+            *success* An array of emojis
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Emoji'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /emoji/{emojiId}:
+    put:
+      summary: Emoji type
+      description: The emoji endpoint is to be used to manage emojis in the database.
+      parameters:
+        - name: emoji
+          in: body
+          description: Emoji object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Emoji'
+        - name: emojiId
+          in: path
+          description: Emoji ID to update
+          type: integer
+      tags:
+        - Emoji
+      responses:
+        200:
+          description: |
+            *success* The created emoji object
+          schema:
+            $ref: '#/definitions/Emoji'
+        422:
+          description: |
+            *error* Emoji object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Emoji type
+      description: The emoji endpoint is to be used to manage emojis in the database.
+      parameters:
+        - name: emojiId
+          in: path
+          description: Emoji ID to update
+          type: integer
+      tags: 
+        - Emoji
+      responses:
+        200:
+          description: |
+            *success* Emoji well deleted.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Delete'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Delete'
+  # Folder routes definition.
+  /folder:
+    get:
+      summary: Get all folders
+      description: |
+        Return an array containing all folders in the database.
+      tags:
+        - Folder
+      responses:
+        200:
+          description: |
+            *success* An array of folders
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Folder'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new folder
+      description: |
+        Add new folder to database.
+      parameters:
+        - name: folder
+          in: body
+          description: Folder object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Folder'
+      tags:
+        - Folder
+      responses:
+        200:
+          description: |
+            *success* The created folder object
+          schema:
+            $ref: '#/definitions/Folder'
+        422:
+          description: |
+            *error* Folder object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /folder/all:
+    get:
+      summary: Get all folders
+      description: |
+        Return an array containing all folders in the database.
+      tags:
+        - Folder
+      responses:
+        200:
+          description: |
+            *success* An array of folders
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Folder'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /folder/new:
+    post:
+      description: |
+        Add new folder to database.
+      parameters:
+        - name: folder
+          in: body
+          description: Folder object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Folder'
+      tags:
+        - Folder
+      responses:
+        200:
+          description: |
+            *success* The created folder object
+          schema:
+            $ref: '#/definitions/Folder'
+        422:
+          description: |
+            *error* Folder object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /folder/message:
+    post:
+      summary: Get folder in provided message
+      description: |
+        Return an array containing folder link to provided message
+      parameters:
+        - name: folder
+          in: body
+          description: Folder object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Folder'
+      tags:
+        - Folder
+      responses:
+        200:
+          description: |
+            *success* An array of folders
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Folder'
+        422:
+          description: |
+            *error* Folder object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /folder/type/{folderType}:
+    get:
+      summary: Get folder from type
+      description: |
+        Return an array of avatar having specified type.
+      parameters:
+        - name: folderType
+          in: path
+          description: Type to folder
+          required: false
+          type: string
+      tags:
+        - Folder
+      responses:
+        200:
+          description: |
+            *success* An array of folders
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Folder'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /folder/name/{folderName}:
+    get:
+      summary: Get folder from name
+      description: |
+        Return an array from specified name
+      parameters:
+        - name: folderName
+          in: path
+          description: Name of folder
+          required: false
+          type: string
+      tags:
+        - Folder
+      responses:
+        200:
+          description: |
+            *success* An array of folders
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Folder'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /folder/{folderId}:
+    put:
+      summary: Update folder
+      description: |
+        Update provided folder
+      parameters:
+        - name: folder
+          in: body
+          description: Folder object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Folder'
+        - name: folderId
+          in: path
+          description: Folder ID to update
+          type: integer
+      tags:
+        - Folder
+      responses:
+        200:
+          description: |
+            *success* The created folder object
+          schema:
+            $ref: '#/definitions/Folder'
+        422:
+          description: |
+            *error* Folder object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete folder
+      description: |
+        Delete provided folder.
+      parameters:
+        - name: folderId
+          in: path
+          description: Folder ID to update
+          type: integer
+      tags: 
+        - Folder
+      responses:
+        200:
+          description: |
+            *success* Folder well deleted.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Delete'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Delete'
+  # Member routes definition.
+  /member:
+    get:
+      summary: Get all members
+      description: |
+        Return an array containing all members in the database.
+      tags:
+        - Member
+      responses:
+        200:
+          description: |
+            *success* An array of members
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Member'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new member
+      description: |
+        Add new member to database.
+      parameters:
+        - name: member
+          in: body
+          description: Member object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Member'
+      tags:
+        - Member
+      responses:
+        200:
+          description: |
+            *success* The created member object
+          schema:
+            $ref: '#/definitions/Member'
+        422:
+          description: |
+            *error* Member object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /member/all:
+    get:
+      summary: Get all members
+      description: |
+        Return an array containing all members in the database.
+      tags:
+        - Member
+      responses:
+        200:
+          description: |
+            *success* An array of members
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Member'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /member/new:
+    post:
+      description: |
+        Add new member to database.
+      parameters:
+        - name: member
+          in: body
+          description: Member object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Member'
+      tags:
+        - Member
+      responses:
+        200:
+          description: |
+            *success* The created member object
+          schema:
+            $ref: '#/definitions/Member'
+        422:
+          description: |
+            *error* Member object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /member/channel:
+    post:
+      summary: Get member in provided channel
+      description: |
+        Return an array containing member of a channel
+      parameters:
+        - name: member
+          in: body
+          description: Channel object to retrieve member from
+          required: true
+          schema:
+            $ref: '#/definitions/Member'
+      tags:
+        - Member
+      responses:
+        200:
+          description: |
+            *success* An array of members
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Member'
+        422:
+          description: |
+            *error* Member object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /member/user:
+    post:
+      summary: Get channel an user is in
+      description: |
+        Return an array containing channels a member is in
+      parameters:
+        - name: member
+          in: body
+          description: Member object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Member'
+      tags:
+        - Member
+      responses:
+        200:
+          description: |
+            *success* An array of members
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Member'
+        422:
+          description: |
+            *error* Member object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /member/{memberId}:
+    put:
+      summary: Update member
+      description: |
+        Update provided member
+      parameters:
+        - name: member
+          in: body
+          description: Member object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Member'
+        - name: memberId
+          in: path
+          description: Member ID to update
+          type: integer
+      tags:
+        - Member
+      responses:
+        200:
+          description: |
+            *success* The created member object
+          schema:
+            $ref: '#/definitions/Member'
+        422:
+          description: |
+            *error* Member object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete member
+      description: |
+        Delete provided member.
+      parameters:
+        - name: memberId
+          in: path
+          description: Member ID to update
+          type: integer
+      tags: 
+        - Member
+      responses:
+        200:
+          description: |
+            *success* Member well deleted.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Delete'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Delete'
+# Message routes definition.
+  /message:
+    get:
+      summary: Get all messages
+      description: |
+        Return an array containing all messages in the database.
+      tags:
+        - Message
+      responses:
+        200:
+          description: |
+            *success* An array of messages
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Message'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new message
+      description: |
+        Add new message to database.
+      parameters:
+        - name: message
+          in: body
+          description: Message object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Message'
+      tags:
+        - Message
+      responses:
+        200:
+          description: |
+            *success* The created message object
+          schema:
+            $ref: '#/definitions/Message'
+        422:
+          description: |
+            *error* Message object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /message/all:
+    get:
+      summary: Get all messages
+      description: |
+        Return an array containing all messages in the database.
+      tags:
+        - Message
+      responses:
+        200:
+          description: |
+            *success* An array of messages
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Message'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /message/new:
+    post:
+      description: |
+        Add new message to database.
+      parameters:
+        - name: message
+          in: body
+          description: Message object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Message'
+      tags:
+        - Message
+      responses:
+        200:
+          description: |
+            *success* The created message object
+          schema:
+            $ref: '#/definitions/Message'
+        422:
+          description: |
+            *error* Message object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /message/channel:
+    post:
+      summary: Get message in provided channel
+      description: |
+        Return an array containing message from a channel
+      parameters:
+        - name: message
+          in: body
+          description: Channel object to retrieve message from
+          required: true
+          schema:
+            $ref: '#/definitions/Message'
+      tags:
+        - Message
+      responses:
+        200:
+          description: |
+            *success* An array of messages
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Message'
+        422:
+          description: |
+            *error* Message object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /message/creator:
+    post:
+      summary: Get message created by provided user
+      description: |
+        Return an array containing message created by an user
+      parameters:
+        - name: message
+          in: body
+          description: Message object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Message'
+      tags:
+        - Message
+      responses:
+        200:
+          description: |
+            *success* An array of messages
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Message'
+        422:
+          description: |
+            *error* Message object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error' 
+  /message/date/{messageDate}:
+    get:
+      summary: Get message send at some date
+      description: |
+        Return an array of message corresponding to provided date
+      parameters:
+        - name: messageDate
+          in: path
+          description: Date of message
+          required: false
+          type: string
+      tags:
+        - Message
+      responses:
+        200:
+          description: |
+            *success* An array of messages
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Message'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /message/{messageId}:
+    put:
+      summary: Update message
+      description: |
+        Update provided message
+      parameters:
+        - name: message
+          in: body
+          description: Message object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Message'
+        - name: messageId
+          in: path
+          description: Message ID to update
+          type: integer
+      tags:
+        - Message
+      responses:
+        200:
+          description: |
+            *success* The created message object
+          schema:
+            $ref: '#/definitions/Message'
+        422:
+          description: |
+            *error* Message object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete message
+      description: |
+        Delete provided message.
+      parameters:
+        - name: messageId
+          in: path
+          description: Message ID to update
+          type: integer
+      tags: 
+        - Message
+      responses:
+        200:
+          description: |
+            *success* Message well deleted.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Delete'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Delete'
+# Organisation routes definition.
+  /organisation:
+    get:
+      summary: Get all organisations
+      description: |
+        Return an array containing all organisations in the database.
+      tags:
+        - Organisation
+      responses:
+        200:
+          description: |
+            *success* An array of organisations
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Organisation'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new organisation
+      description: |
+        Add new organisation to database.
+      parameters:
+        - name: organisation
+          in: body
+          description: Organisation object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Organisation'
+      tags:
+        - Organisation
+      responses:
+        200:
+          description: |
+            *success* The created organisation object
+          schema:
+            $ref: '#/definitions/Organisation'
+        422:
+          description: |
+            *error* Organisation object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /organisation/all:
+    get:
+      summary: Get all organisations
+      description: |
+        Return an array containing all organisations in the database.
+      tags:
+        - Organisation
+      responses:
+        200:
+          description: |
+            *success* An array of organisations
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Organisation'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /organisation/new:
+    post:# Organisation routes definition.
+  /organisation:
+    get:
+      summary: Get all organisations
+      description: |
+        Return an array containing all organisations in the database.
+      tags:
+        - Organisation
+      responses:
+        200:
+          description: |
+            *success* An array of organisations
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Organisation'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new organisation
+      description: |
+        Add new organisation to database.
+      parameters:
+        - name: organisation
+          in: body
+          description: Organisation object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Organisation'
+      tags:
+        - Organisation
+      responses:
+        200:
+          description: |
+            *success* The created organisation object
+          schema:
+            $ref: '#/definitions/Organisation'
+        422:
+          description: |
+            *error* Organisation object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /organisation/all:
+    get:
+      summary: Get all organisations
+      description: |
+        Return an array containing all organisations in the database.
+      tags:
+        - Organisation
+      responses:
+        200:
+          description: |
+            *success* An array of organisations
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Organisation'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /organisation/new:
+    post:
+      description: |
+        Add new organisation to database.
+      parameters:
+        - name: organisation
+          in: body
+          description: Organisation object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Organisation'
+      tags:
+        - Organisation
+      responses:
+        200:
+          description: |
+            *success* The created organisation object
+          schema:
+            $ref: '#/definitions/Organisation'
+        422:
+          description: |
+            *error* Organisation object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      description: |
+        Add new organisation to database.
+      parameters:
+        - name: organisation
+          in: body
+          description: Organisation object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Organisation'
+      tags:
+        - Organisation
+      responses:
+        200:
+          description: |
+            *success* The created organisation object
+          schema:
+            $ref: '#/definitions/Organisation'
+        422:
+          description: |
+            *error* Organisation object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /organisation/{organisationId}:
+    put:
+      summary: Update organisation
+      description: |
+        Update provided organisation
+      parameters:
+        - name: organisation
+          in: body
+          description: Organisation object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Organisation'
+        - name: organisationId
+          in: path
+          description: Organisation ID to update
+          type: integer
+      tags:
+        - Organisation
+      responses:
+        200:
+          description: |
+            *success* The created organisation object
+          schema:
+            $ref: '#/definitions/Organisation'
+        422:
+          description: |
+            *error* Organisation object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+# Parameter routes definition.
+  /parameter:
+    get:
+      summary: Get all parameters
+      description: |
+        Return an array containing all parameters in the database.
+      tags:
+        - Parameter
+      responses:
+        200:
+          description: |
+            *success* An array of parameters
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Parameter'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new parameter
+      description: |
+        Add new parameter to database.
+      parameters:
+        - name: parameter
+          in: body
+          description: Parameter object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Parameter'
+      tags:
+        - Parameter
+      responses:
+        200:
+          description: |
+            *success* The created parameter object
+          schema:
+            $ref: '#/definitions/Parameter'
+        422:
+          description: |
+            *error* Parameter object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /parameter/all:
+    get:
+      summary: Get all parameters
+      description: |
+        Return an array containing all parameters in the database.
+      tags:
+        - Parameter
+      responses:
+        200:
+          description: |
+            *success* An array of parameters
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Parameter'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /parameter/new:
+    post:# Parameter routes definition.
+  /parameter:
+    get:
+      summary: Get all parameters
+      description: |
+        Return an array containing all parameters in the database.
+      tags:
+        - Parameter
+      responses:
+        200:
+          description: |
+            *success* An array of parameters
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Parameter'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new parameter
+      description: |
+        Add new parameter to database.
+      parameters:
+        - name: parameter
+          in: body
+          description: Parameter object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Parameter'
+      tags:
+        - Parameter
+      responses:
+        200:
+          description: |
+            *success* The created parameter object
+          schema:
+            $ref: '#/definitions/Parameter'
+        422:
+          description: |
+            *error* Parameter object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /parameter/all:
+    get:
+      summary: Get all parameters
+      description: |
+        Return an array containing all parameters in the database.
+      tags:
+        - Parameter
+      responses:
+        200:
+          description: |
+            *success* An array of parameters
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Parameter'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /parameter/new:
+    post:
+      description: |
+        Add new parameter to database.
+      parameters:
+        - name: parameter
+          in: body
+          description: Parameter object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Parameter'
+      tags:
+        - Parameter
+      responses:
+        200:
+          description: |
+            *success* The created parameter object
+          schema:
+            $ref: '#/definitions/Parameter'
+        422:
+          description: |
+            *error* Parameter object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      description: |
+        Add new parameter to database.
+      parameters:
+        - name: parameter
+          in: body
+          description: Parameter object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Parameter'
+      tags:
+        - Parameter
+      responses:
+        200:
+          description: |
+            *success* The created parameter object
+          schema:
+            $ref: '#/definitions/Parameter'
+        422:
+          description: |
+            *error* Parameter object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /parameter/{parameterId}:
+    put:
+      summary: Update parameter
+      description: |
+        Update provided parameter
+      parameters:
+        - name: parameter
+          in: body
+          description: Parameter object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Parameter'
+        - name: parameterId
+          in: path
+          description: Parameter ID to update
+          type: integer
+      tags:
+        - Parameter
+      responses:
+        200:
+          description: |
+            *success* The created parameter object
+          schema:
+            $ref: '#/definitions/Parameter'
+        422:
+          description: |
+            *error* Parameter object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  # Role routes definition.
+  /role:
+    get:
+      summary: Get all roles
+      description: |
+        Return an array containing all roles in the database.
+      tags:
+        - Role
+      responses:
+        200:
+          description: |
+            *success* An array of roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Role'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new role
+      description: |
+        Add new role to database.
+      parameters:
+        - name: role
+          in: body
+          description: Role object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Role'
+      tags:
+        - Role
+      responses:
+        200:
+          description: |
+            *success* The created role object
+          schema:
+            $ref: '#/definitions/Role'
+        422:
+          description: |
+            *error* Role object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /role/all:
+    get:
+      summary: Get all roles
+      description: |
+        Return an array containing all roles in the database.
+      tags:
+        - Role
+      responses:
+        200:
+          description: |
+            *success* An array of roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Role'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /role/new:
+    post:
+      description: |
+        Add new role to database.
+      parameters:
+        - name: role
+          in: body
+          description: Role object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Role'
+      tags:
+        - Role
+      responses:
+        200:
+          description: |
+            *success* The created role object
+          schema:
+            $ref: '#/definitions/Role'
+        422:
+          description: |
+            *error* Role object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /role/rights:
+    post:
+      summary: Get roles having rights
+      description: |
+        Return an array containing roles possessing some rights
+      parameters:
+        - name: role
+          in: body
+          description: Role object to retrieve role from without ID and name
+          required: true
+          schema:
+            $ref: '#/definitions/Role'
+      tags:
+        - Role
+      responses:
+        200:
+          description: |
+            *success* An array of roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Role'
+        422:
+          description: |
+            *error* Role object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /role/name/{roleName}:
+    get:
+      summary: Role type
+      description: The role endpoint is to be used to manage roles in the database.
+      parameters:
+        - name: roleName
+          in: path
+          description: Name of role
+          required: false
+          type: string
+      tags:
+        - Role
+      responses:
+        200:
+          description: |
+            *success* An array of roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Role'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /role/{roleId}:
+    put:
+      summary: Update role
+      description: |
+        Update provided role
+      parameters:
+        - name: role
+          in: body
+          description: Role object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/Role'
+        - name: roleId
+          in: path
+          description: Role ID to update
+          type: integer
+      tags:
+        - Role
+      responses:
+        200:
+          description: |
+            *success* The created role object
+          schema:
+            $ref: '#/definitions/Role'
+        422:
+          description: |
+            *error* Role object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete role
+      description: |
+        Delete provided role.
+      parameters:
+        - name: roleId
+          in: path
+          description: Role ID to update
+          type: integer
+      tags: 
+        - Role
+      responses:
+        200:
+          description: |
+            *success* Role well deleted.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Delete'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Delete'
+  # User route definition        
+  /user:
+    get:
+      summary: Get all users
+      description: |
+        Return an array containing all users in the database.
       tags:
         - User
       responses:
         200:
-          description: Profile information for a user
+          description: |
+            *success* An array of users
           schema:
-            $ref: '#/definitions/Profile'
-        default:
-          description: Unexpected error
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        503:
+          description: |
+            *error* Unable to connect to database
           schema:
             $ref: '#/definitions/Error'
-  /history:
-    get:
-      summary: User Activity
-      description: The User Activity endpoint returns data about a user's lifetime activity with Uber. The response will include pickup locations and times, dropoff locations and times, the distance of past requests, and information about which products were requested.<br><br>The history array in the response will have a maximum length based on the limit parameter. The response value count may exceed limit, therefore subsequent API requests may be necessary.
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Create new user
+      description: |
+        Add new user to database.
       parameters:
-        - name: offset
-          in: query
-          type: integer
-          format: int32
-          description: Offset the list of returned results by this amount. Default is zero.
-        - name: limit
-          in: query
-          type: integer
-          format: int32
-          description: Number of items to retrieve. Default is 5, maximum is 100.
+        - name: user
+          in: path
+          description: User object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/User'
       tags:
         - User
       responses:
         200:
-          description: History information for the given user
+          description: |
+            *success* The created user object
           schema:
-            $ref: '#/definitions/Activities'
+            $ref: '#/definitions/User'
+        422:
+          description: |
+            *error* User object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /user/all:
+    get:
+      summary: Get all users
+      description: |
+        Return an array containing all users in the database.
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/new:
+    post:
+      description: |
+        Add new user to database.
+      parameters:
+        - name: user
+          in: path
+          description: User object to create in database
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* The created user object
+          schema:
+            $ref: '#/definitions/User'
+        422:
+          description: |
+            *error* User object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/deleted:
+    get:
+      summary: Get deleted users
+      description: |
+        Return an array containing deleted users in the database.
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/role:
+    post:
+      summary: Get user having specific role
+      description: |
+        Return an array containing user having wanted role
+      parameters:
+        - name: role
+          in: path
+          description: Role object we want user to have
+          required: true
+          schema:
+            $ref: '#/definitions/Member'
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        422:
+          description: |
+            *error* Role object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/date/{userDate}:
+    get:
+      summary: Get user by date
+      description: |
+        Return an array of user corresponding to provided date
+      parameters:
+        - date: userDate
+          in: path
+          description: Date the user should have been created
+          required: false
+          type: string
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/email/{userEmail}:
+    get:
+      summary: Get user by email
+      description: |
+        Return an array of user corresponding to provided email
+      parameters:
+        - email: userEmail
+          in: path
+          description: Email of the user we wish to find
+          required: false
+          type: string
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/username/{userName}:
+    get:
+      summary: Get user by user name
+      description: |
+        Return an array of user corresponding to provided user name
+      parameters:
+        - name: userName
+          in: path
+          description: User name of user
+          required: false
+          type: string
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/nickname/{userName}:
+    get:
+      summary: Get user by nick name
+      description: |
+        Return an array of user corresponding to provided nick name
+      parameters:
+        - name: userName
+          in: path
+          description: Nick name of user
+          required: false
+          type: string
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/firstname/{userName}:
+    get:
+      summary: Get user by first name
+      description: |
+        Return an array of user corresponding to provided first name
+      parameters:
+        - name: userName
+          in: path
+          description: First name of user
+          required: false
+          type: string
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/lastname/{userName}:
+    get:
+      summary: Get user by last name
+      description: |
+        Return an array of user corresponding to provided lsat name
+      parameters:
+        - name: userName
+          in: path
+          description: Last name of user
+          required: false
+          type: string
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* An array of users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /user/{userId}:
+    put:
+      summary: Update specified user
+      description: |
+        Update user corresponding to provided id with provided values. 
+      parameters:
+        - name: user
+          in: path
+          description: User object to update in database
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+        - name: userId
+          in: path
+          description: User ID to update
+          type: integer
+          required: true
+      tags:
+        - User
+      responses:
+        200:
+          description: |
+            *success* The updated user object
+          schema:
+            $ref: '#/definitions/User'
+        422:
+          description: |
+            *error* User object not correctly formated
+          schema:
+            $ref: '#/definitions/Error'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete user
+      description: |
+        Delete provided user from database
+      parameters:
+        - name: userId
+          in: path
+          description: User ID to update
+          type: integer
+          required: true
+      tags: 
+        - User
+      responses:
+        200:
+          description: |
+            *success* User well deleted.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Delete'
+        503:
+          description: |
+            *error* Unable to connect to database
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: |
+            *error* Unexpected error
+          schema:
+            $ref: '#/definitions/Delete'
+# Objects definition
 definitions:
   Avatar:
     type: object
     properties:
       id:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Avatar ID in database.
       name:
@@ -202,7 +2873,7 @@ definitions:
     type: object
     properties:
       id:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Channel ID in database..
       web_id:
@@ -234,7 +2905,7 @@ definitions:
     type: object
     properties:
       id:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Emoji ID in database.
       name:
@@ -250,7 +2921,7 @@ definitions:
     type: object
     properties:
       id:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Folder ID in database.
       name:
@@ -263,29 +2934,29 @@ definitions:
         type: string
         description: Folder type (can be extention).
       id_message:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Id of the message containing the folder.
   Member:
     type: object
     properties:
       id_user:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Id of the member.
       id_channel:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Id of the channel member is in.
       id_role:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Id of the role of the member into channel.
   Message:
     type: object
     properties:
       id:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Message ID in database..
       date:
@@ -296,18 +2967,18 @@ definitions:
         type: string
         description: Content of the message
       id_user:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Id of the member.
       id_channel:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Id of the channel member is in.
   Organisation:
     type: object
     properties:
       id:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Organisation ID in database..
       docker_stack:
@@ -330,14 +3001,14 @@ definitions:
     type: object
     properties:
       id:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Parameter ID in database..
       local:
-        type: local string
+        type: string
         description: Default langage local for the Organisation (xx_XX code)
       time_zone:
-        type: utc string
+        type: string
         description: Default time zone for the organisation (UTC-timezoneid)
       sleep_start:
         type: integer
@@ -351,7 +3022,7 @@ definitions:
     type: object
     properties:
       id:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: Role ID in database..
       name:
@@ -379,7 +3050,7 @@ definitions:
     type: object
     properties:
       id:
-        type: unsigned integer
+        type: integer
         format: uint64
         description: ChanUsernel ID in database..
       web_id:
@@ -435,14 +3106,23 @@ definitions:
     properties:
       id:
         type: string
-        description: Error key.
       status_code:
         type: integer
         format: int32
-        decription: Return code
       message:
         type: string
       detailed_error:
         type: string
       request_id:
         type: integer
+  Delete:
+    type: object
+    properties:
+      succes:
+        type: boolean
+      message:
+        type: string
+      object_removed:
+        type: object
+        description: |
+          Object we tried to remove.

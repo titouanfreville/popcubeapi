@@ -14,49 +14,48 @@ import (
 
 func initUserRoute(router chi.Router) {
 	router.Route("/user", func(r chi.Router) {
-		r.Route("/get", func(r chi.Router) {
-			r.Get("/", getAllUser)
-			r.Get("/all", getAllUser)
-			r.Get("/deleted", getDeletedUser)
-			r.Post("/role", getUserFromRole)
-			r.Route("/date/", func(r chi.Router) {
-				r.Route("/:date", func(r chi.Router) {
-					r.Use(userContext)
-					r.Get("/", getUserFromDate)
-				})
-			})
-			r.Route("/email/", func(r chi.Router) {
-				r.Route("/:userEmail", func(r chi.Router) {
-					r.Use(userContext)
-					r.Get("/", getUserFromEmail)
-				})
-			})
-			r.Route("/username/", func(r chi.Router) {
-				r.Route("/:userName", func(r chi.Router) {
-					r.Use(userContext)
-					r.Get("/", getUserFromName)
-				})
-			})
-			r.Route("/nickname/", func(r chi.Router) {
-				r.Route("/:nickName", func(r chi.Router) {
-					r.Use(userContext)
-					r.Get("/", getUserFromNickName)
-				})
-			})
-			r.Route("/firstname/", func(r chi.Router) {
-				r.Route("/:firstName", func(r chi.Router) {
-					r.Use(userContext)
-					r.Get("/", getUserFromFirstName)
-				})
-			})
-			r.Route("/lastname/", func(r chi.Router) {
-				r.Route("/:lastName", func(r chi.Router) {
-					r.Use(userContext)
-					r.Get("/", getUserFromLastName)
-				})
+		r.Get("/", getAllUser)
+		r.Post("/", newUser)
+		r.Get("/all", getAllUser)
+		r.Post("/new", newUser)
+		r.Get("/deleted", getDeletedUser)
+		r.Post("/role", getUserFromRole)
+		r.Route("/date/", func(r chi.Router) {
+			r.Route("/:date", func(r chi.Router) {
+				r.Use(userContext)
+				r.Get("/", getUserFromDate)
 			})
 		})
-		r.Post("/new", newUser)
+		r.Route("/email/", func(r chi.Router) {
+			r.Route("/:userEmail", func(r chi.Router) {
+				r.Use(userContext)
+				r.Get("/", getUserFromEmail)
+			})
+		})
+		r.Route("/username/", func(r chi.Router) {
+			r.Route("/:userName", func(r chi.Router) {
+				r.Use(userContext)
+				r.Get("/", getUserFromName)
+			})
+		})
+		r.Route("/nickname/", func(r chi.Router) {
+			r.Route("/:nickName", func(r chi.Router) {
+				r.Use(userContext)
+				r.Get("/", getUserFromNickName)
+			})
+		})
+		r.Route("/firstname/", func(r chi.Router) {
+			r.Route("/:firstName", func(r chi.Router) {
+				r.Use(userContext)
+				r.Get("/", getUserFromFirstName)
+			})
+		})
+		r.Route("/lastname/", func(r chi.Router) {
+			r.Route("/:lastName", func(r chi.Router) {
+				r.Use(userContext)
+				r.Get("/", getUserFromLastName)
+			})
+		})
 		r.Route("/:userID", func(r chi.Router) {
 			r.Use(userContext)
 			r.Put("/update", updateUser)
@@ -246,15 +245,22 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user").(models.User)
 	store := datastores.NewStore()
 	render := renderPackage.New()
+	message := deleteMessage{
+		Object: user,
+	}
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		err := store.User().Delete(&user, db)
 		if err == nil {
-			render.JSON(w, 200, "User correctly removed.")
+			message.Success = true
+			message.Message = "User well removed."
+			render.JSON(w, 200, message)
 		} else {
-			render.JSON(w, err.StatusCode, err)
+			message.Success = false
+			message.Message = err.Message
+			render.JSON(w, err.StatusCode, message.Message)
 		}
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, 503, error503)
 	}
 }

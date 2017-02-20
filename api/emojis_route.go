@@ -14,29 +14,28 @@ import (
 
 func initEmojiRoute(router chi.Router) {
 	router.Route("/emoji", func(r chi.Router) {
-		r.Route("/get", func(r chi.Router) {
-			r.Get("/", getAllEmoji)
-			r.Get("/all", getAllEmoji)
-			r.Route("/fromlink/", func(r chi.Router) {
-				r.Route("/:emojiLink", func(r chi.Router) {
-					r.Use(emojiContext)
-					r.Get("/", getEmojiFromLink)
-				})
-			})
-			r.Route("/fromname/", func(r chi.Router) {
-				r.Route("/:emojiName", func(r chi.Router) {
-					r.Use(emojiContext)
-					r.Get("/", getEmojiFromName)
-				})
-			})
-			r.Route("/fromshortcut/", func(r chi.Router) {
-				r.Route("/:emojiShortcut", func(r chi.Router) {
-					r.Use(emojiContext)
-					r.Get("/", getEmojiFromShortcut)
-				})
+		r.Get("/", getAllEmoji)
+		r.Post("/", newEmoji)
+		r.Get("/all", getAllEmoji)
+		r.Post("/new", newEmoji)
+		r.Route("/link/", func(r chi.Router) {
+			r.Route("/:emojiLink", func(r chi.Router) {
+				r.Use(emojiContext)
+				r.Get("/", getEmojiFromLink)
 			})
 		})
-		r.Post("/new", newEmoji)
+		r.Route("/name/", func(r chi.Router) {
+			r.Route("/:emojiName", func(r chi.Router) {
+				r.Use(emojiContext)
+				r.Get("/", getEmojiFromName)
+			})
+		})
+		r.Route("/shortcut/", func(r chi.Router) {
+			r.Route("/:emojiShortcut", func(r chi.Router) {
+				r.Use(emojiContext)
+				r.Get("/", getEmojiFromShortcut)
+			})
+		})
 		r.Route("/:emojiID", func(r chi.Router) {
 			r.Use(emojiContext)
 			r.Put("/update", updateEmoji)
@@ -159,15 +158,22 @@ func deleteEmoji(w http.ResponseWriter, r *http.Request) {
 	emoji := r.Context().Value("emoji").(models.Emoji)
 	store := datastores.NewStore()
 	render := renderPackage.New()
+	message := deleteMessage{
+		Object: emoji,
+	}
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		err := store.Emoji().Delete(&emoji, db)
 		if err == nil {
-			render.JSON(w, 200, "Emoji correctly removed.")
+			message.Success = true
+			message.Message = "Emoji well removed."
+			render.JSON(w, 200, message)
 		} else {
-			render.JSON(w, err.StatusCode, err)
+			message.Success = false
+			message.Message = err.Message
+			render.JSON(w, err.StatusCode, message.Message)
 		}
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, 503, error503)
 	}
 }

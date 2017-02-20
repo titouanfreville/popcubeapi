@@ -14,30 +14,29 @@ import (
 
 func initFolderRoute(router chi.Router) {
 	router.Route("/folder", func(r chi.Router) {
-		r.Route("/get", func(r chi.Router) {
-			r.Get("/", getAllFolder)
-			r.Get("/all", getAllFolder)
-			r.Post("/message", getFolderFromMessage)
-			r.Route("/foldername/", func(r chi.Router) {
-				r.Route("/:folderName", func(r chi.Router) {
-					r.Use(folderContext)
-					r.Get("/", getFolderFromName)
-				})
-			})
-			r.Route("/link/", func(r chi.Router) {
-				r.Route("/:folderLink", func(r chi.Router) {
-					r.Use(folderContext)
-					r.Get("/", getFolderFromLink)
-				})
-			})
-			r.Route("/type/", func(r chi.Router) {
-				r.Route("/:folderType", func(r chi.Router) {
-					r.Use(folderContext)
-					r.Get("/", getFolderFromType)
-				})
+		r.Get("/", getAllFolder)
+		r.Post("/", newFolder)
+		r.Get("/all", getAllFolder)
+		r.Post("/new", newFolder)
+		r.Post("/message", getFolderFromMessage)
+		r.Route("/foldername/", func(r chi.Router) {
+			r.Route("/:folderName", func(r chi.Router) {
+				r.Use(folderContext)
+				r.Get("/", getFolderFromName)
 			})
 		})
-		r.Post("/new", newFolder)
+		r.Route("/link/", func(r chi.Router) {
+			r.Route("/:folderLink", func(r chi.Router) {
+				r.Use(folderContext)
+				r.Get("/", getFolderFromLink)
+			})
+		})
+		r.Route("/type/", func(r chi.Router) {
+			r.Route("/:folderType", func(r chi.Router) {
+				r.Use(folderContext)
+				r.Get("/", getFolderFromType)
+			})
+		})
 		r.Route("/:folderID", func(r chi.Router) {
 			r.Use(folderContext)
 			r.Put("/update", updateFolder)
@@ -182,15 +181,22 @@ func deleteFolder(w http.ResponseWriter, r *http.Request) {
 	folder := r.Context().Value("folder").(models.Folder)
 	store := datastores.NewStore()
 	render := renderPackage.New()
+	message := deleteMessage{
+		Object: folder,
+	}
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		err := store.Folder().Delete(&folder, db)
 		if err == nil {
-			render.JSON(w, 200, "Folder correctly removed.")
+			message.Success = true
+			message.Message = "Folder well removed."
+			render.JSON(w, 200, message)
 		} else {
-			render.JSON(w, err.StatusCode, err)
+			message.Success = false
+			message.Message = err.Message
+			render.JSON(w, err.StatusCode, message.Message)
 		}
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, 503, error503)
 	}
 }
