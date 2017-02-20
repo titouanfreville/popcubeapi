@@ -11,6 +11,8 @@ schemes:
   - http
 # will be prefixed to all paths
 basePath: /
+consumes:
+  - application/json
 produces:
   - application/json
 paths:
@@ -1713,153 +1715,6 @@ paths:
             $ref: '#/definitions/Error'
   /organisation/new:
     post:# Organisation routes definition.
-  /organisation:
-    get:
-      summary: Get all organisations
-      description: |
-        Return an array containing all organisations in the database.
-      tags:
-        - Organisation
-      responses:
-        200:
-          description: |
-            *success* An array of organisations
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Organisation'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: |
-            *error* Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      summary: Create new organisation
-      description: |
-        Add new organisation to database.
-      parameters:
-        - name: organisation
-          in: body
-          description: Organisation object to create in database
-          required: true
-          schema:
-            $ref: '#/definitions/Organisation'
-      tags:
-        - Organisation
-      responses:
-        200:
-          description: |
-            *success* The created organisation object
-          schema:
-            $ref: '#/definitions/Organisation'
-        422:
-          description: |
-            *error* Organisation object not correctly formated
-          schema:
-            $ref: '#/definitions/Error'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /organisation/all:
-    get:
-      summary: Get all organisations
-      description: |
-        Return an array containing all organisations in the database.
-      tags:
-        - Organisation
-      responses:
-        200:
-          description: |
-            *success* An array of organisations
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Organisation'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: |
-            *error* Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /organisation/new:
-    post:
-      description: |
-        Add new organisation to database.
-      parameters:
-        - name: organisation
-          in: body
-          description: Organisation object to create in database
-          required: true
-          schema:
-            $ref: '#/definitions/Organisation'
-      tags:
-        - Organisation
-      responses:
-        200:
-          description: |
-            *success* The created organisation object
-          schema:
-            $ref: '#/definitions/Organisation'
-        422:
-          description: |
-            *error* Organisation object not correctly formated
-          schema:
-            $ref: '#/definitions/Error'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-      description: |
-        Add new organisation to database.
-      parameters:
-        - name: organisation
-          in: body
-          description: Organisation object to create in database
-          required: true
-          schema:
-            $ref: '#/definitions/Organisation'
-      tags:
-        - Organisation
-      responses:
-        200:
-          description: |
-            *success* The created organisation object
-          schema:
-            $ref: '#/definitions/Organisation'
-        422:
-          description: |
-            *error* Organisation object not correctly formated
-          schema:
-            $ref: '#/definitions/Error'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
   /organisation/{organisationId}:
     put:
       summary: Update organisation
@@ -1984,153 +1839,6 @@ paths:
             $ref: '#/definitions/Error'
   /parameter/new:
     post:# Parameter routes definition.
-  /parameter:
-    get:
-      summary: Get all parameters
-      description: |
-        Return an array containing all parameters in the database.
-      tags:
-        - Parameter
-      responses:
-        200:
-          description: |
-            *success* An array of parameters
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Parameter'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: |
-            *error* Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-    post:
-      summary: Create new parameter
-      description: |
-        Add new parameter to database.
-      parameters:
-        - name: parameter
-          in: body
-          description: Parameter object to create in database
-          required: true
-          schema:
-            $ref: '#/definitions/Parameter'
-      tags:
-        - Parameter
-      responses:
-        200:
-          description: |
-            *success* The created parameter object
-          schema:
-            $ref: '#/definitions/Parameter'
-        422:
-          description: |
-            *error* Parameter object not correctly formated
-          schema:
-            $ref: '#/definitions/Error'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /parameter/all:
-    get:
-      summary: Get all parameters
-      description: |
-        Return an array containing all parameters in the database.
-      tags:
-        - Parameter
-      responses:
-        200:
-          description: |
-            *success* An array of parameters
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Parameter'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: |
-            *error* Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /parameter/new:
-    post:
-      description: |
-        Add new parameter to database.
-      parameters:
-        - name: parameter
-          in: body
-          description: Parameter object to create in database
-          required: true
-          schema:
-            $ref: '#/definitions/Parameter'
-      tags:
-        - Parameter
-      responses:
-        200:
-          description: |
-            *success* The created parameter object
-          schema:
-            $ref: '#/definitions/Parameter'
-        422:
-          description: |
-            *error* Parameter object not correctly formated
-          schema:
-            $ref: '#/definitions/Error'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-      description: |
-        Add new parameter to database.
-      parameters:
-        - name: parameter
-          in: body
-          description: Parameter object to create in database
-          required: true
-          schema:
-            $ref: '#/definitions/Parameter'
-      tags:
-        - Parameter
-      responses:
-        200:
-          description: |
-            *success* The created parameter object
-          schema:
-            $ref: '#/definitions/Parameter'
-        422:
-          description: |
-            *error* Parameter object not correctly formated
-          schema:
-            $ref: '#/definitions/Error'
-        503:
-          description: |
-            *error* Unable to connect to database
-          schema:
-            $ref: '#/definitions/Error'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
   /parameter/{parameterId}:
     put:
       summary: Update parameter
@@ -2601,13 +2309,13 @@ paths:
             $ref: '#/definitions/Error'
   /user/date/{userDate}:
     get:
-      summary: Get user by date
+      summary: Get user send at some date
       description: |
         Return an array of user corresponding to provided date
       parameters:
-        - date: userDate
+        - name: userDate
           in: path
-          description: Date the user should have been created
+          description: Date of user creation
           required: false
           type: string
       tags:
@@ -2632,13 +2340,13 @@ paths:
             $ref: '#/definitions/Error'
   /user/email/{userEmail}:
     get:
-      summary: Get user by email
+      summary: Get user send at some email
       description: |
         Return an array of user corresponding to provided email
       parameters:
-        - email: userEmail
+        - name: userEmail
           in: path
-          description: Email of the user we wish to find
+          description: Email of user
           required: false
           type: string
       tags:

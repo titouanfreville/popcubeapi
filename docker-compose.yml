@@ -1,5 +1,14 @@
 version: "3"
 services:
+  apidocumentation:
+    build:
+      context: .
+      dockerfile: docker/slateserver.Dockerfile
+    image: registry.le-corre.eu:5000/innerapi:slate-alpha-doc
+    volumes:
+      - "./swagger.yml:/tmp/swagger"
+    ports:
+      - 4567:4567
   back:
     build:
       context: .
