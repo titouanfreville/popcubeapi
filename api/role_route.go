@@ -14,18 +14,17 @@ import (
 
 func initRoleRoute(router chi.Router) {
 	router.Route("/role", func(r chi.Router) {
-		r.Route("/get", func(r chi.Router) {
-			r.Get("/", getAllRole)
-			r.Get("/all", getAllRole)
-			r.Post("/fromrights", getRoleFromRight)
-			r.Route("/fromname/", func(r chi.Router) {
-				r.Route("/:roleName", func(r chi.Router) {
-					r.Use(roleContext)
-					r.Get("/", getRoleFromName)
-				})
+		r.Get("/", getAllRole)
+		r.Post("/", newRole)
+		r.Get("/all", getAllRole)
+		r.Post("/new", newRole)
+		r.Post("/rights", getRoleFromRight)
+		r.Route("/name/", func(r chi.Router) {
+			r.Route("/:roleName", func(r chi.Router) {
+				r.Use(roleContext)
+				r.Get("/", getRoleFromName)
 			})
 		})
-		r.Post("/new", newRole)
 		r.Route("/:roleID", func(r chi.Router) {
 			r.Use(roleContext)
 			r.Put("/update", updateRole)
@@ -148,15 +147,22 @@ func deleteRole(w http.ResponseWriter, r *http.Request) {
 	role := r.Context().Value("role").(models.Role)
 	store := datastores.NewStore()
 	render := renderPackage.New()
+	message := deleteMessage{
+		Object: role,
+	}
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		err := store.Role().Delete(&role, db)
 		if err == nil {
-			render.JSON(w, 200, "Role correctly removed.")
+			message.Success = true
+			message.Message = "Role well removed."
+			render.JSON(w, 200, message)
 		} else {
-			render.JSON(w, err.StatusCode, err)
+			message.Success = false
+			message.Message = err.Message
+			render.JSON(w, err.StatusCode, message.Message)
 		}
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, 503, error503)
 	}
 }

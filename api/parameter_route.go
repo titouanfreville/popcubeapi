@@ -14,10 +14,9 @@ import (
 
 func initParameterRoute(router chi.Router) {
 	router.Route("/parameter", func(r chi.Router) {
-		r.Route("/get", func(r chi.Router) {
-			r.Get("/", getAllParameter)
-			r.Get("/all", getAllParameter)
-		})
+		r.Get("/", getAllParameter)
+		r.Post("/", newParameter)
+		r.Get("/all", getAllParameter)
 		r.Post("/new", newParameter)
 		r.Route("/:parameterID", func(r chi.Router) {
 			r.Use(parameterContext)

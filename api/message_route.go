@@ -30,7 +30,7 @@ func initMessageRoute(router chi.Router) {
 		r.Route("/:messageID", func(r chi.Router) {
 			r.Use(messageContext)
 			r.Put("/update", updateMessage)
-			r.Delete("/delete", deleteMessage)
+			r.Delete("/delete", deleteMessageFunction)
 		})
 	})
 }
@@ -167,19 +167,26 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func deleteMessage(w http.ResponseWriter, r *http.Request) {
+func deleteMessageFunction(w http.ResponseWriter, r *http.Request) {
 	message := r.Context().Value("message").(models.Message)
 	store := datastores.NewStore()
 	render := renderPackage.New()
+	dmessage := deleteMessage{
+		Object: message,
+	}
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		err := store.Message().Delete(&message, db)
 		if err == nil {
-			render.JSON(w, 200, "Message correctly removed.")
+			dmessage.Success = true
+			dmessage.Message = "Message well removed."
+			render.JSON(w, 200, message)
 		} else {
-			render.JSON(w, err.StatusCode, err)
+			dmessage.Success = false
+			dmessage.Message = err.Message
+			render.JSON(w, err.StatusCode, dmessage.Message)
 		}
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, 503, error503)
 	}
 }

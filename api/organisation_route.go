@@ -14,10 +14,9 @@ import (
 
 func initOrganisationRoute(router chi.Router) {
 	router.Route("/organisation", func(r chi.Router) {
-		r.Route("/get", func(r chi.Router) {
-			r.Get("/", getAllOrganisation)
-			r.Get("/all", getAllOrganisation)
-		})
+		r.Get("/", getAllOrganisation)
+		r.Post("/", newOrganisation)
+		r.Get("/all", getAllOrganisation)
 		r.Post("/new", newOrganisation)
 		r.Route("/:organisationID", func(r chi.Router) {
 			r.Use(organisationContext)
