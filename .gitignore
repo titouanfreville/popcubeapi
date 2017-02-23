@@ -254,3 +254,4 @@ paket-files/
 vendor/*
 .env*
 !.env.dist
+!.env.test

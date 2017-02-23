@@ -1,14 +1,16 @@
-FROM registry.le-corre.eu:5000/go:base
-MAINTAINER FREVILLE Titouan titouanfreville@gmail.com
+FROM golang:1.7-alpine
+MAINTAINER Clement LE CORRE <clement@le-corre.eu>
 
 ENV TERM xterm-256color
-ENV WATCHING 0
-ENV TERM xterm-256color
-ENV GOCOPYPATH go/src/github.com/titouanfreville/popcubeapi
-ENV GOSU_VERSION 1.9
-
+COPY go/src /go/src
 WORKDIR /go/src
 
+RUN apk add --no-cache --update git \
+    && go get -v golang.org/x/tools/cmd/godoc \
+    && rm -rf /go/src/golang.org \
+    && apk del git
+
+ENV GOSU_VERSION 1.9
 RUN set -x \
     && apk add --no-cache --virtual .gosu-deps \
         dpkg \
@@ -24,6 +26,6 @@ RUN set -x \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
     && apk del .gosu-deps
-
-
-ENTRYPOINT entrypoint /$GOCOPYPATH $WATCHING
+    
+EXPOSE 6060
+ENTRYPOINT godoc -http=:6060 -goroot=/go/src
