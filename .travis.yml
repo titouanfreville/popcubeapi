@@ -1,23 +1,29 @@
-docker/gotest.Dockerfilesudo: required
+sudo: required
 
-language: bash
+services:
+  - docker
+
+language: go
+
 env:
-  DOCKER_COMPOSE_VERSION: 1.9.0
+    global:
+        - DOCKER_VERSION=1.13.1-0~ubuntu-trusty
+        - DOCKER_COMPOSE_VERSION=1.11.2
 
 before_install:
-  - sudo rm /usr/local/bin/docker-compose
+  - apt-cache madison docker-engine
+  - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
+  - sudo rm -f /usr/local/bin/docker-compose
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - cp .env.test .env
 
-
-services:
-  - docker
-
 script:
+  - docker version
+  - docker-compose version
   - docker login -u="$DOCKER_USER" -p="$DOCKER_PWD" $DOCKER_REGISTRY
-  - docker build -t go_base -f docker/go_base.Dockerfile .;
+  - docker build -t go_base -f docker/gobase.Dockerfile .;
   - docker build -t popcube-docs -f docker/docs.Dockerfile .;
   - docker-compose -f docker-compose.test.yml up --build;
 
@@ -25,7 +31,7 @@ after_success:
   - >-
     if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u="$DOCKER_USER" -p="$DOCKER_PWD" $DOCKER_REGISTRY;
-    docker build -t go_base -f docker/go_base.Dockerfile .;
+    docker build -t go_base -f docker/gobase.Dockerfile .;
     docker tag go_base $DOCKER_REGISTRY/go:base;
     docker push $DOCKER_REGISTRY/go:base;
     docker tag go_base $DOCKER_REGISTRY/popcubeapi:latest;
@@ -33,12 +39,12 @@ after_success:
     docker build -t $DOCKER_REGISTRY/popcubeapidocs:latest -f docker/docs.Dockerfile .;
     docker push $DOCKER_REGISTRY/popcubeapidocs:latest;
     curl -X POST --header 'Content-Type: application/json' --header "X-AUTH-TOKEN: ${DEPLOY_TOKEN}" -d '{ "Image": "registry.le-corre.eu:5000/popcubeapi:latest", "Env": [ "VIRTUAL_NETWORK=nginx-proxy", "LETSENCRYPT_HOST=api.popcube.xyz", "LETSENCRYPT_EMAIL=clement@popcube.xyz", "VIRTUAL_HOST=api.popcube.xyz", "VIRTUAL_PORT=8080" ], "Hostname": "popcube_api" }' http://${DEPLOY_URL}/deploy;
-    curl -X POST --header 'Content-Type: application/json' --header "X-AUTH-TOKEN: ${DEPLOY_TOKEN}" -d '{ "Image": "registry.le-corre.eu:5000/popcubeapidocs:latest", "Env": [ "VIRTUAL_NETWORK=nginx-proxy", "LETSENCRYPT_HOST=master.popcube.xyz", "LETSENCRYPT_EMAIL=clement@popcube.xyz", "VIRTUAL_HOST=docs.popcube.xyz" ], "Hostname": "docs" }' http://${DEPLOY_URL}/deploy;
+    curl -X POST --header 'Content-Type: application/json' --header "X-AUTH-TOKEN: ${DEPLOY_TOKEN}" -d '{ "Image": "registry.le-corre.eu:5000/popcubeapidocs:latest", "Env": [ "VIRTUAL_NETWORK=nginx-proxy", "LETSENCRYPT_HOST=docs.popcube.xyz", "LETSENCRYPT_EMAIL=clement@popcube.xyz", "VIRTUAL_HOST=docs.popcube.xyz" ], "Hostname": "docs" }' http://${DEPLOY_URL}/deploy;
     fi
   - >-
     if [ "$TRAVIS_BRANCH" == "development" ]; then
     docker login -u="$DOCKER_USER" -p="$DOCKER_PWD" $DOCKER_REGISTRY;
-    docker build -t go_base -f docker/go_base.Dockerfile .;
+    docker build -t go_base -f docker/gobase.Dockerfile .;
     docker tag go_base $DOCKER_REGISTRY/go:base-dev;
     docker push $DOCKER_REGISTRY/go:base-dev;
     docker build -t nginx_front -f docker/nginx_front.Dockerfile .;
