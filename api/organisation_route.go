@@ -30,7 +30,7 @@ func organisationContext(next http.Handler) http.Handler {
 		_, err := strconv.ParseUint(chi.URLParam(r, "organisationID"), 10, 64)
 		oldOrganisation := models.Organisation{}
 		if err == nil {
-			oldOrganisation = datastores.NewStore().Organisation().Get(dbStore.db)
+			oldOrganisation = datastores.Store().Organisation().Get(dbStore.db)
 		}
 		ctx := context.WithValue(r.Context(), "oldOrganisation", oldOrganisation)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -38,7 +38,7 @@ func organisationContext(next http.Handler) http.Handler {
 }
 
 func getAllOrganisation(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -54,7 +54,7 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 		Organisation *models.Organisation
 		OmitID       interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -80,7 +80,7 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 		Organisation *models.Organisation
 		OmitID       interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body

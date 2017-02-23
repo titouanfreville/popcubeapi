@@ -25,7 +25,7 @@ import (
 )
 
 // Store interface the Stores and usefull DB functions
-type Store interface {
+type StoreInterface interface {
 	Avatar() AvatarStore
 	Channel() ChannelStore
 	Emoji() EmojiStore
@@ -44,8 +44,8 @@ type Store interface {
 // StoreImpl implement store interface
 type StoreImpl struct{}
 
-// NewStore init store
-func NewStore() Store {
+// Store init store
+func Store() StoreInterface {
 	return StoreImpl{}
 }
 
@@ -88,9 +88,9 @@ func (store StoreImpl) InitDatabase(user string, dbname string, password string,
 	db := store.InitConnection(user, dbname, password, host, port)
 
 	// Create correct tables
-	db.AutoMigrate(&models.Avatar{}, &models.Channel{}, &models.Emoji{}, &models.Folder{},
-		models.Member{}, &models.Message{}, &models.Organisation{}, &models.Parameter{},
-		&models.Role{}, &models.User{})
+	// db.AutoMigrate(&models.Avatar{}, &models.Channel{}, &models.Emoji{}, &models.Folder{},
+	// 	models.Member{}, &models.Message{}, &models.Organisation{}, &models.Parameter{},
+	// 	&models.Role{}, &models.User{})
 
 	// Will not set CreatedAt and LastUpdate on .Create() call
 	db.Callback().Create().Remove("gorm:update_time_stamp")
@@ -233,5 +233,3 @@ type UserStore interface {
 	GetAll(db *gorm.DB) []models.User
 	Delete(user *models.User, db *gorm.DB) *u.AppError
 }
-
-// GetByChannel(channel *models.Channel, db *gorm.DB) *[]models.User

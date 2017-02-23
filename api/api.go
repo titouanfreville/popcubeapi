@@ -65,7 +65,7 @@ func basicRoutes(router *chi.Mux) {
 // StartAPI initialise the api with provided host and port.
 func StartAPI(hostname string, port string) {
 	router := newRouter()
-	dbStore.db = datastores.NewStore().InitConnection("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
+	dbStore.db = datastores.Store().InitConnection("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
 	initMiddleware(router)
 	basicRoutes(router)
 	initAvatarRoute(router)

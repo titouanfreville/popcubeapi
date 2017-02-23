@@ -42,7 +42,7 @@ func messageContext(next http.Handler) http.Handler {
 		oldMessage := models.Message{}
 		ctx := context.WithValue(r.Context(), "date", date)
 		if err == nil {
-			oldMessage = datastores.NewStore().Message().GetByID(messageID, dbStore.db)
+			oldMessage = datastores.Store().Message().GetByID(messageID, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, "oldMessage", oldMessage)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -50,7 +50,7 @@ func messageContext(next http.Handler) http.Handler {
 }
 
 func getAllMessage(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -62,7 +62,7 @@ func getAllMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMessageFromDate(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	date := r.Context().Value("date").(int)
@@ -75,7 +75,7 @@ func getMessageFromUser(w http.ResponseWriter, r *http.Request) {
 		User   *models.User
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -97,7 +97,7 @@ func getMessageFromChannel(w http.ResponseWriter, r *http.Request) {
 		Channel *models.Channel
 		OmitID  interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -119,7 +119,7 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 		Message *models.Message
 		OmitID  interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -145,7 +145,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 		Message *models.Message
 		OmitID  interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -169,7 +169,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 
 func deleteMessageFunction(w http.ResponseWriter, r *http.Request) {
 	message := r.Context().Value("message").(models.Message)
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	dmessage := deleteMessage{
 		Object: message,

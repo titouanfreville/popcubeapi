@@ -1,0 +1,116 @@
+---
+swagger: "2.0"
+info:
+  description: "The inner API of Popcube aim to define every methods need to manage\
+    \ communication organisation inside PopCube chat project"
+  version: "alpha"
+  title: "Popcube iner API"
+  contact:
+    name: "Titouan Freville"
+    email: "titouanfreville@gmail.com"
+host: "popcube:3000"
+basePath: "/alpha"
+schemes:
+- "http"
+- "https"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths: {}
+definitions:
+  User:
+    type: "object"
+    required:
+    - "deleted"
+    - "email"
+    - "email_verified"
+    - "failed_attempts"
+    - "id"
+    - "id_role"
+    - "last_password_update"
+    - "last_update"
+    - "locale"
+    - "password"
+    - "username"
+    properties:
+      avatar:
+        type: "string"
+        description: "Avatar\_used by user"
+        x-go-name: "Avatar"
+      deleted:
+        type: "boolean"
+        description: "User is deleted from organisation but still in database"
+        x-go-name: "Deleted"
+      email:
+        type: "string"
+        description: "User email"
+        x-go-name: "Email"
+      email_verified:
+        type: "boolean"
+        description: "State if email was verified"
+        x-go-name: "EmailVerified"
+      failed_attempts:
+        type: "integer"
+        format: "int64"
+        description: "Number of attemps failed while loging in"
+        x-go-name: "FailedAttempts"
+      first_name:
+        type: "string"
+        description: "First name"
+        x-go-name: "FirstName"
+      id:
+        type: "integer"
+        format: "uint64"
+        description: "id of the user"
+        minimum: 0.0
+        x-go-name: "IDUser"
+      id_role:
+        type: "integer"
+        format: "uint64"
+        description: "Role key of user in the organisation"
+        x-go-name: "IDRole"
+      last_activity_at:
+        type: "integer"
+        format: "int64"
+        x-go-name: "LastActivityAt"
+      last_name:
+        type: "string"
+        description: "User Lastname"
+        x-go-name: "LastName"
+      last_password_update:
+        type: "integer"
+        format: "int64"
+        description: "Date of the last update of password from user"
+        x-go-name: "LastPasswordUpdate"
+      last_update:
+        type: "integer"
+        format: "int64"
+        description: "Date of the last update from user"
+        x-go-name: "LastUpdate"
+      locale:
+        type: "string"
+        description: "User langage"
+        x-go-name: "Locale"
+      nickname:
+        type: "string"
+        description: "User nickname"
+        x-go-name: "NickName"
+      password:
+        type: "string"
+        description: "Encrypted user password"
+        x-go-name: "Password"
+      username:
+        type: "string"
+        description: "User name"
+        maxLength: 64
+        x-go-name: "Username"
+      web_id:
+        type: "string"
+        description: "web id for the user used only for cache and cookie purpose"
+        x-go-name: "WebID"
+    title: "User object."
+    description: "An user is an account who have an access to a specific organisation.\
+      \ Each user is unique inside a given organisation, but users are not shared\
+      \ between\norganisations. Required apply only for creatrion of the object."
+    x-go-package: "github.com/titouanfreville/popcubeapi/models"

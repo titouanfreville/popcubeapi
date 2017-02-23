@@ -47,7 +47,7 @@ func avatarContext(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), "avatarName", name)
 		ctx = context.WithValue(ctx, "avatarLink", link)
 		if err == nil {
-			oldAvatar = datastores.NewStore().Avatar().GetByID(avatarID, dbStore.db)
+			oldAvatar = datastores.Store().Avatar().GetByID(avatarID, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, "oldAvatar", oldAvatar)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -55,7 +55,7 @@ func avatarContext(next http.Handler) http.Handler {
 }
 
 func getAllAvatar(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -67,7 +67,7 @@ func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -80,7 +80,7 @@ func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAvatarFromLink(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -97,7 +97,7 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 		Avatar *models.Avatar
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -123,7 +123,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 		Avatar *models.Avatar
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -147,7 +147,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 
 func deleteAvatar(w http.ResponseWriter, r *http.Request) {
 	avatar := r.Context().Value("avatar").(models.Avatar)
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessage{
 		Object: avatar,

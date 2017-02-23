@@ -56,7 +56,7 @@ func folderContext(next http.Handler) http.Handler {
 		ctx = context.WithValue(r.Context(), "folderType", folderType)
 		ctx = context.WithValue(ctx, "folderLink", folderLink)
 		if err == nil {
-			oldFolder = datastores.NewStore().Folder().GetByID(folderID, dbStore.db)
+			oldFolder = datastores.Store().Folder().GetByID(folderID, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, "oldFolder", oldFolder)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -64,7 +64,7 @@ func folderContext(next http.Handler) http.Handler {
 }
 
 func getAllFolder(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -76,7 +76,7 @@ func getAllFolder(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFolderFromName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	name := r.Context().Value("folderName").(string)
@@ -85,7 +85,7 @@ func getFolderFromName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFolderFromType(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	folderType := r.Context().Value("folderType").(string)
@@ -94,7 +94,7 @@ func getFolderFromType(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFolderFromLink(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	link := r.Context().Value("folderLink").(string)
@@ -107,7 +107,7 @@ func getFolderFromMessage(w http.ResponseWriter, r *http.Request) {
 		Message *models.Message
 		OmitID  interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -129,7 +129,7 @@ func newFolder(w http.ResponseWriter, r *http.Request) {
 		Folder *models.Folder
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -155,7 +155,7 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 		Folder *models.Folder
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -179,7 +179,7 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 
 func deleteFolder(w http.ResponseWriter, r *http.Request) {
 	folder := r.Context().Value("folder").(models.Folder)
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessage{
 		Object: folder,

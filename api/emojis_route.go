@@ -55,7 +55,7 @@ func emojiContext(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, "emojiLink", link)
 		ctx = context.WithValue(ctx, "emojiShortcut", shortcut)
 		if err == nil {
-			oldEmoji = datastores.NewStore().Emoji().GetByID(emojiID, dbStore.db)
+			oldEmoji = datastores.Store().Emoji().GetByID(emojiID, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, "oldEmoji", oldEmoji)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -63,7 +63,7 @@ func emojiContext(next http.Handler) http.Handler {
 }
 
 func getAllEmoji(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -75,7 +75,7 @@ func getAllEmoji(w http.ResponseWriter, r *http.Request) {
 }
 
 func getEmojiFromName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	name := r.Context().Value("emojiName").(string)
@@ -84,7 +84,7 @@ func getEmojiFromName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getEmojiFromShortcut(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	link := r.Context().Value("emojiShortcut").(string)
@@ -93,7 +93,7 @@ func getEmojiFromShortcut(w http.ResponseWriter, r *http.Request) {
 }
 
 func getEmojiFromLink(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	link := r.Context().Value("emojiLink").(string)
@@ -106,7 +106,7 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 		Emoji  *models.Emoji
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -132,7 +132,7 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 		Emoji  *models.Emoji
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -156,7 +156,7 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 
 func deleteEmoji(w http.ResponseWriter, r *http.Request) {
 	emoji := r.Context().Value("emoji").(models.Emoji)
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessage{
 		Object: emoji,

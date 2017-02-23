@@ -1,19 +1,3 @@
-/*Package models implements the basics databases models used by PopCube chat api.
-
-Models
-
-The following is a list of models described:
-	Avatar: Contain all informations for avatar management
-	Channel: Contain all informations for channel management
-	Emojis: Contain all informations for emojis management
-	Organisation: Contain all informations for organisation management
-	Parameter: Contain all informations for parmeters management
-	Role: Contain all informations for roles management
-	User: Contain all informations for users management
-*/
-// Created by Titouan FREVILLE <titouanfreville@gmail.com>
-//
-// Inspired by mattermost project
 package models
 
 import (
@@ -49,57 +33,74 @@ var (
 	validUsernameChars = regexp.MustCompile(`^[a-z0-9\.\-_]+$`)
 )
 
-/*User object
-
-- webwebID: String unique and non null to webIDentify the user on application services. - REQUIRED
-
-- username: Store the user username used to log into the service. - REQUIRED
-
-- email: user mail ;). - REQUIRED
-
-- emailVerified: true if email was verified by user. - REQUIRED
-
-- lastUpdate: Time of the last update. Used to create tag for browser cache. - REQUIRED
-
-- deleted: True if user is deleted. - REQUIRED
-
-- password: Hashed password. - REQUIRED
-
-- lastpasswordUpdate: Date of the last password modification. - REQUIRED
-
-- failedAttemps: Number of fail try to connect to account. - REQUIRED
-
-- locale: user favorite langage. - REQUIRED
-
-- role : int referencing a user role existing in the database. - REQUIRED
-
-- nickname: Name to use in communication channel (by default : username).
-
-- first name: user true first name.
-
-- last name: user true last name.
-
-- lastActivityAt: Date && Time of the last activity of the user.
-*/
+// User object.
+//
+// An user is an account who have an access to a specific organisation. Each user is unique inside a given organisation, but users are not shared between
+// organisations. Required apply only for creatrion of the object.
+//
+// swagger:model
 type User struct {
-	IDUser             uint64 `gorm:"primary_key;column:idUser;AUTO_INCREMENT" json:"id,omitempty"`
-	WebID              string `gorm:"column:webId; not null; unique;" json:"web_id,omitempty"`
-	Username           string `gorm:"column:userName; not null; unique;" json:"username,omitempty"`
-	Email              string `gorm:"column:email; not null; unique;" json:"email,omitempty"`
-	EmailVerified      bool   `gorm:"column:emailVerified; not null;" json:"email_verified,omitempty"`
-	LastUpdate         int64  `gorm:"column:lastUpdate; not null;" json:"last_update,omitempty"`
-	Deleted            bool   `gorm:"column:deleted; not null;" json:"deleted,omitempty"`
-	Password           string `gorm:"column:password; not null;" json:"password,omitempty"`
-	LastPasswordUpdate int64  `gorm:"column:lastPasswordUpdate; not null;" json:"last_password_update,omitempty"`
-	FailedAttempts     int    `gorm:"column:failedAttempts; not null;" json:"failed_attempts,omitempty"`
-	Locale             string `gorm:"column:locale; not null;" json:"locale,omitempty"`
-	Role               Role   `gorm:"ForeignKey:IDRole;" db:"-" json:"-"`
-	IDRole             uint64 `gorm:"column:idRole; not null;" json:"id_role,omitempty"`
-	Avatar             string `gorm:"column:avatar;" json:"avatar, omitempty"`
-	NickName           string `gorm:"column:nickName; unique" json:"nickname, omitempty"`
-	FirstName          string `gorm:"column:firstName;" json:"first_name, omitempty"`
-	LastName           string `gorm:"column:lastName;" json:"last_name, omitempty"`
-	LastActivityAt     int64  `db:"-" json:"last_activity_at,omitempty"`
+	// id of the user
+	//
+	// required: true
+	// min: 0
+	IDUser uint64 `gorm:"primary_key;column:idUser;AUTO_INCREMENT" json:"id,omitempty"`
+	// web id for the user used only for cache and cookie purpose
+	//
+	// required: false
+	WebID string `gorm:"column:webId; not null; unique;" json:"web_id,omitempty"`
+	// User name
+	//
+	// required: true
+	// max length: 64
+	Username string `gorm:"column:userName; not null; unique;" json:"username,omitempty"`
+	// User email
+	//
+	// required: true
+	// max lenght: 128
+	Email string `gorm:"column:email; not null; unique;" json:"email,omitempty"`
+	// State if email was verified
+	//
+	// required: true
+	EmailVerified bool `gorm:"column:emailVerified; not null;" json:"email_verified,omitempty"`
+	// Date of the last update from user
+	//
+	// required: true
+	LastUpdate int64 `gorm:"column:lastUpdate; not null;" json:"last_update,omitempty"`
+	// User is deleted from organisation but still in database
+	//
+	// required: true
+	Deleted bool `gorm:"column:deleted; not null;" json:"deleted,omitempty"`
+	// Encrypted user password
+	//
+	// required: true
+	Password string `gorm:"column:password; not null;" json:"password,omitempty"`
+	// Date of the last update of password from user
+	//
+	// required: true
+	LastPasswordUpdate int64 `gorm:"column:lastPasswordUpdate; not null;" json:"last_password_update,omitempty"`
+	// Number of attemps failed while loging in
+	//
+	// required: true
+	FailedAttempts int `gorm:"column:failedAttempts; not null;" json:"failed_attempts,omitempty"`
+	// User langage
+	//
+	// required: true
+	Locale string `gorm:"column:locale; not null;" json:"locale,omitempty"`
+	Role   Role   `gorm:"ForeignKey:IDRole;" db:"-" json:"-"`
+	// Role key of user in the organisation
+	//
+	// required: true
+	IDRole uint64 `gorm:"column:idRole; not null;" json:"id_role,omitempty"`
+	// Avatar used by user
+	Avatar string `gorm:"column:avatar;" json:"avatar, omitempty"`
+	// User nickname
+	NickName string `gorm:"column:nickName; unique" json:"nickname, omitempty"`
+	// First name
+	FirstName string `gorm:"column:firstName;" json:"first_name, omitempty"`
+	// User Lastname
+	LastName       string `gorm:"column:lastName;" json:"last_name, omitempty"`
+	LastActivityAt int64  `db:"-" json:"last_activity_at,omitempty"`
 }
 
 // IsValid valwebIDates the user and returns an error if it isn't configured
