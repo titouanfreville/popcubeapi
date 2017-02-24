@@ -6,7 +6,8 @@ services:
       dockerfile: docker/slateserver.Dockerfile
     image: registry.le-corre.eu:5000/innerapi:slate-alpha-doc
     volumes:
-      - "./swagger.yml:/tmp/swagger"
+      - "./swagger.json:/tmp/swagger"
+      - "./docker_resources/slate_resources:/home/slate"
     ports:
       - 4567:4567
   back:

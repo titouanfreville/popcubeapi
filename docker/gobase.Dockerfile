@@ -37,7 +37,7 @@ RUN set -x \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
     && apk del .gosu-deps
-    
-# RUN mv /tmp/go/* /go/ && ls /go && rm -rf /tmp/go
-#
+
+WORKDIR /$GOCOPYPATH
+
 ENTRYPOINT go install && popcubeapi

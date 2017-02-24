@@ -36,13 +36,12 @@ var (
 // User object.
 //
 // An user is an account who have an access to a specific organisation. Each user is unique inside a given organisation, but users are not shared between
-// organisations. Required apply only for creatrion of the object.
+// organisations. Required apply only for creation of the object.
 //
 // swagger:model
 type User struct {
 	// id of the user
 	//
-	// required: true
 	// min: 0
 	IDUser uint64 `gorm:"primary_key;column:idUser;AUTO_INCREMENT" json:"id,omitempty"`
 	// web id for the user used only for cache and cookie purpose
@@ -64,8 +63,6 @@ type User struct {
 	// required: true
 	EmailVerified bool `gorm:"column:emailVerified; not null;" json:"email_verified,omitempty"`
 	// Date of the last update from user
-	//
-	// required: true
 	LastUpdate int64 `gorm:"column:lastUpdate; not null;" json:"last_update,omitempty"`
 	// User is deleted from organisation but still in database
 	//
