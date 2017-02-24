@@ -1,0 +1,12 @@
+version: "3"
+services:
+  unit-gotest:
+    build:
+      context: .
+      dockerfile: docker/gotest.Dockerfile
+    env_file: .env
+  golint:
+    build:
+      context: .
+      dockerfile: docker/golint.Dockerfile
+    env_file: .env
