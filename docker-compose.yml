@@ -7,7 +7,7 @@ services:
     image: registry.le-corre.eu:5000/innerapi:slate-alpha-doc
     volumes:
       - "./swagger.json:/tmp/swagger"
-      - "./docker_resources/slate_resources:/home/slate"
+      # - "./docker_resources/slate_resources:/home/slate"
     ports:
       - 4567:4567
   back:

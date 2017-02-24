@@ -4,6 +4,7 @@ FROM rails
 ADD docker_resources/slate_resources /home/slate
 ADD swagger.yaml /tmp/swagger
 ADD docker_resources/swagger /home/swagger
+ADD logo.png /home/slate/source/images/logo.png
 
 RUN apt-get -q update && \
  apt-get -q install -yyy --auto-remove --no-install-recommends \
