@@ -12,11 +12,57 @@ import (
 	renderPackage "github.com/unrolled/render"
 )
 
+const (
+	avatarNameKey key = "avatarName"
+	avatarLinkKey key = "avatarLink"
+	oldAvatarKey  key = "oldAvatar"
+)
+
 func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
+		// swagger:route GET /avatar Avatars
+		//
+		// Get avatars
+		//
+		// This will get all the avatars available in the organisation.
+		//
+		// 	Responses:
+		// 	  default: genericError
+		// 	  503: genericError
+		//    200: avatarArraySuccess
 		r.Get("/", getAllAvatar)
+		// swagger:route POST /avatar Avatars
+		//
+		// New avatar
+		//
+		// This will create an avatar for organisation avatars library.
+		//
+		// 	Responses:
+		// 	  default: genericError
+		// 	  503: genericError
+		//    200: avatarObjectSuccess
 		r.Post("/", newAvatar)
+		// swagger:route GET /avatar/all Avatars
+		//
+		// Get avatars
+		//
+		// This will get all the avatars available in the organisation.
+		//
+		// 	Responses:
+		// 	  default: genericError
+		// 	  503: genericError
+		//    200: avatarArraySuccess
 		r.Get("/all", getAllAvatar)
+		// swagger:route POST /avatar/new Avatars
+		//
+		// New avatar
+		//
+		// This will create an avatar for organisation avatars library.
+		//
+		// 	Responses:
+		// 	  default: genericError
+		// 	  503: genericError
+		//    200: avatarObjectSuccess
 		r.Post("/new", newAvatar)
 		r.Route("/link/", func(r chi.Router) {
 			r.Route("/:avatarLink", func(r chi.Router) {
@@ -44,12 +90,12 @@ func avatarContext(next http.Handler) http.Handler {
 		name := chi.URLParam(r, "avatarName")
 		link := chi.URLParam(r, "avatarLink")
 		oldAvatar := models.Avatar{}
-		ctx := context.WithValue(r.Context(), "avatarName", name)
-		ctx = context.WithValue(ctx, "avatarLink", link)
+		ctx := context.WithValue(r.Context(), avatarNameKey, name)
+		ctx = context.WithValue(ctx, avatarLinkKey, link)
 		if err == nil {
 			oldAvatar = datastores.Store().Avatar().GetByID(avatarID, dbStore.db)
 		}
-		ctx = context.WithValue(ctx, "oldAvatar", oldAvatar)
+		ctx = context.WithValue(ctx, oldAvatarKey, oldAvatar)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -71,7 +117,7 @@ func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
-		name := r.Context().Value("avatarName").(string)
+		name := r.Context().Value(avatarNameKey).(string)
 		avatar := store.Avatar().GetByName(name, db)
 		render.JSON(w, 200, avatar)
 	} else {
@@ -84,7 +130,7 @@ func getAvatarFromLink(w http.ResponseWriter, r *http.Request) {
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
-		link := r.Context().Value("avatarLink").(string)
+		link := r.Context().Value(avatarLinkKey).(string)
 		avatar := store.Avatar().GetByLink(link, db)
 		render.JSON(w, 200, avatar)
 	} else {
@@ -128,7 +174,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	avatar := r.Context().Value("oldAvatar").(models.Avatar)
+	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
 	if err != nil {
 		render.JSON(w, 422, error422)
 	} else {
@@ -146,7 +192,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteAvatar(w http.ResponseWriter, r *http.Request) {
-	avatar := r.Context().Value("avatar").(models.Avatar)
+	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
 	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessage{

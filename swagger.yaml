@@ -8,7 +8,7 @@ info:
   contact:
     name: "Titouan Freville"
     email: "titouanfreville@gmail.com"
-host: "popcube:3000"
+host: "api.popcube"
 basePath: "/alpha"
 schemes:
 - "http"
@@ -17,7 +17,139 @@ consumes:
 - "application/json"
 produces:
 - "application/json"
-paths: {}
+paths:
+  /:
+    get:
+      tags:
+      - "Test"
+      description: "Hello World"
+      operationId: "getter"
+      parameters: []
+      responses:
+        200:
+          $ref: "#/responses/%2Asuccess%2A"
+        default:
+          description: "AppError Type used to structure error reporting for popcube\
+            \ chat project."
+          headers:
+            detailed_error:
+              type: "string"
+              description: "Detail of error"
+            id:
+              type: "string"
+              description: "ID for the error"
+            is_oauth:
+              type: "boolean"
+            message:
+              type: "string"
+              description: "Error's message"
+            request_id:
+              type: "string"
+              description: "Id of the request if exist"
+            status_code:
+              type: "integer"
+              format: "int64"
+              description: "Error's status code"
+  /avatar:
+    get:
+      tags:
+      - "Avatars"
+      summary: "Get avatars"
+      description: "This will get all the avatars available in the organisation."
+      operationId: "getter"
+      parameters: []
+      responses:
+        200: {}
+        503:
+          $ref: "#/responses/databaseConnectionError"
+        default:
+          description: "AppError Type used to structure error reporting for popcube\
+            \ chat project."
+          headers:
+            detailed_error:
+              type: "string"
+              description: "Detail of error"
+            id:
+              type: "string"
+              description: "ID for the error"
+            is_oauth:
+              type: "boolean"
+            message:
+              type: "string"
+              description: "Error's message"
+            request_id:
+              type: "string"
+              description: "Id of the request if exist"
+            status_code:
+              type: "integer"
+              format: "int64"
+              description: "Error's status code"
+  /panic:
+    get:
+      tags:
+      - "Test"
+      summary: "Should result in 500"
+      description: "Test panic cautching"
+      operationId: "getter"
+      parameters: []
+      responses:
+        500:
+          $ref: "#/responses/%2Asuccess%2A"
+        default:
+          description: "AppError Type used to structure error reporting for popcube\
+            \ chat project."
+          headers:
+            detailed_error:
+              type: "string"
+              description: "Detail of error"
+            id:
+              type: "string"
+              description: "ID for the error"
+            is_oauth:
+              type: "boolean"
+            message:
+              type: "string"
+              description: "Error's message"
+            request_id:
+              type: "string"
+              description: "Id of the request if exist"
+            status_code:
+              type: "integer"
+              format: "int64"
+              description: "Error's status code"
+  /ping:
+    get:
+      tags:
+      - "Test"
+      summary: "Pong"
+      description: "Test api ping"
+      operationId: "getter"
+      parameters: []
+      responses:
+        200:
+          $ref: "#/responses/%2Asuccess%2A"
+        default:
+          description: "AppError Type used to structure error reporting for popcube\
+            \ chat project."
+          headers:
+            detailed_error:
+              type: "string"
+              description: "Detail of error"
+            id:
+              type: "string"
+              description: "ID for the error"
+            is_oauth:
+              type: "boolean"
+            message:
+              type: "string"
+              description: "Error's message"
+            request_id:
+              type: "string"
+              description: "Id of the request if exist"
+            status_code:
+              type: "integer"
+              format: "int64"
+              description: "Error's status code"
 definitions:
   User:
     type: "object"
@@ -114,3 +246,26 @@ definitions:
       \ Each user is unique inside a given organisation, but users are not shared\
       \ between\norganisations. Required apply only for creatrion of the object."
     x-go-package: "github.com/titouanfreville/popcubeapi/models"
+responses:
+  genericError:
+    description: "AppError Type used to structure error reporting for popcube chat\
+      \ project."
+    headers:
+      detailed_error:
+        type: "string"
+        description: "Detail of error"
+      id:
+        type: "string"
+        description: "ID for the error"
+      is_oauth:
+        type: "boolean"
+      message:
+        type: "string"
+        description: "Error's message"
+      request_id:
+        type: "string"
+        description: "Id of the request if exist"
+      status_code:
+        type: "integer"
+        format: "int64"
+        description: "Error's status code"

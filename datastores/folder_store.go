@@ -82,14 +82,14 @@ func (fsi FolderStoreImpl) GetByType(messageType string, db *gorm.DB) []models.F
 	return folders
 }
 
-// GetOrderedByDate get all folders having link
+// GetByLink get all folders having link
 func (fsi FolderStoreImpl) GetByLink(messageLink string, db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
 	db.Where("link = ?", messageLink).Find(&folders)
 	return folders
 }
 
-// GetByCreator get folder from user
+// GetByMessage get folder from user
 func (fsi FolderStoreImpl) GetByMessage(message *models.Message, db *gorm.DB) []models.Folder {
 	folders := []models.Folder{}
 	db.Table("folders").Select("*").Joins("natural join messages").Where("messages.idMessage = ?", message.IDMessage).Find(&folders)

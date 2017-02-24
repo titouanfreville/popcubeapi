@@ -23,11 +23,13 @@ type deleteMessage struct {
 	Object  interface{} `json:"removed_object, omitempty"`
 }
 
+type key string
+
 var (
 	routes   = flag.Bool("routes", false, "Generate router documentation")
 	dbStore  = testDb{}
-	error422 = utils.NewApiError(422, "parse.request.body", "Request json object not correct.")
-	error503 = utils.NewApiError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
+	error422 = utils.NewAPIError(422, "parse.request.body", "Request json object not correct.")
+	error503 = utils.NewAPIError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
 )
 
 // newRouter initialise api serveur.
@@ -49,14 +51,37 @@ func initMiddleware(router *chi.Mux) {
 
 // basicRoutes set basic routes for the API
 func basicRoutes(router *chi.Mux) {
+	// swagger:route GET / Test getter
+	//
+	// Hello World
+	//
+	// 	Responses:
+	// 	  default: genericError
+	//    200: *success* Api well launch
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Welcome to PopCube api. Let's chat all together :O"))
 	})
-
+	// swagger:route GET /ping Test getter
+	//
+	// Pong
+	//
+	// Test api ping
+	//
+	// 	Responses:
+	// 	  default: genericError
+	//    200: *success* pong
 	router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
 	})
-
+	// swagger:route GET /panic Test getter
+	//
+	// Should result in 500
+	//
+	// Test panic cautching
+	//
+	// 	Responses:
+	// 	  default: genericError
+	//    500: *success* Correct awaited error
 	router.Get("/panic", func(w http.ResponseWriter, r *http.Request) {
 		panic("C'est la panique, panique, panique. Sur le périphérique")
 	})
@@ -81,12 +106,14 @@ func StartAPI(hostname string, port string) {
 	// Passing -routes to the program will generate docs for the above
 	// router definition. See the `routes.json` file in this folder for
 	// the output.
-	log.Println(docgen.JSONRoutesDoc(router))
-	log.Println(docgen.BuildDoc(router))
-	log.Println(docgen.MarkdownRoutesDoc(router, docgen.MarkdownOpts{
-		ProjectPath: "github.com/titouanfreville/popcubeapi",
-		Intro:       "Welcomme to popcube user api.",
-	}))
+	if *routes {
+		log.Println(docgen.JSONRoutesDoc(router))
+		log.Println(docgen.BuildDoc(router))
+		log.Println(docgen.MarkdownRoutesDoc(router, docgen.MarkdownOpts{
+			ProjectPath: "github.com/titouanfreville/popcubeapi",
+			Intro:       "Welcomme to popcube user api.",
+		}))
+	}
 
 	http.ListenAndServe(hostname+":"+port, router)
 }

@@ -1,0 +1,244 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "The inner API of Popcube aim to define every methods need to manage communication organisation inside PopCube chat project",
+    "title": "Popcube iner API",
+    "contact": {
+      "name": "Titouan Freville",
+      "email": "titouanfreville@gmail.com"
+    },
+    "version": "alpha"
+  },
+  "host": "api.popcube",
+  "basePath": "/alpha",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Hello World",
+        "tags": [
+          "Test"
+        ],
+        "operationId": "getter",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/%2Asuccess%2A"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/avatar": {
+      "get": {
+        "description": "This will get all the avatars available in the organisation.",
+        "tags": [
+          "Avatars"
+        ],
+        "summary": "Get avatars",
+        "operationId": "getter",
+        "responses": {
+          "200": {},
+          "503": {
+            "$ref": "#/responses/databaseConnectionError"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/panic": {
+      "get": {
+        "description": "Test panic cautching",
+        "tags": [
+          "Test"
+        ],
+        "summary": "Should result in 500",
+        "operationId": "getter",
+        "responses": {
+          "500": {
+            "$ref": "#/responses/%2Asuccess%2A"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "description": "Test api ping",
+        "tags": [
+          "Test"
+        ],
+        "summary": "Pong",
+        "operationId": "getter",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/%2Asuccess%2A"
+          },
+          "default": {
+            "$ref": "#/responses/genericError"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "description": "An user is an account who have an access to a specific organisation. Each user is unique inside a given organisation, but users are not shared between\norganisations. Required apply only for creatrion of the object.",
+      "type": "object",
+      "title": "User object.",
+      "required": [
+        "id",
+        "username",
+        "email",
+        "email_verified",
+        "last_update",
+        "deleted",
+        "password",
+        "last_password_update",
+        "failed_attempts",
+        "locale",
+        "id_role"
+      ],
+      "properties": {
+        "avatar": {
+          "description": "Avatar used by user",
+          "type": "string",
+          "x-go-name": "Avatar"
+        },
+        "deleted": {
+          "description": "User is deleted from organisation but still in database",
+          "type": "boolean",
+          "x-go-name": "Deleted"
+        },
+        "email": {
+          "description": "User email",
+          "type": "string",
+          "x-go-name": "Email"
+        },
+        "email_verified": {
+          "description": "State if email was verified",
+          "type": "boolean",
+          "x-go-name": "EmailVerified"
+        },
+        "failed_attempts": {
+          "description": "Number of attemps failed while loging in",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "FailedAttempts"
+        },
+        "first_name": {
+          "description": "First name",
+          "type": "string",
+          "x-go-name": "FirstName"
+        },
+        "id": {
+          "description": "id of the user",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0,
+          "x-go-name": "IDUser"
+        },
+        "id_role": {
+          "description": "Role key of user in the organisation",
+          "type": "integer",
+          "format": "uint64",
+          "x-go-name": "IDRole"
+        },
+        "last_activity_at": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "LastActivityAt"
+        },
+        "last_name": {
+          "description": "User Lastname",
+          "type": "string",
+          "x-go-name": "LastName"
+        },
+        "last_password_update": {
+          "description": "Date of the last update of password from user",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "LastPasswordUpdate"
+        },
+        "last_update": {
+          "description": "Date of the last update from user",
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "LastUpdate"
+        },
+        "locale": {
+          "description": "User langage",
+          "type": "string",
+          "x-go-name": "Locale"
+        },
+        "nickname": {
+          "description": "User nickname",
+          "type": "string",
+          "x-go-name": "NickName"
+        },
+        "password": {
+          "description": "Encrypted user password",
+          "type": "string",
+          "x-go-name": "Password"
+        },
+        "username": {
+          "description": "User name",
+          "type": "string",
+          "maxLength": 64,
+          "x-go-name": "Username"
+        },
+        "web_id": {
+          "description": "web id for the user used only for cache and cookie purpose",
+          "type": "string",
+          "x-go-name": "WebID"
+        }
+      },
+      "x-go-package": "github.com/titouanfreville/popcubeapi/models"
+    }
+  },
+  "responses": {
+    "genericError": {
+      "description": "AppError Type used to structure error reporting for popcube chat project.",
+      "headers": {
+        "detailed_error": {
+          "type": "string",
+          "description": "Detail of error"
+        },
+        "id": {
+          "type": "string",
+          "description": "ID for the error"
+        },
+        "is_oauth": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error's message"
+        },
+        "request_id": {
+          "type": "string",
+          "description": "Id of the request if exist"
+        },
+        "status_code": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Error's status code"
+        }
+      }
+    }
+  }
+}

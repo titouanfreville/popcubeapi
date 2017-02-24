@@ -25,7 +25,6 @@ README.md
 Godeps
 docker 
 configs
-utils
 vendor
 scripts
 docker_resources
