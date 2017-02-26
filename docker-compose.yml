@@ -16,6 +16,8 @@ services:
       dockerfile:  docker/gobase.Dockerfile
     env_file: .env
     image: registry.le-corre.eu:5000/go:base
+    ports:
+      - 3000:3000
   goconvey:
     build:
       context: .

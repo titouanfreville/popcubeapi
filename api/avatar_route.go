@@ -101,6 +101,16 @@ func initAvatarRoute(router chi.Router) {
 		r.Route("/link/", func(r chi.Router) {
 			r.Route("/:avatarLink", func(r chi.Router) {
 				r.Use(avatarContext)
+				// swagger:route GET /avatar/link/:avatarLink Avatars
+				//
+				// Get avatar from link
+				//
+				// This will return the avatar object corresponding to provided link
+				//
+				// 	Responses:
+				//    200: avatarObjectSuccess
+				// 	  503: genericError
+				// 	  default: genericError
 				r.Get("/", getAvatarFromLink)
 			})
 		})

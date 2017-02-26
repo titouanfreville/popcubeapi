@@ -19,7 +19,6 @@ RUN apk add --update git bash && \
         cd /$GOCOPYPATH && \
         godep get -v && \
 		rm -rf /var/cache/apk/*
-		# rm /bin/go_get.sh
 
 ENV GOSU_VERSION 1.9
 RUN set -x \

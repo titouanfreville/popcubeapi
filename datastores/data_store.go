@@ -99,16 +99,16 @@ func (store StoreImpl) InitDatabase(user string, dbname string, password string,
 	// Will not update LastUpdate on .Save() call
 	db.Callback().Update().Remove("gorm:update_time_stamp")
 	db.Callback().Update().Remove("gorm:save_associations")
-
-	if db.NewRecord(models.Owner) {
-		store.roleInitSave(models.Owner, db)
-	}
-	if db.NewRecord(&models.Admin) {
-		store.roleInitSave(models.Admin, db)
-	}
-	if db.NewRecord(&models.Standart) {
-		store.roleInitSave(models.Standart, db)
-	}
+	/*
+		if db.NewRecord(models.Owner) {
+			store.roleInitSave(models.Owner, db)
+		}
+		if db.NewRecord(&models.Admin) {
+			store.roleInitSave(models.Admin, db)
+		}
+		if db.NewRecord(&models.Standart) {
+			store.roleInitSave(models.Standart, db)
+		}*/
 }
 
 // CloseConnection close database connection
