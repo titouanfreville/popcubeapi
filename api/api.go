@@ -10,26 +10,20 @@ import (
 	"github.com/pressly/chi/docgen"
 	"github.com/pressly/chi/middleware"
 	"github.com/titouanfreville/popcubeapi/datastores"
-	"github.com/titouanfreville/popcubeapi/utils"
 )
 
 type testDb struct {
 	db *gorm.DB
 }
 
-type deleteMessage struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Object  interface{} `json:"removed_object, omitempty"`
-}
-
+// Key type to be sure the context key is the one we want.
 type key string
 
 var (
 	routes   = flag.Bool("routes", false, "Generate router documentation")
 	dbStore  = testDb{}
-	error422 = utils.NewAPIError(422, "parse.request.body", "Request json object not correct.")
-	error503 = utils.NewAPIError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
+	error422 = newEntityError(422, "parse.request.body", "Request json object not correct.")
+	error503 = newDatabaseError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
 )
 
 // newRouter initialise api serveur.
@@ -56,8 +50,8 @@ func basicRoutes(router *chi.Mux) {
 	// Hello World
 	//
 	// 	Responses:
+	//    200
 	// 	  default: genericError
-	//    200: *success* Api well launch
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Welcome to PopCube api. Let's chat all together :O"))
 	})
@@ -68,8 +62,8 @@ func basicRoutes(router *chi.Mux) {
 	// Test api ping
 	//
 	// 	Responses:
+	//    200
 	// 	  default: genericError
-	//    200: *success* pong
 	router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
 	})
@@ -80,8 +74,8 @@ func basicRoutes(router *chi.Mux) {
 	// Test panic cautching
 	//
 	// 	Responses:
+	//    500
 	// 	  default: genericError
-	//    500: *success* Correct awaited error
 	router.Get("/panic", func(w http.ResponseWriter, r *http.Request) {
 		panic("C'est la panique, panique, panique. Sur le périphérique")
 	})
