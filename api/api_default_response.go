@@ -6,10 +6,10 @@ package api
 //
 // swagger:response defaultOk
 type generalOk struct {
-    Status int `json:"-"`
-    // What you want to say
-    Message string `json:"message,omitempty"`
-} 
+	Status int `json:"-"`
+	// What you want to say
+	Message string `json:"message,omitempty"`
+}
 
 // ---------------------------------------------------
 // Errors --------------------------------------------
@@ -56,22 +56,23 @@ type deleteMessage struct {
 	// The object we where trying to remove
 	Object interface{} `json:"removed_object, omitempty"`
 }
+
 // ---------------------------------------------------
 // Generators ----------------------------------------
 
 func newGeneralOk(message string) generalOk {
-    return generalOk {
-        Status: 200,
-        Message: message
-    }
+	return generalOk{
+		Status:  200,
+		Message: message,
+	}
 }
 
-func newDeleteMessage(succes bool, message string) {
-    return deleteMessage {
-        Status: 200,
-        Message: message,
-        Success: succes
-    }
+func newDeleteMessage(succes bool, message string) deleteMessage {
+	return deleteMessage{
+		Status:  200,
+		Message: message,
+		Success: succes,
+	}
 }
 
 func newEntityError(code int, where string, message string) wrongEntityError {

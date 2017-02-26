@@ -18,6 +18,39 @@ const (
 	oldAvatarKey  key = "oldAvatar"
 )
 
+// avatarArraySuccess list of avatars
+//
+// swagger:response avatarArraySuccess
+type avatarArraySuccess struct {
+	// List of avatars returned
+	Avatars []models.Avatar `json:"avatars"`
+	// Status code.
+	Status int `json:"status"`
+	// Message if we need to tell more things
+	Message string `json:"message, omitempty"`
+}
+
+// avatarObjectSuccess list of avatars
+//
+// swagger:response avatarObjectSuccess
+type avatarObjectSuccess struct {
+	// List of avatars returned
+	Avatar models.Avatar `json:"avatar"`
+	// Status code.
+	Status int `json:"status"`
+	// Message if we need to tell more things
+	Message string `json:"message, omitempty"`
+}
+
+var (
+	avatarArrayReturn = avatarArraySuccess{
+		Status: 200,
+	}
+	avatarObjectReturn = avatarObjectSuccess{
+		Status: 200,
+	}
+)
+
 func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
 		// swagger:route GET /avatar Avatars
@@ -27,9 +60,9 @@ func initAvatarRoute(router chi.Router) {
 		// This will get all the avatars available in the organisation.
 		//
 		// 	Responses:
-		// 	  default: genericError
-		// 	  503: genericError
 		//    200: avatarArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/", getAllAvatar)
 		// swagger:route POST /avatar Avatars
 		//
@@ -38,9 +71,10 @@ func initAvatarRoute(router chi.Router) {
 		// This will create an avatar for organisation avatars library.
 		//
 		// 	Responses:
-		// 	  default: genericError
-		// 	  503: genericError
 		//    200: avatarObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/", newAvatar)
 		// swagger:route GET /avatar/all Avatars
 		//
@@ -49,9 +83,9 @@ func initAvatarRoute(router chi.Router) {
 		// This will get all the avatars available in the organisation.
 		//
 		// 	Responses:
-		// 	  default: genericError
-		// 	  503: genericError
 		//    200: avatarArraySuccess
+		// 	  503: genericError
+		// 	  default: genericError
 		r.Get("/all", getAllAvatar)
 		// swagger:route POST /avatar/new Avatars
 		//
@@ -106,9 +140,10 @@ func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Avatar().GetAll(db)
-		render.JSON(w, 200, result)
+		avatarArrayReturn.Avatars = result
+		render.JSON(w, avatarArrayReturn.Status, avatarArrayReturn)
 	} else {
-		render.JSON(w, 503, error503)
+		render.JSON(w, error503.Status, error503)
 	}
 }
 
@@ -119,9 +154,10 @@ func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
 	if err := db.DB().Ping(); err == nil {
 		name := r.Context().Value(avatarNameKey).(string)
 		avatar := store.Avatar().GetByName(name, db)
-		render.JSON(w, 200, avatar)
+		avatarObjectReturn.Avatar = avatar
+		render.JSON(w, avatarObjectReturn.Status, avatarObjectReturn)
 	} else {
-		render.JSON(w, 503, error503)
+		render.JSON(w, error503.Status, error503)
 	}
 }
 
@@ -132,9 +168,10 @@ func getAvatarFromLink(w http.ResponseWriter, r *http.Request) {
 	if err := db.DB().Ping(); err == nil {
 		link := r.Context().Value(avatarLinkKey).(string)
 		avatar := store.Avatar().GetByLink(link, db)
-		render.JSON(w, 200, avatar)
+		avatarObjectReturn.Avatar = avatar
+		render.JSON(w, avatarObjectReturn.Status, avatarObjectReturn)
 	} else {
-		render.JSON(w, 503, error503)
+		render.JSON(w, error503.Status, error503)
 	}
 }
 
@@ -149,7 +186,7 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 422, error422)
+		render.JSON(w, error422.Status, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Avatar().Save(data.Avatar, db)
@@ -159,7 +196,7 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 503, error503)
+			render.JSON(w, error503.Status, error503)
 		}
 	}
 }
@@ -176,7 +213,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 	err := chiRender.Bind(request, &data)
 	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
 	if err != nil {
-		render.JSON(w, 422, error422)
+		render.JSON(w, error422.Status, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Avatar().Update(&avatar, data.Avatar, db)
@@ -186,7 +223,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 503, error503)
+			render.JSON(w, error503.Status, error503)
 		}
 	}
 }
