@@ -30,7 +30,7 @@ func parameterContext(next http.Handler) http.Handler {
 		_, err := strconv.ParseUint(chi.URLParam(r, "parameterID"), 10, 64)
 		parameter := models.Parameter{}
 		if err == nil {
-			parameter = datastores.NewStore().Parameter().Get(dbStore.db)
+			parameter = datastores.Store().Parameter().Get(dbStore.db)
 		}
 		ctx := context.WithValue(r.Context(), "parameter", parameter)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -38,7 +38,7 @@ func parameterContext(next http.Handler) http.Handler {
 }
 
 func getAllParameter(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -54,7 +54,7 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 		Parameter *models.Parameter
 		OmitID    interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -80,7 +80,7 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 		Parameter *models.Parameter
 		OmitID    interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body

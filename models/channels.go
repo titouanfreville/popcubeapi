@@ -22,17 +22,38 @@ var (
 	ChannelAvailableTypes = []string{"direct", "text", "audio", "video"}
 )
 
-// Channel type is a model for DB Channel table
+// Channel object.
+//
+// Channel is the place where user can speak.
+// Required apply only for creation of the object.
+//
+// swagger:model
 type Channel struct {
-	IDChannel   uint64 `gorm:"primary_key;column:idChannel;AUTO_INCREMENT" json:"id,omitempty"`
-	WebID       string `gorm:"column:webId;not null;unique" json:"web_id,omitempty"`
+	// id of the channel
+	//
+	// min: 0
+	IDChannel uint64 `gorm:"primary_key;column:idChannel;AUTO_INCREMENT" json:"id,omitempty"`
+	// web id for the user used only for cache and cookie purpose
+	//
+	// required: false
+	WebID string `gorm:"column:webId;not null;unique" json:"web_id,omitempty"`
+	// required: true
+	// max lenght: 64
 	ChannelName string `gorm:"column:channelName;not null;unique" json:"name,omitempty"`
-	Type        string `gorm:"column:type;not null" json:"type,omitempty"`
-	LastUpdate  int64  `gorm:"column:lastUpdate;not null;" json:"last_update,omitempty"`
-	Private     bool   `gorm:"column:private;not null" json:"private,omitempty"`
+	// Set if channel is text, video, audio or direct
+	Type string `gorm:"column:type;not null" json:"type,omitempty"`
+	// Last time channel information where updated
+	LastUpdate int64 `gorm:"column:lastUpdate;not null;" json:"last_update,omitempty"`
+	// Channel is private ?
+	Private bool `gorm:"column:private;not null" json:"private,omitempty"`
+	// Describe the channel$
+	// max lenght: 1024
 	Description string `gorm:"column:description" json:"description,omitempty"`
-	Subject     string `gorm:"column:subject" json:"subject,omitempty"`
-	Avatar      string `gorm:"column:avatar" json:"avatar,omitempty"`
+	// What we are speaking about
+	// max lenght: 250
+	Subject string `gorm:"column:subject" json:"subject,omitempty"`
+	// Photo :O
+	Avatar string `gorm:"column:avatar" json:"avatar,omitempty"`
 }
 
 // ToJSON Take a channel and convert it into json

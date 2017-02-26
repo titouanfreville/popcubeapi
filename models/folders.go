@@ -7,14 +7,33 @@ import (
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
-// Folder Type descibe the Folder table for Popcube DB. It is linked to Message table
+// Folder object
+//
+// A folder is a file larger than a simple message.
+//
+// swagger:model
 type Folder struct {
-	IDFolder  uint64  `gorm:"primary_key;column:idFolder;AUTO_INCREMENT" json:"id,omitempty"`
-	Link      string  `gorm:"column:link;not null;unique" json:"link,omitempty"`
-	Name      string  `gorm:"column:name;not null;unique" json:"name,omitempty"`
-	Type      string  `gorm:"column:type;not null;" json:"type,omitempty"`
-	Message   Message `db:"-" gorm:"-" json:"-"`
-	IDMessage uint64  `gorm:"column:idMessage; not null;" json:"id_message,omitempty"`
+	// id of the folder
+	//
+	// min: 0
+	IDFolder uint64 `gorm:"primary_key;column:idFolder;AUTO_INCREMENT" json:"id,omitempty"`
+	// path to the folder in the server
+	//
+	// required: true
+	Link string `gorm:"column:link;not null;unique" json:"link,omitempty"`
+	// folder name
+	//
+	// required: true
+	Name string `gorm:"column:name;not null;unique" json:"name,omitempty"`
+	// type if the folder (extension, snippet)
+	//
+	// required: true
+	Type    string  `gorm:"column:type;not null;" json:"type,omitempty"`
+	Message Message `db:"-" gorm:"-" json:"-"`
+	// id of the message folder is in
+	//
+	// required: true
+	IDMessage uint64 `gorm:"column:idMessage; not null;" json:"id_message,omitempty"`
 }
 
 // IsValid is used to check validity of Folder objects

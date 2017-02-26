@@ -7,12 +7,27 @@ import (
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
-// Emoji Type descibe the Emoji table for Popcube DB
+// Emoji object.
+//
+// Emoji object describe the emoji available in the organisation and theire shortcuts.
+// Required apply only for creation of the object.
+//
+// swagger:model
 type Emoji struct {
-	IDEmoji  uint64 `gorm:"primary_key;column:idEmoji;AUTO_INCREMENT" json:"id,omitempty"`
-	Name     string `gorm:"column:name;not null;unique" json:"name,omitempty"`
+	// id of the emoji
+	//
+	// min: 0
+	IDEmoji uint64 `gorm:"primary_key;column:idEmoji;AUTO_INCREMENT" json:"id,omitempty"`
+	// required: true
+	// max length: 64
+	Name string `gorm:"column:name;not null;unique" json:"name,omitempty"`
+	// required: true
+	// max length: 20
 	Shortcut string `gorm:"column:shortcut;not null;unique" json:"shortcut,omitempty"`
-	Link     string `gorm:"column:link;not null;unique" json:"link,omitempty"`
+	// path to emoji into server
+	//
+	// required: true
+	Link string `gorm:"column:link;not null;unique" json:"link,omitempty"`
 }
 
 // IsValid is used to check validity of Emoji objects

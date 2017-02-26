@@ -81,7 +81,7 @@ func userContext(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, "email", email)
 		ctx = context.WithValue(ctx, "date", date)
 		if err == nil {
-			oldUser = datastores.NewStore().User().GetByID(userID, dbStore.db)
+			oldUser = datastores.Store().User().GetByID(userID, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, "oldUser", oldUser)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -89,7 +89,7 @@ func userContext(next http.Handler) http.Handler {
 }
 
 func getAllUser(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -101,7 +101,7 @@ func getAllUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDeletedUser(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -113,7 +113,7 @@ func getDeletedUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	name := r.Context().Value("userName").(string)
@@ -122,7 +122,7 @@ func getUserFromName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromNickName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	name := r.Context().Value("nickName").(string)
@@ -131,7 +131,7 @@ func getUserFromNickName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromFirstName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	name := r.Context().Value("firstName").(string)
@@ -140,7 +140,7 @@ func getUserFromFirstName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromLastName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	name := r.Context().Value("lastName").(string)
@@ -149,7 +149,7 @@ func getUserFromLastName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromEmail(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	email := r.Context().Value("email").(string)
@@ -158,7 +158,7 @@ func getUserFromEmail(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromDate(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	date := r.Context().Value("date").(int)
@@ -171,7 +171,7 @@ func getUserFromRole(w http.ResponseWriter, r *http.Request) {
 		Role   *models.Role
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -193,7 +193,7 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 		User   *models.User
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -219,7 +219,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		User   *models.User
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -243,7 +243,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user").(models.User)
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessage{
 		Object: user,

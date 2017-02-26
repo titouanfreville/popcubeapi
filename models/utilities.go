@@ -1,3 +1,19 @@
+/*Package models implements the basics databases models used by PopCube chat api.
+
+Models
+
+The following is a list of models described:
+	Avatar: Contain all informations for avatar management
+	Channel: Contain all informations for channel management
+	Emojis: Contain all informations for emojis management
+	Organisation: Contain all informations for organisation management
+	Parameter: Contain all informations for parmeters management
+	Role: Contain all informations for roles management
+	User: Contain all informations for users management
+*/
+// Created by Titouan FREVILLE <titouanfreville@gmail.com>
+//
+// Inspired by mattermost project
 package models
 
 import (

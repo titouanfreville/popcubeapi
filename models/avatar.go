@@ -7,11 +7,25 @@ import (
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
-// Avatar type is a DB model for avatar storage
+// Avatar object
+//
+// Avatar object store default avatar images you can use within an association.
+//Required apply only for creation of the object. Id is required only on update.
+//
+// swagger:model
 type Avatar struct {
+	// id of the avatar
+	//
+	// min: 0
 	IDAvatar uint64 `gorm:"primary_key;column:idAvatar;AUTO_INCREMENT" json:"id,omitempty"`
-	Name     string `gorm:"column:name;not null;unique" json:"name,omitempty"`
-	Link     string `gorm:"column:link;not null;unique" json:"link,omitempty"`
+	// Avatar name
+	//
+	// required: true
+	Name string `gorm:"column:name;not null;unique" json:"name,omitempty"`
+	// Path into server
+	//
+	// required: true
+	Link string `gorm:"column:link;not null;unique" json:"link,omitempty"`
 }
 
 // IsValid check the validity of on Avatar object before saving it to DB in update or creation process

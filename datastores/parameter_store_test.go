@@ -12,7 +12,7 @@ import (
 )
 
 func TestParameterStore(t *testing.T) {
-	store := NewStore()
+	store := Store()
 	db := store.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
 
 	psi := store.Parameter()

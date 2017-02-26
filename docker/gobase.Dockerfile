@@ -19,7 +19,6 @@ RUN apk add --update git bash && \
         cd /$GOCOPYPATH && \
         godep get -v && \
 		rm -rf /var/cache/apk/*
-		# rm /bin/go_get.sh
 
 ENV GOSU_VERSION 1.9
 RUN set -x \
@@ -37,7 +36,7 @@ RUN set -x \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
     && apk del .gosu-deps
-    
-# RUN mv /tmp/go/* /go/ && ls /go && rm -rf /tmp/go
-#
+
+WORKDIR /$GOCOPYPATH
+
 ENTRYPOINT go install && popcubeapi

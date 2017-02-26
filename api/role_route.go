@@ -40,7 +40,7 @@ func roleContext(next http.Handler) http.Handler {
 		oldRole := models.Role{}
 		ctx := context.WithValue(r.Context(), "roleName", name)
 		if err == nil {
-			oldRole = datastores.NewStore().Role().GetByID(roleID, dbStore.db)
+			oldRole = datastores.Store().Role().GetByID(roleID, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, "oldRole", oldRole)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -48,7 +48,7 @@ func roleContext(next http.Handler) http.Handler {
 }
 
 func getAllRole(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -60,7 +60,7 @@ func getAllRole(w http.ResponseWriter, r *http.Request) {
 }
 
 func getRoleFromName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	name := r.Context().Value("roleName").(string)
@@ -73,7 +73,7 @@ func getRoleFromRight(w http.ResponseWriter, r *http.Request) {
 		Role   *models.Role
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -95,7 +95,7 @@ func newRole(w http.ResponseWriter, r *http.Request) {
 		Role   *models.Role
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -121,7 +121,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 		Role   *models.Role
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -145,7 +145,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 
 func deleteRole(w http.ResponseWriter, r *http.Request) {
 	role := r.Context().Value("role").(models.Role)
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessage{
 		Object: role,

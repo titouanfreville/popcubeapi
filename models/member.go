@@ -4,15 +4,22 @@ import (
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
-// Member describe the associtive table member between USER, CHANNEL, and ROLE
+// Member object.
+//
+// Member is the link between an User and a Channel. It also state the role of the user
+// in the channel if it is channel specific.
+//
+// swagger:model
 type Member struct {
 	// IDMember uint64  `gorm:"primary_key;column:idMember;AUTO_INCREMENT" json:"-"`
-	User      User    `db:"-" json:"-"`
-	IDUser    uint64  `gorm:"column:idUser; not null;" json:"id_user,omitempty"`
-	Channel   Channel `db:"-" json:"-"`
-	IDChannel uint64  `gorm:"column:idChannel; not null;" json:"id_channel,omitempty"`
-	Role      Role    `db:"-" json:"-"`
-	IDRole    uint64  `gorm:"column:idRole; not null;" json:"id_role,omitempty"`
+	User User `db:"-" json:"-"`
+	// required: true
+	IDUser  uint64  `gorm:"column:idUser; not null;" json:"id_user,omitempty"`
+	Channel Channel `db:"-" json:"-"`
+	// required: true
+	IDChannel uint64 `gorm:"column:idChannel; not null;" json:"id_channel,omitempty"`
+	Role      Role   `db:"-" json:"-"`
+	IDRole    uint64 `gorm:"column:idRole; not null;" json:"id_role,omitempty"`
 }
 
 // IsValid check validity of member object

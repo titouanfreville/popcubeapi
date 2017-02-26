@@ -51,7 +51,7 @@ func channelContext(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, "channelType", channelType)
 		ctx = context.WithValue(ctx, "channelShortcut", shortcut)
 		if err == nil {
-			oldChannel = datastores.NewStore().Channel().GetByID(channelID, dbStore.db)
+			oldChannel = datastores.Store().Channel().GetByID(channelID, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, "oldChannel", oldChannel)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -59,7 +59,7 @@ func channelContext(next http.Handler) http.Handler {
 }
 
 func getAllChannel(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -71,7 +71,7 @@ func getAllChannel(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPublicChannel(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -83,7 +83,7 @@ func getPublicChannel(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPrivateChannel(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -95,7 +95,7 @@ func getPrivateChannel(w http.ResponseWriter, r *http.Request) {
 }
 
 func getChannelFromName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	name := r.Context().Value("channelName").(string)
@@ -104,7 +104,7 @@ func getChannelFromName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getChannelFromType(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	channelType := r.Context().Value("channelType").(string)
@@ -117,7 +117,7 @@ func newChannel(w http.ResponseWriter, r *http.Request) {
 		Channel *models.Channel
 		OmitID  interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -143,7 +143,7 @@ func updateChannel(w http.ResponseWriter, r *http.Request) {
 		Channel *models.Channel
 		OmitID  interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -167,7 +167,7 @@ func updateChannel(w http.ResponseWriter, r *http.Request) {
 
 func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	channel := r.Context().Value("channel").(models.Channel)
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessage{
 		Object: channel,

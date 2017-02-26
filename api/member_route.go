@@ -34,7 +34,7 @@ func memberContext(next http.Handler) http.Handler {
 		memberID, err := strconv.ParseUint(chi.URLParam(r, "memberID"), 10, 64)
 		oldMember := models.Member{}
 		if err == nil {
-			oldMember = datastores.NewStore().Member().GetByID(memberID, dbStore.db)
+			oldMember = datastores.Store().Member().GetByID(memberID, dbStore.db)
 		}
 		ctx := context.WithValue(r.Context(), "oldMember", oldMember)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -42,7 +42,7 @@ func memberContext(next http.Handler) http.Handler {
 }
 
 func getAllMember(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
@@ -58,7 +58,7 @@ func getMemberFromUser(w http.ResponseWriter, r *http.Request) {
 		User   *models.User
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -80,7 +80,7 @@ func getMemberFromChannel(w http.ResponseWriter, r *http.Request) {
 		Channel *models.Channel
 		OmitID  interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -102,7 +102,7 @@ func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
 		Role   *models.Role
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -124,7 +124,7 @@ func newMember(w http.ResponseWriter, r *http.Request) {
 		Member *models.Member
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -150,7 +150,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 		Member *models.Member
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
@@ -174,7 +174,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 
 func deleteMember(w http.ResponseWriter, r *http.Request) {
 	member := r.Context().Value("member").(models.Member)
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessage{
 		Object: member,
