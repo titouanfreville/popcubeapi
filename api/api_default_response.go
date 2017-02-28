@@ -44,10 +44,10 @@ type databaseError struct {
 // ---------------------------------------------------
 // Unknow --------------------------------------------
 
-// deleteMessage return object to confirm correct deletion of an item.
+// deleteMessageModel is an object to confirm correct deletion of an item.
 //
-// swagger:response deleteMessage
-type deleteMessage struct {
+// swagger:model deleteMessageModel
+type deleteMessageModel struct {
 	// Status
 	Status int `json:"status"`
 	// Correctly removed ?
@@ -56,6 +56,14 @@ type deleteMessage struct {
 	Message string `json:"message,omitempty"`
 	// The object we where trying to remove
 	Object interface{} `json:"removed_object, omitempty"`
+}
+
+// deleteMessage return object to confirm correct deletion of an item.
+//
+// swagger:model deleteMessage
+type deleteMessage struct {
+	// in:body
+	Message deleteMessageModel
 }
 
 // ---------------------------------------------------
@@ -68,8 +76,8 @@ func newGeneralOk(message string) generalOk {
 	}
 }
 
-func newDeleteMessage(succes bool, message string) deleteMessage {
-	return deleteMessage{
+func newDeleteMessage(succes bool, message string) deleteMessageModel {
+	return deleteMessageModel{
 		Status:  200,
 		Message: message,
 		Success: succes,

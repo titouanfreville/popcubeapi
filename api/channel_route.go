@@ -169,7 +169,7 @@ func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	channel := r.Context().Value("channel").(models.Channel)
 	store := datastores.Store()
 	render := renderPackage.New()
-	message := deleteMessage{
+	message := deleteMessageModel{
 		Object: channel,
 	}
 	db := dbStore.db

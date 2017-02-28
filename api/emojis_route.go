@@ -158,7 +158,7 @@ func deleteEmoji(w http.ResponseWriter, r *http.Request) {
 	emoji := r.Context().Value("emoji").(models.Emoji)
 	store := datastores.Store()
 	render := renderPackage.New()
-	message := deleteMessage{
+	message := deleteMessageModel{
 		Object: emoji,
 	}
 	db := dbStore.db

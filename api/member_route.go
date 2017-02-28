@@ -176,7 +176,7 @@ func deleteMember(w http.ResponseWriter, r *http.Request) {
 	member := r.Context().Value("member").(models.Member)
 	store := datastores.Store()
 	render := renderPackage.New()
-	message := deleteMessage{
+	message := deleteMessageModel{
 		Object: member,
 	}
 	db := dbStore.db

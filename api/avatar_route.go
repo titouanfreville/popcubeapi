@@ -223,7 +223,7 @@ func deleteAvatar(w http.ResponseWriter, r *http.Request) {
 	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
 	store := datastores.Store()
 	render := renderPackage.New()
-	message := deleteMessage{
+	message := deleteMessageModel{
 		Object: avatar,
 	}
 	db := dbStore.db

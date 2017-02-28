@@ -171,7 +171,7 @@ func deleteMessageFunction(w http.ResponseWriter, r *http.Request) {
 	message := r.Context().Value("message").(models.Message)
 	store := datastores.Store()
 	render := renderPackage.New()
-	dmessage := deleteMessage{
+	dmessage := deleteMessageModel{
 		Object: message,
 	}
 	db := dbStore.db
