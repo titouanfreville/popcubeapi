@@ -10,6 +10,7 @@ import (
 	"github.com/pressly/chi/docgen"
 	"github.com/pressly/chi/middleware"
 	"github.com/titouanfreville/popcubeapi/datastores"
+	"github.com/titouanfreville/popcubeapi/utils"
 )
 
 type testDb struct {
@@ -22,8 +23,8 @@ type key string
 var (
 	routes   = flag.Bool("routes", false, "Generate router documentation")
 	dbStore  = testDb{}
-	error422 = newEntityError(422, "parse.request.body", "Request json object not correct.")
-	error503 = newDatabaseError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
+	error422 = utils.NewAPIError(422, "parse.request.body", "Request json object not correct.")
+	error503 = utils.NewAPIError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
 )
 
 // newRouter initialise api serveur.

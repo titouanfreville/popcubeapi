@@ -1,43 +1,44 @@
 package api
 
+import "github.com/titouanfreville/popcubeapi/utils"
+
 // Success -------------------------------------------
 
 // generalOk default object style to return if correct
 //
 // swagger:response defaultOk
 type generalOk struct {
-	Status int `json:"-"`
 	// What you want to say
+	// in:body
 	Message string `json:"message,omitempty"`
+	Status  int    `json:"-"`
 }
 
 // ---------------------------------------------------
 // Errors --------------------------------------------
 
+// genericError general error when unexpected errors occured
+//
+// swagger:response genericError
+type genericError struct {
+	// in:body
+	Error utils.AppError
+}
+
 // wrongEntityError is an error object to inform that the provided object was not correctly formated
 //
 // swagger:response wrongEntity
 type wrongEntityError struct {
-	// Status code
-	Status int `json:"status"`
-	// Location of the error
-	Where string `json:"where,omitempty"`
-	// Message for what get wrong
-	Message string `json:"message,omitempty"`
-	// Culprit
-	Object interface{} `json:"object"`
+	// in:body
+	Error utils.AppError
 }
 
 // databaseError is an error object to tell what is happening when we encounter issue with database
 //
 // swagger:response databaseError
 type databaseError struct {
-	// Status code
-	Status int `json:"status"`
-	// Location of the error
-	Where string `json:"where,omitempty"`
-	// Message for what get wrong
-	Message string `json:"message,omitempty"`
+	// in:body
+	Error utils.AppError
 }
 
 // ---------------------------------------------------
@@ -72,22 +73,6 @@ func newDeleteMessage(succes bool, message string) deleteMessage {
 		Status:  200,
 		Message: message,
 		Success: succes,
-	}
-}
-
-func newEntityError(code int, where string, message string) wrongEntityError {
-	return wrongEntityError{
-		Status:  code,
-		Where:   where,
-		Message: message,
-	}
-}
-
-func newDatabaseError(code int, where string, message string) databaseError {
-	return databaseError{
-		Status:  code,
-		Where:   where,
-		Message: message,
 	}
 }
 
