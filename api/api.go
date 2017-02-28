@@ -17,12 +17,7 @@ type testDb struct {
 	db *gorm.DB
 }
 
-type deleteMessage struct {
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Object  interface{} `json:"removed_object, omitempty"`
-}
-
+// Key type to be sure the context key is the one we want.
 type key string
 
 var (
@@ -56,8 +51,8 @@ func basicRoutes(router *chi.Mux) {
 	// Hello World
 	//
 	// 	Responses:
+	//    200
 	// 	  default: genericError
-	//    200: *success* Api well launch
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Welcome to PopCube api. Let's chat all together :O"))
 	})
@@ -68,8 +63,8 @@ func basicRoutes(router *chi.Mux) {
 	// Test api ping
 	//
 	// 	Responses:
+	//    200
 	// 	  default: genericError
-	//    200: *success* pong
 	router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
 	})
@@ -80,8 +75,8 @@ func basicRoutes(router *chi.Mux) {
 	// Test panic cautching
 	//
 	// 	Responses:
+	//    500
 	// 	  default: genericError
-	//    500: *success* Correct awaited error
 	router.Get("/panic", func(w http.ResponseWriter, r *http.Request) {
 		panic("C'est la panique, panique, panique. Sur le périphérique")
 	})
@@ -90,7 +85,7 @@ func basicRoutes(router *chi.Mux) {
 // StartAPI initialise the api with provided host and port.
 func StartAPI(hostname string, port string) {
 	router := newRouter()
-	dbStore.db = datastores.Store().InitConnection("root", "popcube_test", "popcube_dev", "0.0.0.0", "3306")
+	dbStore.db = datastores.Store().InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
 	initMiddleware(router)
 	basicRoutes(router)
 	initAvatarRoute(router)

@@ -147,7 +147,7 @@ func deleteRole(w http.ResponseWriter, r *http.Request) {
 	role := r.Context().Value("role").(models.Role)
 	store := datastores.Store()
 	render := renderPackage.New()
-	message := deleteMessage{
+	message := deleteMessageModel{
 		Object: role,
 	}
 	db := dbStore.db

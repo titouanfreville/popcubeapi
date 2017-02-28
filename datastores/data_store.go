@@ -20,11 +20,13 @@ import (
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
 	// Importing sql driver. They are used by gorm package and used by default from blank.
+	"log"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
 
-// Store interface the Stores and usefull DB functions
+// StoreInterface interface the Stores and usefull DB functions
 type StoreInterface interface {
 	Avatar() AvatarStore
 	Channel() ChannelStore
@@ -62,6 +64,11 @@ func (store StoreImpl) InitConnection(user string, dbname string, password strin
 	db.Callback().Update().Remove("gorm:update_time_stamp")
 	db.Callback().Update().Remove("gorm:save_associations")
 
+	if err := db.DB().Ping(); err != nil {
+		log.Print("Can't connect to database")
+		log.Print(host)
+		return nil
+	}
 	return db
 }
 
@@ -86,7 +93,7 @@ func (store StoreImpl) roleInitSave(role models.Role, db *gorm.DB) *u.AppError {
 // InitDatabase initialise a connection to the database and the database.
 func (store StoreImpl) InitDatabase(user string, dbname string, password string, host string, port string) {
 	db := store.InitConnection(user, dbname, password, host, port)
-
+	db.Debug().DB().Ping()
 	// Create correct tables
 	// db.AutoMigrate(&models.Avatar{}, &models.Channel{}, &models.Emoji{}, &models.Folder{},
 	// 	models.Member{}, &models.Message{}, &models.Organisation{}, &models.Parameter{},
@@ -99,6 +106,8 @@ func (store StoreImpl) InitDatabase(user string, dbname string, password string,
 	// Will not update LastUpdate on .Save() call
 	db.Callback().Update().Remove("gorm:update_time_stamp")
 	db.Callback().Update().Remove("gorm:save_associations")
+
+	db.Debug().DB().Ping()
 
 	if db.NewRecord(models.Owner) {
 		store.roleInitSave(models.Owner, db)

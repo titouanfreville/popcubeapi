@@ -245,7 +245,7 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user").(models.User)
 	store := datastores.Store()
 	render := renderPackage.New()
-	message := deleteMessage{
+	message := deleteMessageModel{
 		Object: user,
 	}
 	db := dbStore.db

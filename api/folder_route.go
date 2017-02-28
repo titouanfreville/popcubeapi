@@ -181,7 +181,7 @@ func deleteFolder(w http.ResponseWriter, r *http.Request) {
 	folder := r.Context().Value("folder").(models.Folder)
 	store := datastores.Store()
 	render := renderPackage.New()
-	message := deleteMessage{
+	message := deleteMessageModel{
 		Object: folder,
 	}
 	db := dbStore.db
