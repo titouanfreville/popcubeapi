@@ -14,11 +14,14 @@ services:
       context: .
       dockerfile:  docker/gobase.Dockerfile
     env_file: .env
+    depends_on: 
+      - database
     volumes:
       - "./api:/go/src/github.com/titouanfreville/popcubeapi/api"
       - "./datastores:/go/src/github.com/titouanfreville/popcubeapi/datastores"
       - "./models:/go/src/github.com/titouanfreville/popcubeapi/models"
       - "./utils:/go/src/github.com/titouanfreville/popcubeapi/utils"
+      - "./configs:/go/src/github.com/titouanfreville/popcubeapi/configs"
       - "./main.go:/go/src/github.com/titouanfreville/popcubeapi/main.go"
     image: registry.le-corre.eu:5000/go:base
     ports:
@@ -28,13 +31,14 @@ services:
       context: .
       dockerfile: docker/goconvey.Dockerfile
     env_file: .env
-    depends_on: 
+    depends_on:
       - back
     volumes:
       - "./api:/go/src/github.com/titouanfreville/popcubeapi/api"
       - "./datastores:/go/src/github.com/titouanfreville/popcubeapi/datastores"
       - "./models:/go/src/github.com/titouanfreville/popcubeapi/models"
       - "./utils:/go/src/github.com/titouanfreville/popcubeapi/utils"
+      - "./configs:/go/src/github.com/titouanfreville/popcubeapi/configs"
       - "./main.go:/go/src/github.com/titouanfreville/popcubeapi/main.go"
     ports:
       - 8082:8080
@@ -48,6 +52,7 @@ services:
       - "./datastores:/go/src/github.com/titouanfreville/popcubeapi/datastores"
       - "./models:/go/src/github.com/titouanfreville/popcubeapi/models"
       - "./utils:/go/src/github.com/titouanfreville/popcubeapi/utils"
+      - "./configs:/go/src/github.com/titouanfreville/popcubeapi/configs"
       - "./main.go:/go/src/github.com/titouanfreville/popcubeapi/main.go"
   database:
     image: mariadb:10.1

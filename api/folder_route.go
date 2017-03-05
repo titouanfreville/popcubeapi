@@ -71,7 +71,7 @@ func getAllFolder(w http.ResponseWriter, r *http.Request) {
 		result := store.Folder().GetAll(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
@@ -113,13 +113,13 @@ func getFolderFromMessage(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			role := store.Folder().GetByMessage(data.Message, db)
 			render.JSON(w, 200, role)
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -135,7 +135,7 @@ func newFolder(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Folder().Save(data.Folder, db)
@@ -145,7 +145,7 @@ func newFolder(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -162,7 +162,7 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 	err := chiRender.Bind(request, &data)
 	folder := r.Context().Value("oldFolder").(models.Folder)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Folder().Update(&folder, data.Folder, db)
@@ -172,7 +172,7 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }

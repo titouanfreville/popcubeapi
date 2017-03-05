@@ -12,6 +12,13 @@ import (
 	renderPackage "github.com/unrolled/render"
 )
 
+const (
+	emojiNameKey     key = "emojiName"
+	emojiLinkKey     key = "emojiLink"
+	emojiShortcutKey key = "emojiShortcut"
+	oldEmojiKey      key = "oldEmoji"
+)
+
 func initEmojiRoute(router chi.Router) {
 	router.Route("/emoji", func(r chi.Router) {
 		r.Get("/", getAllEmoji)
@@ -51,13 +58,13 @@ func emojiContext(next http.Handler) http.Handler {
 		link := chi.URLParam(r, "emojiLink")
 		shortcut := chi.URLParam(r, "emojiShortcut")
 		oldEmoji := models.Emoji{}
-		ctx := context.WithValue(r.Context(), "emojiName", name)
-		ctx = context.WithValue(ctx, "emojiLink", link)
-		ctx = context.WithValue(ctx, "emojiShortcut", shortcut)
+		ctx := context.WithValue(r.Context(), emojiNameKey, name)
+		ctx = context.WithValue(ctx, emojiLinkKey, link)
+		ctx = context.WithValue(ctx, emojiShortcutKey, shortcut)
 		if err == nil {
 			oldEmoji = datastores.Store().Emoji().GetByID(emojiID, dbStore.db)
 		}
-		ctx = context.WithValue(ctx, "oldEmoji", oldEmoji)
+		ctx = context.WithValue(ctx, oldEmojiKey, oldEmoji)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -70,7 +77,7 @@ func getAllEmoji(w http.ResponseWriter, r *http.Request) {
 		result := store.Emoji().GetAll(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
@@ -78,7 +85,7 @@ func getEmojiFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	name := r.Context().Value("emojiName").(string)
+	name := r.Context().Value(emojiNameKey).(string)
 	emoji := store.Emoji().GetByName(name, db)
 	render.JSON(w, 200, emoji)
 }
@@ -87,7 +94,7 @@ func getEmojiFromShortcut(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	link := r.Context().Value("emojiShortcut").(string)
+	link := r.Context().Value(emojiShortcutKey).(string)
 	emoji := store.Emoji().GetByShortcut(link, db)
 	render.JSON(w, 200, emoji)
 }
@@ -96,7 +103,7 @@ func getEmojiFromLink(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	link := r.Context().Value("emojiLink").(string)
+	link := r.Context().Value(emojiLinkKey).(string)
 	emoji := store.Emoji().GetByLink(link, db)
 	render.JSON(w, 200, emoji)
 }
@@ -112,7 +119,7 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Emoji().Save(data.Emoji, db)
@@ -122,7 +129,7 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -137,9 +144,9 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	emoji := r.Context().Value("oldEmoji").(models.Emoji)
+	emoji := r.Context().Value(oldEmojiKey).(models.Emoji)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Emoji().Update(&emoji, data.Emoji, db)
@@ -149,13 +156,13 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
 
 func deleteEmoji(w http.ResponseWriter, r *http.Request) {
-	emoji := r.Context().Value("emoji").(models.Emoji)
+	emoji := r.Context().Value(oldEmojiKey).(models.Emoji)
 	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessageModel{

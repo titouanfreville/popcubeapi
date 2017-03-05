@@ -130,3 +130,24 @@ type channelObjectSuccess struct {
 }
 
 // <><><><><> <><><><><> <><><><><> <><><><><> //
+
+// <><><><><> EMOJI RESPONSES <><><><><> //
+
+// emojiSlice Array of emojis
+//
+// swagger:response emojiArraySuccess
+type emojiArraySuccess struct {
+	// in:body
+	Emojis []models.Emoji
+}
+
+// emojiObjectSuccess list of emojis
+//
+// swagger:response emojiObjectSuccess
+type emojiObjectSuccess struct {
+	// in:body
+	// List of emojis returned
+	Emoji models.Emoji `json:"emoji"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //

@@ -4,23 +4,21 @@ MAINTAINER FREVILLE Titouan titouanfreville@gmail.com
 
 ENV TERM xterm-256color
 ENV GOCOPYPATH go/src/github.com/titouanfreville/popcubeapi
+ENV GOSU_VERSION 1.9
+ENV ENVTYPE container
 
 COPY api /$GOCOPYPATH/api
 COPY models /$GOCOPYPATH/models
 COPY utils /$GOCOPYPATH/utils
 COPY datastores /$GOCOPYPATH/datastores
+COPY configs /$GOCOPYPATH/configs
 COPY main.go /$GOCOPYPATH/main.go
-# COPY utils/go_get.sh /bin/go_get.sh
+COPY scripts/wait-for-it.sh /bin/waitforit
 
 RUN apk add --update git bash && \
 		cd /go/ && \
-		go get -v github.com/tools/godep && \
-		go get -v github.com/smartystreets/goconvey && \
-        cd /$GOCOPYPATH && \
-        godep get -v && \
 		rm -rf /var/cache/apk/*
 
-ENV GOSU_VERSION 1.9
 RUN set -x \
     && apk add --no-cache --virtual .gosu-deps \
         dpkg \
@@ -37,6 +35,12 @@ RUN set -x \
     && gosu nobody true \
     && apk del .gosu-deps
 
+
+RUN go get -v github.com/tools/godep && \
+    go get -v github.com/smartystreets/goconvey && \
+    cd /$GOCOPYPATH && \
+    godep get -v
+
 WORKDIR /$GOCOPYPATH
 
-ENTRYPOINT go install && popcubeapi
+ENTRYPOINT waitforit database:3306 -t 0 -- echo "Db is ready" && go install && popcubeapi

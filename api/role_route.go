@@ -55,7 +55,7 @@ func getAllRole(w http.ResponseWriter, r *http.Request) {
 		result := store.Role().GetAll(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
@@ -79,13 +79,13 @@ func getRoleFromRight(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			role := store.Role().GetByRights(data.Role, db)
 			render.JSON(w, 200, role)
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -101,7 +101,7 @@ func newRole(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Role().Save(data.Role, db)
@@ -111,7 +111,7 @@ func newRole(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -128,7 +128,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 	err := chiRender.Bind(request, &data)
 	role := r.Context().Value("oldRole").(models.Role)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Role().Update(&role, data.Role, db)
@@ -138,7 +138,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }

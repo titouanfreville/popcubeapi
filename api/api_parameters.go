@@ -64,3 +64,41 @@ type channelObjectParam struct {
 }
 
 // <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> EMOJI PARAMETERS <><><><><> //
+
+// swagger:parameters getEmojiFromLink
+type emojiLinkParam struct {
+	//Link of the emoji in server.
+	// in:path
+	EmojiLink string `json:"emojiLink"`
+}
+
+// swagger:parameters getEmojiFromName
+type emojiNameParam struct {
+	//Link of the emoji in server.
+	// in:path
+	EmojiName string `json:"emojiName"`
+}
+
+// swagger:parameters getEmojiFromShortcut
+type emojiShortcutParam struct {
+	//Link of the emoji in server.
+	// in:path
+	EmojiShortcut string `json:"emojiShortcut"`
+}
+
+// swagger:parameters updateEmoji deleteEmoji
+type emojiIDParam struct {
+	//Link of the emoji in server.
+	// in:path
+	EmojiID int `json:"emojiID"`
+}
+
+// swagger:parameters newEmoji updateEmoji
+type emojiObjectParam struct {
+	//Link of the emoji in server.
+	// in:body
+	Emoji models.Emoji `json:"emoji"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //

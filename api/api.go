@@ -9,11 +9,12 @@ import (
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/docgen"
 	"github.com/pressly/chi/middleware"
+	"github.com/titouanfreville/popcubeapi/configs"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/utils"
 )
 
-type testDb struct {
+type saveDb struct {
 	db *gorm.DB
 }
 
@@ -22,7 +23,7 @@ type key string
 
 var (
 	routes   = flag.Bool("routes", false, "Generate router documentation")
-	dbStore  = testDb{}
+	dbStore  = saveDb{}
 	error422 = utils.NewAPIError(422, "parse.request.body", "Request json object not correct.")
 	error503 = utils.NewAPIError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
 )
@@ -40,7 +41,7 @@ func initMiddleware(router *chi.Mux) {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.StripSlashes)
 	router.Use(middleware.Timeout(5 * 1000))
-	router.Use(middleware.Heartbeat("/ping"))
+	// router.Use(middleware.Heartbeat("/heartbeat"))
 	router.Use(middleware.CloseNotify)
 }
 
@@ -83,9 +84,16 @@ func basicRoutes(router *chi.Mux) {
 }
 
 // StartAPI initialise the api with provided host and port.
-func StartAPI(hostname string, port string) {
+func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnection) {
 	router := newRouter()
-	dbStore.db = datastores.Store().InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
+	// Init DB connection
+	user := DbConnectionInfo.User
+	db := DbConnectionInfo.Database
+	pass := DbConnectionInfo.Password
+	host := DbConnectionInfo.Host
+	dbport := DbConnectionInfo.Port
+	dbStore.db = datastores.Store().InitConnection(user, db, pass, host, dbport)
+
 	initMiddleware(router)
 	basicRoutes(router)
 	initAvatarRoute(router)

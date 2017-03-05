@@ -45,7 +45,7 @@ func getAllOrganisation(w http.ResponseWriter, r *http.Request) {
 		result := store.Organisation().Get(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
@@ -60,7 +60,7 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Organisation().Save(data.Organisation, db)
@@ -70,7 +70,7 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -87,7 +87,7 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 	err := chiRender.Bind(request, &data)
 	organisation := r.Context().Value("oldOrganisation").(models.Organisation)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Organisation().Update(&organisation, data.Organisation, db)
@@ -97,7 +97,7 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }

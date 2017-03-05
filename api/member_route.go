@@ -49,7 +49,7 @@ func getAllMember(w http.ResponseWriter, r *http.Request) {
 		result := store.Member().GetAll(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
@@ -64,13 +64,13 @@ func getMemberFromUser(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			role := store.Member().GetByUser(data.User, db)
 			render.JSON(w, 200, role)
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -86,13 +86,13 @@ func getMemberFromChannel(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			role := store.Member().GetByChannel(data.Channel, db)
 			render.JSON(w, 200, role)
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -108,13 +108,13 @@ func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			role := store.Member().GetByRole(data.Role, db)
 			render.JSON(w, 200, role)
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -130,7 +130,7 @@ func newMember(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Member().Save(data.Member, db)
@@ -140,7 +140,7 @@ func newMember(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -157,7 +157,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 	err := chiRender.Bind(request, &data)
 	member := r.Context().Value("oldMember").(models.Member)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Member().Update(&member, data.Member, db)
@@ -167,7 +167,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }

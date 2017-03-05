@@ -106,7 +106,7 @@ func initAvatarRoute(router chi.Router) {
 			// This will return the new avatar object
 			//
 			// 	Responses:
-			//    200: avatarObjectSuccess
+			//    200: avatzarObjectSuccess
 			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: genericError
