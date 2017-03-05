@@ -25,7 +25,7 @@ type avatarIDParam struct {
 	AvatarID int `json:"avatarID"`
 }
 
-// swagger:parameters newAvatar updateAvatar
+// swagger:parameters newAvatar newAvatar1 updateAvatar
 type avatarObjectParam struct {
 	//Link of the avatar in server.
 	// in:body
@@ -56,7 +56,7 @@ type channelIDParam struct {
 	ChannelID int `json:"channelID"`
 }
 
-// swagger:parameters newChannel updateChannel
+// swagger:parameters newChannel newChannel1 updateChannel getMemberFromChannel getMessageFromChannel
 type channelObjectParam struct {
 	//Link of the channel in server.
 	// in:body
@@ -94,11 +94,218 @@ type emojiIDParam struct {
 	EmojiID int `json:"emojiID"`
 }
 
-// swagger:parameters newEmoji updateEmoji
+// swagger:parameters newEmoji newEmoji1 updateEmoji
 type emojiObjectParam struct {
 	//Link of the emoji in server.
 	// in:body
 	Emoji models.Emoji `json:"emoji"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> FOLDER PARAMETERS <><><><><> //
+
+// swagger:parameters getFolderFromLink
+type folderLinkParam struct {
+	//Link of the folder in server.
+	// in:path
+	FolderLink string `json:"folderLink"`
+}
+
+// swagger:parameters getFolderFromName
+type folderNameParam struct {
+	//Link of the folder in server.
+	// in:path
+	FolderName string `json:"folderName"`
+}
+
+// swagger:parameters getFolderFromType
+type folderTypeParam struct {
+	//Link of the folder in server.
+	// in:path
+	FolderType string `json:"folderType"`
+}
+
+// swagger:parameters updateFolder deleteFolder
+type folderIDParam struct {
+	//Link of the folder in server.
+	// in:path
+	FolderID int `json:"folderID"`
+}
+
+// swagger:parameters newFolder newFolder1 updateFolder
+type folderObjectParam struct {
+	//Link of the folder in server.
+	// in:body
+	Folder models.Folder `json:"folder"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> MEMBER PARAMETERS <><><><><> //
+
+// swagger:parameters updateMember
+type memberIDParam struct {
+	//Link of the member in server.
+	// in:path
+	MemberID int `json:"memberID"`
+}
+
+// swagger:parameters newMember newMember1 updateOrgansisation
+type memberObjectParam struct {
+	// Member object
+	// in:body
+	Member models.Member `json:"member"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> MESSAGE PARAMETERS <><><><><> //
+
+// swagger:parameters getMessageFromDate
+type messageDate struct {
+	// Date of the message
+	// in:path
+	MessageDate int64 `json:"messageDate"`
+}
+
+// swagger:parameters updateMessage deleteMessage
+type messageIDParam struct {
+	//Link of the message in server.
+	// in:path
+	MessageID int `json:"messageID"`
+}
+
+// swagger:parameters newMessage newMessage1 updateMessage getFolderFromMessage
+type messageObjectParam struct {
+	//Link of the message in server.
+	// in:body
+	Message models.Message `json:"message"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> ORGANISATION PARAMETERS <><><><><> //
+
+// swagger:parameters updateOrganisation
+type organisationIDParam struct {
+	//Link of the organisation in server.
+	// in:path
+	OrganisationID int `json:"organisationID"`
+}
+
+// swagger:parameters newOrganisation newOrganisation1 updateOrgansisation
+type organisationObjectParam struct {
+	// Organisation object
+	// in:body
+	Organisation models.Organisation `json:"organisation"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> PARMETER PARAMETERS <><><><><> //
+
+// swagger:parameters updateParameter
+type parameterIDParam struct {
+	//Link of the parameter in server.
+	// in:path
+	ParameterID int `json:"parameterID"`
+}
+
+// swagger:parameters newParameter newParameter1 updateOrgansisation
+type parameterObjectParam struct {
+	// Parameter object
+	// in:body
+	Parameter models.Parameter `json:"parameter"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> ROLE PARAMETERS <><><><><> //
+
+// swagger:parameters getRoleFromName
+type roleNameParam struct {
+	//Link of the role in server.
+	// in:path
+	RoleName string `json:"roleName"`
+}
+
+// swagger:parameters updateRole deleteRole
+type roleIDParam struct {
+	//Link of the role in server.
+	// in:path
+	RoleID int `json:"roleID"`
+}
+
+// swagger:parameters newRole newRole1 updateRole getUserFromRole getMemberFromRole
+type roleObjectParam struct {
+	// Role object
+	// in:body
+	Role models.Role `json:"role"`
+}
+
+// rightsParameterModel is the object you can pass to get roles from rights.
+//
+// swagger:model rightsParameterModel
+type rightsParameterModel struct {
+	// User can use private channel
+	CanUsePrivate bool `gorm:"column:canUsePrivate;not null" json:"can_use_private,omitempty"`
+	// User can moderate channels
+	CanModerate bool `gorm:"column:canModerate;not null" json:"can_moderate,omitempty"`
+	// User can archive channels
+	CanArchive bool `gorm:"column:canArchive;not null" json:"can_archive,omitempty"`
+	// User can invite others to private channel or organisation
+	CanInvite bool `gorm:"column:canInvite;not null" json:"can_invite,omitempty"`
+	// User can manage organisation/channel parameters and data
+	CanManage bool `gorm:"column:canManage;not null" json:"can_manage,omitempty"`
+	// User can manage other organisation/channel user
+	CanManageUser bool `gorm:"column:canManageUser;not null" json:"can_manage_user,omitempty"`
+}
+
+// swagger:parameters getRoleFromRights
+type rightsObjectParam struct {
+	// Right of the role we search
+	// in:body
+	Rights rightsParameterModel `json:"rights"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> USER PARAMETERS <><><><><> //
+
+// swagger:parameters getUserFromName
+type userNameParam struct {
+	//Link of the user in server.
+	// in:path
+	UserName string `json:"userName"`
+}
+
+// swagger:parameters getUserFromNickName
+type nickNameParam struct {
+	//Link of the user in server.
+	// in:path
+	NickName string `json:"nickName"`
+}
+
+// swagger:parameters getUserFromFirstName
+type firstNameParam struct {
+	//Link of the user in server.
+	// in:path
+	FirstName string `json:"firstName"`
+}
+
+// swagger:parameters getUserFromLastName
+type lastNameeParam struct {
+	//Link of the user in server.
+	// in:path
+	LastName string `json:"lastName"`
+}
+
+// swagger:parameters updateUser deleteUser
+type userIDParam struct {
+	//Link of the user in server.
+	// in:path
+	UserID int `json:"userID"`
+}
+
+// swagger:parameters newUser newUser1 updateUser getMemberFromUser getMessageFromUser
+type userObjectParam struct {
+	//Link of the user in server.
+	// in:body
+	User models.User `json:"user"`
 }
 
 // <><><><><> <><><><><> <><><><><> <><><><><> //

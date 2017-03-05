@@ -23,9 +23,13 @@ paths:
       tags:
       - "Test"
       description: "Hello World"
-      operationId: "getter"
+      operationId: "hello"
       parameters: []
       responses:
+        200:
+          description: "generalOk"
+          schema:
+            $ref: "#/definitions/generalOk"
         default:
           description: "genericError general error when unexpected errors occured"
           schema:
@@ -73,6 +77,11 @@ paths:
           description: "avatarObjectSuccess list of avatars"
           schema:
             $ref: "#/definitions/Avatar"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
         503:
           description: "databaseError is an error object to tell what is happening\
             \ when we encounter issue with database"
@@ -82,7 +91,121 @@ paths:
           description: "genericError general error when unexpected errors occured"
           schema:
             $ref: "#/definitions/genericErrorModel"
-  /avatar/:avatarID:
+  /avatar/all:
+    get:
+      tags:
+      - "Avatars"
+      summary: "Get avatars"
+      description: "This will get all the avatars available in the organisation."
+      operationId: "getAllAvatar1"
+      parameters: []
+      responses:
+        200:
+          description: "avatarSlice Array of avatars"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Avatar"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /avatar/link/{avatarLink}:
+    get:
+      tags:
+      - "Avatars"
+      summary: "Get avatar from link"
+      description: "This will return the avatar object corresponding to provided link"
+      operationId: "getAvatarFromLink"
+      parameters:
+      - name: "avatarLink"
+        in: "path"
+        description: "Link of the avatar in server."
+        required: true
+        type: "string"
+        x-go-name: "AvatarLink"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /avatar/name/{avatarName}:
+    get:
+      tags:
+      - "Avatars"
+      summary: "y\nGet avatar from name"
+      description: "This will return the avatar object corresponding to provided name"
+      operationId: "getAvatarFromName"
+      parameters:
+      - name: "avatarName"
+        in: "path"
+        description: "Link of the avatar in server."
+        required: true
+        type: "string"
+        x-go-name: "AvatarName"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /avatar/new:
+    post:
+      tags:
+      - "Avatars"
+      summary: "New avatar"
+      description: "This will create an avatar for organisation avatars library."
+      operationId: "newAvatar1"
+      parameters:
+      - in: "body"
+        name: "avatar"
+        description: "Link of the avatar in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Avatar"
+        x-go-name: "Avatar"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /avatar/{avatarID}:
     put:
       tags:
       - "Avatars"
@@ -123,143 +246,6 @@ paths:
           description: "genericError general error when unexpected errors occured"
           schema:
             $ref: "#/definitions/genericErrorModel"
-    delete:
-      tags:
-      - "Avatars"
-      summary: "Delete avatar"
-      description: "This will return an object describing the deletion"
-      operationId: "deleteAvatar"
-      parameters:
-      - name: "avatarID"
-        in: "path"
-        description: "Link of the avatar in server."
-        required: true
-        type: "integer"
-        format: "int64"
-        x-go-name: "AvatarID"
-      responses:
-        200:
-          description: "deleteMessage"
-          schema:
-            $ref: "#/definitions/deleteMessage"
-        503:
-          description: "databaseError is an error object to tell what is happening\
-            \ when we encounter issue with database"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        default:
-          description: "genericError general error when unexpected errors occured"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-  /avatar/all:
-    get:
-      tags:
-      - "Avatars"
-      summary: "Get avatars"
-      description: "This will get all the avatars available in the organisation."
-      operationId: "getAllAvatar"
-      parameters: []
-      responses:
-        200:
-          description: "avatarSlice Array of avatars"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Avatar"
-        503:
-          description: "databaseError is an error object to tell what is happening\
-            \ when we encounter issue with database"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        default:
-          description: "genericError general error when unexpected errors occured"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-  /avatar/link/:avatarLink:
-    get:
-      tags:
-      - "Avatars"
-      summary: "Get avatar from link"
-      description: "This will return the avatar object corresponding to provided link"
-      operationId: "getAvatarFromLink"
-      parameters:
-      - name: "avatarLink"
-        in: "path"
-        description: "Link of the avatar in server."
-        required: true
-        type: "string"
-        x-go-name: "AvatarLink"
-      responses:
-        200:
-          description: "avatarObjectSuccess list of avatars"
-          schema:
-            $ref: "#/definitions/Avatar"
-        503:
-          description: "databaseError is an error object to tell what is happening\
-            \ when we encounter issue with database"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        default:
-          description: "genericError general error when unexpected errors occured"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-  /avatar/name/:avatarName:
-    get:
-      tags:
-      - "Avatars"
-      summary: "y\nGet avatar from name"
-      description: "This will return the avatar object corresponding to provided name"
-      operationId: "getAvatarFromName"
-      parameters:
-      - name: "avatarName"
-        in: "path"
-        description: "Link of the avatar in server."
-        required: true
-        type: "string"
-        x-go-name: "AvatarName"
-      responses:
-        200:
-          description: "avatarObjectSuccess list of avatars"
-          schema:
-            $ref: "#/definitions/Avatar"
-        503:
-          description: "databaseError is an error object to tell what is happening\
-            \ when we encounter issue with database"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        default:
-          description: "genericError general error when unexpected errors occured"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-  /avatar/new:
-    post:
-      tags:
-      - "Avatars"
-      summary: "New avatar"
-      description: "This will create an avatar for organisation avatars library."
-      operationId: "newAvatar"
-      parameters:
-      - in: "body"
-        name: "avatar"
-        description: "Link of the avatar in server."
-        required: false
-        schema:
-          $ref: "#/definitions/Avatar"
-        x-go-name: "Avatar"
-      responses:
-        200:
-          description: "avatarObjectSuccess list of avatars"
-          schema:
-            $ref: "#/definitions/Avatar"
-        503:
-          description: "databaseError is an error object to tell what is happening\
-            \ when we encounter issue with database"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        default:
-          description: "genericError general error when unexpected errors occured"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
   /channel:
     get:
       tags:
@@ -286,10 +272,10 @@ paths:
             $ref: "#/definitions/genericErrorModel"
     post:
       tags:
-      - "Channels"
-      summary: "New channel"
-      description: "This will create an channel for organisation channels library."
-      operationId: "newChannel"
+      - "Messages"
+      summary: "Get message from channel"
+      description: "This will return all mesages in provided channel"
+      operationId: "getMessageFromChannel"
       parameters:
       - in: "body"
         name: "channel"
@@ -300,83 +286,14 @@ paths:
         x-go-name: "Channel"
       responses:
         200:
-          description: "channelObjectSuccess list of channels"
+          description: "messageObjectSuccess list of messages"
           schema:
-            $ref: "#/definitions/Channel"
+            $ref: "#/definitions/Message"
         422:
           description: "wrongEntityError is an error object to inform that the provided\
             \ object was not correctly formated"
           schema:
             $ref: "#/definitions/genericErrorModel"
-        503:
-          description: "databaseError is an error object to tell what is happening\
-            \ when we encounter issue with database"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        default:
-          description: "genericError general error when unexpected errors occured"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-  /channel/:channelID:
-    put:
-      tags:
-      - "Channels"
-      summary: "Update channel"
-      description: "This will return the new channel object"
-      operationId: "updateChannel"
-      parameters:
-      - name: "channelID"
-        in: "path"
-        description: "Link of the channel in server."
-        required: true
-        type: "integer"
-        format: "int64"
-        x-go-name: "ChannelID"
-      - in: "body"
-        name: "channel"
-        description: "Link of the channel in server."
-        required: false
-        schema:
-          $ref: "#/definitions/Channel"
-        x-go-name: "Channel"
-      responses:
-        200:
-          description: "channelObjectSuccess list of channels"
-          schema:
-            $ref: "#/definitions/Channel"
-        422:
-          description: "wrongEntityError is an error object to inform that the provided\
-            \ object was not correctly formated"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        503:
-          description: "databaseError is an error object to tell what is happening\
-            \ when we encounter issue with database"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        default:
-          description: "genericError general error when unexpected errors occured"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-    delete:
-      tags:
-      - "Channels"
-      summary: "Delete channel"
-      description: "This will return an object describing the deletion"
-      operationId: "deleteChannel"
-      parameters:
-      - name: "channelID"
-        in: "path"
-        description: "Link of the channel in server."
-        required: true
-        type: "integer"
-        format: "int64"
-        x-go-name: "ChannelID"
-      responses:
-        200:
-          description: "deleteMessage"
-          schema:
-            $ref: "#/definitions/deleteMessage"
         503:
           description: "databaseError is an error object to tell what is happening\
             \ when we encounter issue with database"
@@ -392,7 +309,7 @@ paths:
       - "Channels"
       summary: "Get channels"
       description: "This will get all the channels available in the organisation."
-      operationId: "getAllChannel"
+      operationId: "getAllChannel1"
       parameters: []
       responses:
         200:
@@ -410,7 +327,7 @@ paths:
           description: "genericError general error when unexpected errors occured"
           schema:
             $ref: "#/definitions/genericErrorModel"
-  /channel/name/:channelName:
+  /channel/name/{channelName}:
     get:
       tags:
       - "Channels"
@@ -444,7 +361,7 @@ paths:
       - "Channels"
       summary: "New channel"
       description: "This will create an channel for organisation channels library."
-      operationId: "newChannel"
+      operationId: "newChannel1"
       parameters:
       - in: "body"
         name: "channel"
@@ -520,7 +437,7 @@ paths:
           description: "genericError general error when unexpected errors occured"
           schema:
             $ref: "#/definitions/genericErrorModel"
-  /channel/type/:channelType:
+  /channel/type/{channelType}:
     get:
       tags:
       - "Channels"
@@ -551,15 +468,1249 @@ paths:
           description: "genericError general error when unexpected errors occured"
           schema:
             $ref: "#/definitions/genericErrorModel"
+  /channel/{channelID}:
+    put:
+      tags:
+      - "Channels"
+      summary: "Update channel"
+      description: "This will return the new channel object"
+      operationId: "updateChannel"
+      parameters:
+      - name: "channelID"
+        in: "path"
+        description: "Link of the channel in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "ChannelID"
+      - in: "body"
+        name: "channel"
+        description: "Link of the channel in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Channel"
+        x-go-name: "Channel"
+      responses:
+        200:
+          description: "channelObjectSuccess list of channels"
+          schema:
+            $ref: "#/definitions/Channel"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    delete:
+      tags:
+      - "Channels"
+      summary: "Delete channel"
+      description: "This will return an object describing the deletion"
+      operationId: "deleteChannel"
+      parameters:
+      - name: "channelID"
+        in: "path"
+        description: "Link of the channel in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "ChannelID"
+      responses:
+        200:
+          description: "deleteMessage"
+          schema:
+            $ref: "#/definitions/deleteMessage"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /emoji:
+    get:
+      tags:
+      - "Emojis"
+      summary: "Get emojis"
+      description: "This will get all the emojis available in the organisation."
+      operationId: "getAllEmoji"
+      parameters: []
+      responses:
+        200:
+          description: "emojiSlice Array of emojis"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Emoji"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    post:
+      tags:
+      - "Emojis"
+      summary: "New emoji"
+      description: "This will create an emoji for organisation emojis library."
+      operationId: "newEmoji1"
+      parameters:
+      - in: "body"
+        name: "emoji"
+        description: "Link of the emoji in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Emoji"
+        x-go-name: "Emoji"
+      responses:
+        200:
+          description: "emojiObjectSuccess list of emojis"
+          schema:
+            $ref: "#/definitions/Emoji"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /emoji/all:
+    get:
+      tags:
+      - "Emojis"
+      summary: "Get emojis"
+      description: "This will get all the emojis available in the organisation."
+      operationId: "getAllEmoji1"
+      parameters: []
+      responses:
+        200:
+          description: "emojiSlice Array of emojis"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Emoji"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /emoji/link/{emojiLink}:
+    get:
+      tags:
+      - "Emojis"
+      summary: "Get emoji from link"
+      description: "This will return the emoji object corresponding to provided link"
+      operationId: "getEmojiFromLink"
+      parameters:
+      - name: "emojiLink"
+        in: "path"
+        description: "Link of the emoji in server."
+        required: true
+        type: "string"
+        x-go-name: "EmojiLink"
+      responses:
+        200:
+          description: "emojiObjectSuccess list of emojis"
+          schema:
+            $ref: "#/definitions/Emoji"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /emoji/name/{emojiName}:
+    get:
+      tags:
+      - "Emojis"
+      summary: "Get emoji from name"
+      description: "This will return the emoji object corresponding to provided name"
+      operationId: "getEmojiFromName"
+      parameters:
+      - name: "emojiName"
+        in: "path"
+        description: "Link of the emoji in server."
+        required: true
+        type: "string"
+        x-go-name: "EmojiName"
+      responses:
+        200:
+          description: "emojiObjectSuccess list of emojis"
+          schema:
+            $ref: "#/definitions/Emoji"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /emoji/shortcut/{emojiShortcut}:
+    get:
+      tags:
+      - "Emojis"
+      summary: "Get emoji from shortcut"
+      description: "This will return the emoji object corresponding to provided shortcut"
+      operationId: "getEmojiFromShortcut"
+      parameters:
+      - name: "emojiShortcut"
+        in: "path"
+        description: "Link of the emoji in server."
+        required: true
+        type: "string"
+        x-go-name: "EmojiShortcut"
+      responses:
+        200:
+          description: "emojiObjectSuccess list of emojis"
+          schema:
+            $ref: "#/definitions/Emoji"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /emoji/{emojiID}:
+    put:
+      tags:
+      - "Emojis"
+      summary: "Update emoji"
+      description: "This will return the new emoji object"
+      operationId: "updateEmoji"
+      parameters:
+      - name: "emojiID"
+        in: "path"
+        description: "Link of the emoji in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "EmojiID"
+      - in: "body"
+        name: "emoji"
+        description: "Link of the emoji in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Emoji"
+        x-go-name: "Emoji"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    delete:
+      tags:
+      - "Emojis"
+      summary: "Delete emoji"
+      description: "This will return an object describing the deletion"
+      operationId: "deleteEmoji"
+      parameters:
+      - name: "emojiID"
+        in: "path"
+        description: "Link of the emoji in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "EmojiID"
+      responses:
+        200:
+          description: "deleteMessage"
+          schema:
+            $ref: "#/definitions/deleteMessage"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /folder:
+    get:
+      tags:
+      - "Folders"
+      summary: "Get folders"
+      description: "This will get all the folders available in the organisation."
+      operationId: "getAllFolder"
+      parameters: []
+      responses:
+        200:
+          description: "folderSlice Array of folders"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Folder"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    post:
+      tags:
+      - "Folders"
+      summary: "New folder"
+      description: "This will create an folder for organisation folders library."
+      operationId: "newFolder"
+      parameters:
+      - in: "body"
+        name: "folder"
+        description: "Link of the folder in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Folder"
+        x-go-name: "Folder"
+      responses:
+        200:
+          description: "folderObjectSuccess list of folders"
+          schema:
+            $ref: "#/definitions/Folder"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /folder/all:
+    get:
+      tags:
+      - "Folders"
+      summary: "Get folders"
+      description: "This will get all the folders available in the organisation."
+      operationId: "getAllFolder1"
+      parameters: []
+      responses:
+        200:
+          description: "folderSlice Array of folders"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Folder"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /folder/link/{folderLink}:
+    get:
+      tags:
+      - "Folders"
+      summary: "Get folder from link"
+      description: "This will return the folder object corresponding to provided link"
+      operationId: "getFolderFromLink"
+      parameters:
+      - name: "folderLink"
+        in: "path"
+        description: "Link of the folder in server."
+        required: true
+        type: "string"
+        x-go-name: "FolderLink"
+      responses:
+        200:
+          description: "folderObjectSuccess list of folders"
+          schema:
+            $ref: "#/definitions/Folder"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /folder/message:
+    post:
+      tags:
+      - "Folders"
+      summary: "Get folders linked to message"
+      description: "Return folders linked to provided message."
+      operationId: "getFolderFromMessage"
+      parameters:
+      - in: "body"
+        name: "message"
+        description: "Link of the message in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Message"
+        x-go-name: "Message"
+      responses:
+        200:
+          description: "folderSlice Array of folders"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Folder"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /folder/name/{folderName}:
+    get:
+      tags:
+      - "Folders"
+      summary: "Get folder from name"
+      description: "This will return the folder object corresponding to provided name"
+      operationId: "getFolderFromName"
+      parameters:
+      - name: "folderName"
+        in: "path"
+        description: "Link of the folder in server."
+        required: true
+        type: "string"
+        x-go-name: "FolderName"
+      responses:
+        200:
+          description: "folderObjectSuccess list of folders"
+          schema:
+            $ref: "#/definitions/Folder"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /folder/new:
+    post:
+      tags:
+      - "Folders"
+      summary: "New folder"
+      description: "This will create an folder for organisation folders library."
+      operationId: "newFolder1"
+      parameters:
+      - in: "body"
+        name: "folder"
+        description: "Link of the folder in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Folder"
+        x-go-name: "Folder"
+      responses:
+        200:
+          description: "folderObjectSuccess list of folders"
+          schema:
+            $ref: "#/definitions/Folder"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /folder/type/{folderType}:
+    get:
+      tags:
+      - "Folders"
+      summary: "Get folder from type"
+      description: "This will return the folder object corresponding to provided type"
+      operationId: "getFolderFromType"
+      parameters:
+      - name: "folderType"
+        in: "path"
+        description: "Link of the folder in server."
+        required: true
+        type: "string"
+        x-go-name: "FolderType"
+      responses:
+        200:
+          description: "folderObjectSuccess list of folders"
+          schema:
+            $ref: "#/definitions/Folder"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /folder/{folderID}:
+    put:
+      tags:
+      - "Folders"
+      summary: "Update folder"
+      description: "This will return the new folder object"
+      operationId: "updateFolder"
+      parameters:
+      - name: "folderID"
+        in: "path"
+        description: "Link of the folder in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "FolderID"
+      - in: "body"
+        name: "folder"
+        description: "Link of the folder in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Folder"
+        x-go-name: "Folder"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    delete:
+      tags:
+      - "Folders"
+      summary: "Delete folder"
+      description: "This will return an object describing the deletion"
+      operationId: "deleteFolder"
+      parameters:
+      - name: "folderID"
+        in: "path"
+        description: "Link of the folder in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "FolderID"
+      responses:
+        200:
+          description: "deleteMessage"
+          schema:
+            $ref: "#/definitions/deleteMessage"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /member:
+    get:
+      tags:
+      - "Members"
+      summary: "Get members"
+      description: "This will get all the members available in the organisation."
+      operationId: "getAllMember"
+      parameters: []
+      responses:
+        200:
+          description: "memberSlice Array of members"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Member"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    post:
+      tags:
+      - "Members"
+      summary: "New member"
+      description: "This will create an member for organisation members library."
+      operationId: "newMember"
+      parameters:
+      - in: "body"
+        name: "member"
+        description: "Member object"
+        required: false
+        schema:
+          $ref: "#/definitions/Member"
+        x-go-name: "Member"
+      responses:
+        200:
+          description: "memberObjectSuccess list of members"
+          schema:
+            $ref: "#/definitions/Member"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /member/all:
+    get:
+      tags:
+      - "Members"
+      summary: "Get members"
+      description: "This will get all the members available in the organisation."
+      operationId: "getAllMember1"
+      parameters: []
+      responses:
+        200:
+          description: "memberSlice Array of members"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Member"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /member/new:
+    post:
+      tags:
+      - "Members"
+      summary: "New member"
+      description: "This will create an member for organisation members library."
+      operationId: "newMember1"
+      parameters:
+      - in: "body"
+        name: "member"
+        description: "Member object"
+        required: false
+        schema:
+          $ref: "#/definitions/Member"
+        x-go-name: "Member"
+      responses:
+        200:
+          description: "memberObjectSuccess list of members"
+          schema:
+            $ref: "#/definitions/Member"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /member/{memberID}:
+    put:
+      tags:
+      - "Members"
+      summary: "Update member"
+      description: "This will return the new member object"
+      operationId: "updateMember"
+      parameters:
+      - name: "memberID"
+        in: "path"
+        description: "Link of the member in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "MemberID"
+      responses:
+        200:
+          description: "memberObjectSuccess list of members"
+          schema:
+            $ref: "#/definitions/Member"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /message:
+    get:
+      tags:
+      - "Messages"
+      summary: "Get messages"
+      description: "This will get all the messages available in the organisation."
+      operationId: "getAllMessage"
+      parameters: []
+      responses:
+        200:
+          description: "messageSlice Array of messages"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    post:
+      tags:
+      - "Messages"
+      summary: "New message"
+      description: "This will create an message for organisation messages library."
+      operationId: "newMessage"
+      parameters:
+      - in: "body"
+        name: "message"
+        description: "Link of the message in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Message"
+        x-go-name: "Message"
+      responses:
+        200:
+          description: "messageObjectSuccess list of messages"
+          schema:
+            $ref: "#/definitions/Message"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /message/all:
+    get:
+      tags:
+      - "Messages"
+      summary: "Get messages"
+      description: "This will get all the messages available in the organisation."
+      operationId: "getAllMessage1"
+      parameters: []
+      responses:
+        200:
+          description: "messageSlice Array of messages"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /message/date/{messageDate}:
+    get:
+      tags:
+      - "Messages"
+      summary: "Get message from date"
+      description: "This will return the message object corresponding to provided\
+        \ date"
+      operationId: "getMessageFromDate"
+      parameters:
+      - name: "messageDate"
+        in: "path"
+        description: "Date of the message"
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "MessageDate"
+      responses:
+        200:
+          description: "messageObjectSuccess list of messages"
+          schema:
+            $ref: "#/definitions/Message"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /message/new:
+    post:
+      tags:
+      - "Messages"
+      summary: "New message"
+      description: "This will create an message for organisation messages library."
+      operationId: "newMessage1"
+      parameters:
+      - in: "body"
+        name: "message"
+        description: "Link of the message in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Message"
+        x-go-name: "Message"
+      responses:
+        200:
+          description: "messageObjectSuccess list of messages"
+          schema:
+            $ref: "#/definitions/Message"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /message/{messageID}:
+    put:
+      tags:
+      - "Messages"
+      summary: "Update message"
+      description: "This will return the new message object"
+      operationId: "updateMessage"
+      parameters:
+      - name: "messageID"
+        in: "path"
+        description: "Link of the message in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "MessageID"
+      - in: "body"
+        name: "message"
+        description: "Link of the message in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Message"
+        x-go-name: "Message"
+      responses:
+        200:
+          description: "messageObjectSuccess list of messages"
+          schema:
+            $ref: "#/definitions/Message"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /organisation:
+    get:
+      tags:
+      - "Organisations"
+      summary: "Get organisations"
+      description: "This will get all the organisations available in the organisation."
+      operationId: "getAllOrganisation"
+      parameters: []
+      responses:
+        200:
+          description: "organisationObjectSuccess list of organisations"
+          schema:
+            $ref: "#/definitions/Organisation"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    post:
+      tags:
+      - "Organisations"
+      summary: "New organisation"
+      description: "This will create an organisation for organisation organisations\
+        \ library."
+      operationId: "newOrganisation"
+      parameters:
+      - in: "body"
+        name: "organisation"
+        description: "Organisation object"
+        required: false
+        schema:
+          $ref: "#/definitions/Organisation"
+        x-go-name: "Organisation"
+      responses:
+        200:
+          description: "organisationObjectSuccess list of organisations"
+          schema:
+            $ref: "#/definitions/Organisation"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /organisation/all:
+    get:
+      tags:
+      - "Organisations"
+      summary: "Get organisations"
+      description: "This will get all the organisations available in the organisation."
+      operationId: "getAllOrganisation1"
+      parameters: []
+      responses:
+        200:
+          description: "organisationObjectSuccess list of organisations"
+          schema:
+            $ref: "#/definitions/Organisation"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /organisation/new:
+    post:
+      tags:
+      - "Organisations"
+      summary: "New organisation"
+      description: "This will create an organisation for organisation organisations\
+        \ library."
+      operationId: "newOrganisation1"
+      parameters:
+      - in: "body"
+        name: "organisation"
+        description: "Organisation object"
+        required: false
+        schema:
+          $ref: "#/definitions/Organisation"
+        x-go-name: "Organisation"
+      responses:
+        200:
+          description: "organisationObjectSuccess list of organisations"
+          schema:
+            $ref: "#/definitions/Organisation"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /organisation/{organisationID}:
+    put:
+      tags:
+      - "Organisations"
+      summary: "Get organisation from link"
+      description: "This will return the organisation object corresponding to provided\
+        \ link"
+      operationId: "updateOrganisation"
+      parameters:
+      - name: "organisationID"
+        in: "path"
+        description: "Link of the organisation in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "OrganisationID"
+      responses:
+        200:
+          description: "organisationObjectSuccess list of organisations"
+          schema:
+            $ref: "#/definitions/Organisation"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
   /panic:
     get:
       tags:
       - "Test"
       summary: "Should result in 500"
       description: "Test panic cautching"
-      operationId: "getter"
+      operationId: "panic"
       parameters: []
       responses:
+        500:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /parameter:
+    get:
+      tags:
+      - "Parameters"
+      summary: "Get parameters"
+      description: "This will get all the parameters available in the organisation."
+      operationId: "getAllParameter"
+      parameters: []
+      responses:
+        200:
+          description: "parameterObjectSuccess list of parameters"
+          schema:
+            $ref: "#/definitions/Parameter"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    post:
+      tags:
+      - "Parameters"
+      summary: "New parameter"
+      description: "This will create an parameter for organisation parameters library."
+      operationId: "newParameter"
+      parameters:
+      - in: "body"
+        name: "parameter"
+        description: "Parameter object"
+        required: false
+        schema:
+          $ref: "#/definitions/Parameter"
+        x-go-name: "Parameter"
+      responses:
+        200:
+          description: "parameterObjectSuccess list of parameters"
+          schema:
+            $ref: "#/definitions/Parameter"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /parameter/all:
+    get:
+      tags:
+      - "Parameters"
+      summary: "Get parameters"
+      description: "This will get all the parameters available in the organisation."
+      operationId: "getAllParameter1"
+      parameters: []
+      responses:
+        200:
+          description: "parameterObjectSuccess list of parameters"
+          schema:
+            $ref: "#/definitions/Parameter"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /parameter/new:
+    post:
+      tags:
+      - "Parameters"
+      summary: "New parameter"
+      description: "This will create an parameter for organisation parameters library."
+      operationId: "newParameter1"
+      parameters:
+      - in: "body"
+        name: "parameter"
+        description: "Parameter object"
+        required: false
+        schema:
+          $ref: "#/definitions/Parameter"
+        x-go-name: "Parameter"
+      responses:
+        200:
+          description: "parameterObjectSuccess list of parameters"
+          schema:
+            $ref: "#/definitions/Parameter"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /parameter/{parameterID}:
+    put:
+      tags:
+      - "Parameters"
+      summary: "Update parameter"
+      description: "This will return the new parameter object"
+      operationId: "updateParameter"
+      parameters:
+      - name: "parameterID"
+        in: "path"
+        description: "Link of the parameter in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "ParameterID"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
         default:
           description: "genericError general error when unexpected errors occured"
           schema:
@@ -570,9 +1721,556 @@ paths:
       - "Test"
       summary: "Pong"
       description: "Test api ping"
-      operationId: "getter"
+      operationId: "ping"
       parameters: []
       responses:
+        200:
+          description: "generalOk"
+          schema:
+            $ref: "#/definitions/generalOk"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /role:
+    get:
+      tags:
+      - "Roles"
+      summary: "Get roles"
+      description: "This will get all the roles available in the organisation."
+      operationId: "getAllRole"
+      parameters: []
+      responses:
+        200:
+          description: "roleSlice Array of roles"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Role"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /role/all:
+    get:
+      tags:
+      - "Roles"
+      summary: "Get roles"
+      description: "This will get all the roles available in the organisation."
+      operationId: "getAllRole1"
+      parameters: []
+      responses:
+        200:
+          description: "roleSlice Array of roles"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Role"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /role/name/{roleName}:
+    get:
+      tags:
+      - "Roles"
+      summary: "Get role from name"
+      description: "This will return the role object corresponding to provided name"
+      operationId: "getRoleFromName"
+      parameters:
+      - name: "roleName"
+        in: "path"
+        description: "Link of the role in server."
+        required: true
+        type: "string"
+        x-go-name: "RoleName"
+      responses:
+        200:
+          description: "roleObjectSuccess list of roles"
+          schema:
+            $ref: "#/definitions/Role"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /role/new:
+    post:
+      tags:
+      - "Roles"
+      summary: "New role"
+      description: "This will create an role for organisation roles library."
+      operationId: "newRole1"
+      parameters:
+      - in: "body"
+        name: "role"
+        description: "Role object"
+        required: false
+        schema:
+          $ref: "#/definitions/Role"
+        x-go-name: "Role"
+      responses:
+        200:
+          description: "roleObjectSuccess list of roles"
+          schema:
+            $ref: "#/definitions/Role"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /role/rights:
+    post:
+      tags:
+      - "Roles"
+      summary: "Get role having provided rights"
+      description: "Return an array of roles corresponding to rights"
+      operationId: "getRoleFromRights"
+      parameters:
+      - in: "body"
+        name: "rights"
+        description: "Right of the role we search"
+        required: false
+        schema:
+          $ref: "#/definitions/rightsParameterModel"
+        x-go-name: "Rights"
+      responses:
+        200:
+          description: "roleSlice Array of roles"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Role"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /role/{roleID}:
+    put:
+      tags:
+      - "Roles"
+      summary: "Update role"
+      description: "This will return the new role object"
+      operationId: "updateRole"
+      parameters:
+      - name: "roleID"
+        in: "path"
+        description: "Link of the role in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "RoleID"
+      - in: "body"
+        name: "role"
+        description: "Role object"
+        required: false
+        schema:
+          $ref: "#/definitions/Role"
+        x-go-name: "Role"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    delete:
+      tags:
+      - "Roles"
+      summary: "Delete role"
+      description: "This will return an object describing the deletion"
+      operationId: "deleteRole"
+      parameters:
+      - name: "roleID"
+        in: "path"
+        description: "Link of the role in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "RoleID"
+      responses:
+        200:
+          description: "deleteMessage"
+          schema:
+            $ref: "#/definitions/deleteMessage"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user:
+    get:
+      tags:
+      - "Users"
+      summary: "Get users"
+      description: "This will get all the users available in the organisation."
+      operationId: "getAllUser"
+      parameters: []
+      responses:
+        200:
+          description: "userSlice Array of users"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    post:
+      tags:
+      - "Users"
+      summary: "New user"
+      description: "This will create an user for organisation users library."
+      operationId: "newUser"
+      parameters:
+      - in: "body"
+        name: "user"
+        description: "Link of the user in server."
+        required: false
+        schema:
+          $ref: "#/definitions/User"
+        x-go-name: "User"
+      responses:
+        200:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/all:
+    get:
+      tags:
+      - "Users"
+      summary: "Get deleted user"
+      description: "This will get all the deleted users still present in database."
+      operationId: "getDeletedUser"
+      parameters: []
+      responses:
+        200:
+          description: "userSlice Array of users"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/date:
+    get:
+      tags:
+      - "Users"
+      summary: "Get user ordered by date"
+      description: "This will get all the users ordered by date."
+      operationId: "getOrderedByDate"
+      parameters: []
+      responses:
+        200:
+          description: "userSlice Array of users"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/firstname/{firstName}:
+    get:
+      tags:
+      - "Users"
+      summary: "y\nGet user from firstname"
+      description: "This will return the user object corresponding to provided firstname"
+      operationId: "getUserFromFirstName"
+      parameters:
+      - name: "firstName"
+        in: "path"
+        description: "Link of the user in server."
+        required: true
+        type: "string"
+        x-go-name: "FirstName"
+      responses:
+        200:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/lastname/{lastName}:
+    get:
+      tags:
+      - "Users"
+      summary: "y\nGet user from lastname"
+      description: "This will return the user object corresponding to provided lastname"
+      operationId: "getUserFromLastName"
+      parameters:
+      - name: "lastName"
+        in: "path"
+        description: "Link of the user in server."
+        required: true
+        type: "string"
+        x-go-name: "LastName"
+      responses:
+        200:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/new:
+    post:
+      tags:
+      - "Users"
+      summary: "New user"
+      description: "This will create an user for organisation users library."
+      operationId: "newUser1"
+      parameters:
+      - in: "body"
+        name: "user"
+        description: "Link of the user in server."
+        required: false
+        schema:
+          $ref: "#/definitions/User"
+        x-go-name: "User"
+      responses:
+        200:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/nickname/{nickName}:
+    get:
+      tags:
+      - "Users"
+      summary: "y\nGet user from nickname"
+      description: "This will return the user object corresponding to provided nickname"
+      operationId: "getUserFromNickName"
+      parameters:
+      - name: "nickName"
+        in: "path"
+        description: "Link of the user in server."
+        required: true
+        type: "string"
+        x-go-name: "NickName"
+      responses:
+        200:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/role:
+    post:
+      tags:
+      - "Users"
+      summary: "Get users from its role"
+      description: "This will return the users having provided role."
+      operationId: "getUserFromRole"
+      parameters:
+      - in: "body"
+        name: "role"
+        description: "Role object"
+        required: false
+        schema:
+          $ref: "#/definitions/Role"
+        x-go-name: "Role"
+      responses:
+        200:
+          description: "userSlice Array of users"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/username/{userName}:
+    get:
+      tags:
+      - "Users"
+      summary: "y\nGet user from username"
+      description: "This will return the user object corresponding to provided username"
+      operationId: "getUserFromName"
+      parameters:
+      - name: "userName"
+        in: "path"
+        description: "Link of the user in server."
+        required: true
+        type: "string"
+        x-go-name: "UserName"
+      responses:
+        200:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/{userID}:
+    put:
+      tags:
+      - "Users"
+      summary: "Update user"
+      description: "This will return the new user object"
+      operationId: "updateUser"
+      parameters:
+      - name: "userID"
+        in: "path"
+        description: "Link of the user in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "UserID"
+      - in: "body"
+        name: "user"
+        description: "Link of the user in server."
+        required: false
+        schema:
+          $ref: "#/definitions/User"
+        x-go-name: "User"
+      responses:
+        200:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
         default:
           description: "genericError general error when unexpected errors occured"
           schema:
@@ -991,6 +2689,38 @@ definitions:
           $ref: "#/definitions/Avatar"
     description: "avatarSlice Array of avatars"
     x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  avatarIDParam:
+    type: "object"
+    properties:
+      avatarID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the avatar in server.\nin:path"
+        x-go-name: "AvatarID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  avatarLinkParam:
+    type: "object"
+    properties:
+      avatarLink:
+        type: "string"
+        description: "Link of the avatar in server.\nin:path"
+        x-go-name: "AvatarLink"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  avatarNameParam:
+    type: "object"
+    properties:
+      avatarName:
+        type: "string"
+        description: "Link of the avatar in server.\nin:path"
+        x-go-name: "AvatarName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  avatarObjectParam:
+    type: "object"
+    properties:
+      avatar:
+        description: "Link of the avatar in server.\nin:body"
+        $ref: "#/definitions/Avatar"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
   avatarObjectSuccess:
     type: "object"
     properties:
@@ -1009,6 +2739,30 @@ definitions:
           $ref: "#/definitions/Channel"
     description: "channelSlice Array of channels"
     x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  channelIDParam:
+    type: "object"
+    properties:
+      channelID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the channel in server.\nin:path"
+        x-go-name: "ChannelID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  channelNameParam:
+    type: "object"
+    properties:
+      channelName:
+        type: "string"
+        description: "Link of the channel in server.\nin:path"
+        x-go-name: "ChannelName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  channelObjectParam:
+    type: "object"
+    properties:
+      channel:
+        description: "Link of the channel in server.\nin:body"
+        $ref: "#/definitions/Channel"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
   channelObjectSuccess:
     type: "object"
     properties:
@@ -1016,6 +2770,14 @@ definitions:
         description: "in:body\nList of channels returned"
         $ref: "#/definitions/Channel"
     description: "channelObjectSuccess list of channels"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  channelTypeParam:
+    type: "object"
+    properties:
+      channelType:
+        type: "string"
+        description: "Link of the channel in server.\nin:path"
+        x-go-name: "ChannelType"
     x-go-package: "github.com/titouanfreville/popcubeapi/api"
   databaseError:
     type: "object"
@@ -1056,6 +2818,130 @@ definitions:
         description: "Correctly removed ?"
         x-go-name: "Success"
     title: "deleteMessageModel is an object to confirm correct deletion of an item."
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  emojiArraySuccess:
+    type: "object"
+    properties:
+      Emojis:
+        type: "array"
+        description: "in:body"
+        items:
+          $ref: "#/definitions/Emoji"
+    description: "emojiSlice Array of emojis"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  emojiIDParam:
+    type: "object"
+    properties:
+      emojiID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the emoji in server.\nin:path"
+        x-go-name: "EmojiID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  emojiLinkParam:
+    type: "object"
+    properties:
+      emojiLink:
+        type: "string"
+        description: "Link of the emoji in server.\nin:path"
+        x-go-name: "EmojiLink"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  emojiNameParam:
+    type: "object"
+    properties:
+      emojiName:
+        type: "string"
+        description: "Link of the emoji in server.\nin:path"
+        x-go-name: "EmojiName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  emojiObjectParam:
+    type: "object"
+    properties:
+      emoji:
+        description: "Link of the emoji in server.\nin:body"
+        $ref: "#/definitions/Emoji"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  emojiObjectSuccess:
+    type: "object"
+    properties:
+      emoji:
+        description: "in:body\nList of emojis returned"
+        $ref: "#/definitions/Emoji"
+    description: "emojiObjectSuccess list of emojis"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  emojiShortcutParam:
+    type: "object"
+    properties:
+      emojiShortcut:
+        type: "string"
+        description: "Link of the emoji in server.\nin:path"
+        x-go-name: "EmojiShortcut"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  firstNameParam:
+    type: "object"
+    properties:
+      firstName:
+        type: "string"
+        description: "Link of the user in server.\nin:path"
+        x-go-name: "FirstName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  folderArraySuccess:
+    type: "object"
+    properties:
+      Folders:
+        type: "array"
+        description: "in:body"
+        items:
+          $ref: "#/definitions/Folder"
+    description: "folderSlice Array of folders"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  folderIDParam:
+    type: "object"
+    properties:
+      folderID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the folder in server.\nin:path"
+        x-go-name: "FolderID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  folderLinkParam:
+    type: "object"
+    properties:
+      folderLink:
+        type: "string"
+        description: "Link of the folder in server.\nin:path"
+        x-go-name: "FolderLink"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  folderNameParam:
+    type: "object"
+    properties:
+      folderName:
+        type: "string"
+        description: "Link of the folder in server.\nin:path"
+        x-go-name: "FolderName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  folderObjectParam:
+    type: "object"
+    properties:
+      folder:
+        description: "Link of the folder in server.\nin:body"
+        $ref: "#/definitions/Folder"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  folderObjectSuccess:
+    type: "object"
+    properties:
+      folder:
+        description: "in:body\nList of folders returned"
+        $ref: "#/definitions/Folder"
+    description: "folderObjectSuccess list of folders"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  folderTypeParam:
+    type: "object"
+    properties:
+      folderType:
+        type: "string"
+        description: "Link of the folder in server.\nin:path"
+        x-go-name: "FolderType"
     x-go-package: "github.com/titouanfreville/popcubeapi/api"
   generalOk:
     type: "object"
@@ -1104,6 +2990,267 @@ definitions:
     title: "AppError Type used to structure error reporting for popcube chat project."
     x-go-name: "AppError"
     x-go-package: "github.com/titouanfreville/popcubeapi/utils"
+  lastNameeParam:
+    type: "object"
+    properties:
+      lastName:
+        type: "string"
+        description: "Link of the user in server.\nin:path"
+        x-go-name: "LastName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  memberArraySuccess:
+    type: "object"
+    properties:
+      Members:
+        type: "array"
+        description: "in:body"
+        items:
+          $ref: "#/definitions/Member"
+    description: "memberSlice Array of members"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  memberIDParam:
+    type: "object"
+    properties:
+      memberID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the member in server.\nin:path"
+        x-go-name: "MemberID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  memberObjectParam:
+    type: "object"
+    properties:
+      member:
+        description: "Member object\nin:body"
+        $ref: "#/definitions/Member"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  memberObjectSuccess:
+    type: "object"
+    properties:
+      member:
+        description: "in:body\nList of members returned"
+        $ref: "#/definitions/Member"
+    description: "memberObjectSuccess list of members"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  messageArraySuccess:
+    type: "object"
+    properties:
+      Messages:
+        type: "array"
+        description: "in:body"
+        items:
+          $ref: "#/definitions/Message"
+    description: "messageSlice Array of messages"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  messageDate:
+    type: "object"
+    properties:
+      messageDate:
+        type: "integer"
+        format: "int64"
+        description: "Date of the message\nin:path"
+        x-go-name: "MessageDate"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  messageIDParam:
+    type: "object"
+    properties:
+      messageID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the message in server.\nin:path"
+        x-go-name: "MessageID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  messageObjectParam:
+    type: "object"
+    properties:
+      message:
+        description: "Link of the message in server.\nin:body"
+        $ref: "#/definitions/Message"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  messageObjectSuccess:
+    type: "object"
+    properties:
+      message:
+        description: "in:body\nList of messages returned"
+        $ref: "#/definitions/Message"
+    description: "messageObjectSuccess list of messages"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  nickNameParam:
+    type: "object"
+    properties:
+      nickName:
+        type: "string"
+        description: "Link of the user in server.\nin:path"
+        x-go-name: "NickName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  organisationIDParam:
+    type: "object"
+    properties:
+      organisationID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the organisation in server.\nin:path"
+        x-go-name: "OrganisationID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  organisationObjectParam:
+    type: "object"
+    properties:
+      organisation:
+        description: "Organisation object\nin:body"
+        $ref: "#/definitions/Organisation"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  organisationObjectSuccess:
+    type: "object"
+    properties:
+      organisation:
+        description: "in:body\nList of organisations returned"
+        $ref: "#/definitions/Organisation"
+    description: "organisationObjectSuccess list of organisations"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  parameterIDParam:
+    type: "object"
+    properties:
+      parameterID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the parameter in server.\nin:path"
+        x-go-name: "ParameterID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  parameterObjectParam:
+    type: "object"
+    properties:
+      parameter:
+        description: "Parameter object\nin:body"
+        $ref: "#/definitions/Parameter"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  parameterObjectSuccess:
+    type: "object"
+    properties:
+      parameter:
+        description: "in:body\nList of parameters returned"
+        $ref: "#/definitions/Parameter"
+    description: "parameterObjectSuccess list of parameters"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  rightsObjectParam:
+    type: "object"
+    properties:
+      rights:
+        description: "Right of the role we search\nin:body"
+        $ref: "#/definitions/rightsParameterModel"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  rightsParameterModel:
+    type: "object"
+    properties:
+      can_archive:
+        type: "boolean"
+        description: "User can archive channels"
+        x-go-name: "CanArchive"
+      can_invite:
+        type: "boolean"
+        description: "User can invite others to private channel or organisation"
+        x-go-name: "CanInvite"
+      can_manage:
+        type: "boolean"
+        description: "User can manage organisation/channel parameters and data"
+        x-go-name: "CanManage"
+      can_manage_user:
+        type: "boolean"
+        description: "User can manage other organisation/channel user"
+        x-go-name: "CanManageUser"
+      can_moderate:
+        type: "boolean"
+        description: "User can moderate channels"
+        x-go-name: "CanModerate"
+      can_use_private:
+        type: "boolean"
+        description: "User can use private channel"
+        x-go-name: "CanUsePrivate"
+    title: "rightsParameterModel is the object you can pass to get roles from rights."
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  roleArraySuccess:
+    type: "object"
+    properties:
+      Roles:
+        type: "array"
+        description: "in:body"
+        items:
+          $ref: "#/definitions/Role"
+    description: "roleSlice Array of roles"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  roleIDParam:
+    type: "object"
+    properties:
+      roleID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the role in server.\nin:path"
+        x-go-name: "RoleID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  roleNameParam:
+    type: "object"
+    properties:
+      roleName:
+        type: "string"
+        description: "Link of the role in server.\nin:path"
+        x-go-name: "RoleName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  roleObjectParam:
+    type: "object"
+    properties:
+      role:
+        description: "Role object\nin:body"
+        $ref: "#/definitions/Role"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  roleObjectSuccess:
+    type: "object"
+    properties:
+      role:
+        description: "in:body\nList of roles returned"
+        $ref: "#/definitions/Role"
+    description: "roleObjectSuccess list of roles"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  userArraySuccess:
+    type: "object"
+    properties:
+      Users:
+        type: "array"
+        description: "in:body"
+        items:
+          $ref: "#/definitions/User"
+    description: "userSlice Array of users"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  userIDParam:
+    type: "object"
+    properties:
+      userID:
+        type: "integer"
+        format: "int64"
+        description: "Link of the user in server.\nin:path"
+        x-go-name: "UserID"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  userNameParam:
+    type: "object"
+    properties:
+      userName:
+        type: "string"
+        description: "Link of the user in server.\nin:path"
+        x-go-name: "UserName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  userObjectParam:
+    type: "object"
+    properties:
+      user:
+        description: "Link of the user in server.\nin:body"
+        $ref: "#/definitions/User"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  userObjectSuccess:
+    type: "object"
+    properties:
+      user:
+        description: "in:body\nList of users returned"
+        $ref: "#/definitions/User"
+    description: "userObjectSuccess list of users"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
   wrongEntityError:
     type: "object"
     properties:
@@ -1141,10 +3288,78 @@ responses:
       $ref: "#/definitions/genericErrorModel"
   defaultOk:
     description: "generalOk default object style to return if correct"
+  emojiArraySuccess:
+    description: "emojiSlice Array of emojis"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/Emoji"
+  emojiObjectSuccess:
+    description: "emojiObjectSuccess list of emojis"
+    schema:
+      $ref: "#/definitions/Emoji"
+  folderArraySuccess:
+    description: "folderSlice Array of folders"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/Folder"
+  folderObjectSuccess:
+    description: "folderObjectSuccess list of folders"
+    schema:
+      $ref: "#/definitions/Folder"
   genericError:
     description: "genericError general error when unexpected errors occured"
     schema:
       $ref: "#/definitions/genericErrorModel"
+  memberArraySuccess:
+    description: "memberSlice Array of members"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/Member"
+  memberObjectSuccess:
+    description: "memberObjectSuccess list of members"
+    schema:
+      $ref: "#/definitions/Member"
+  messageArraySuccess:
+    description: "messageSlice Array of messages"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/Message"
+  messageObjectSuccess:
+    description: "messageObjectSuccess list of messages"
+    schema:
+      $ref: "#/definitions/Message"
+  organisationObjectSuccess:
+    description: "organisationObjectSuccess list of organisations"
+    schema:
+      $ref: "#/definitions/Organisation"
+  parameterObjectSuccess:
+    description: "parameterObjectSuccess list of parameters"
+    schema:
+      $ref: "#/definitions/Parameter"
+  roleArraySuccess:
+    description: "roleSlice Array of roles"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/Role"
+  roleObjectSuccess:
+    description: "roleObjectSuccess list of roles"
+    schema:
+      $ref: "#/definitions/Role"
+  userArraySuccess:
+    description: "userSlice Array of users"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/User"
+  userObjectSuccess:
+    description: "userObjectSuccess list of users"
+    schema:
+      $ref: "#/definitions/User"
   wrongEntity:
     description: "wrongEntityError is an error object to inform that the provided\
       \ object was not correctly formated"

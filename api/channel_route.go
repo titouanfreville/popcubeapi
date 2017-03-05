@@ -43,7 +43,7 @@ func initChannelRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newChannel)
-		// swagger:route GET /channel/all Channels getAllChannel
+		// swagger:route GET /channel/all Channels getAllChannel1
 		//
 		// Get channels
 		//
@@ -54,7 +54,7 @@ func initChannelRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Get("/all", getAllChannel)
-		// swagger:route POST /channel/new Channels newChannel
+		// swagger:route POST /channel/new Channels newChannel1
 		//
 		// New channel
 		//
@@ -91,7 +91,7 @@ func initChannelRoute(router chi.Router) {
 		r.Route("/type/", func(r chi.Router) {
 			r.Route("/:channelType", func(r chi.Router) {
 				r.Use(channelContext)
-				// swagger:route GET /channel/type/:channelType Channels getChannelFromType
+				// swagger:route GET /channel/type/{channelType} Channels getChannelFromType
 				//
 				// Get channels of provided type
 				//
@@ -107,7 +107,7 @@ func initChannelRoute(router chi.Router) {
 		r.Route("/name/", func(r chi.Router) {
 			r.Route("/:channelName", func(r chi.Router) {
 				r.Use(channelContext)
-				// swagger:route GET /channel/name/:channelName Channels getChannelFromName
+				// swagger:route GET /channel/name/{channelName} Channels getChannelFromName
 				//
 				// Get nammed channel
 				//
@@ -122,7 +122,7 @@ func initChannelRoute(router chi.Router) {
 		})
 		r.Route("/:channelID", func(r chi.Router) {
 			r.Use(channelContext)
-			// swagger:route PUT /channel/:channelID Channels updateChannel
+			// swagger:route PUT /channel/{channelID} Channels updateChannel
 			//
 			// Update channel
 			//
@@ -134,7 +134,7 @@ func initChannelRoute(router chi.Router) {
 			// 	  503: databaseError
 			// 	  default: genericError
 			r.Put("/update", updateChannel)
-			// swagger:route DELETE /channel/:channelID Channels deleteChannel
+			// swagger:route DELETE /channel/{channelID} Channels deleteChannel
 			//
 			// Delete channel
 			//

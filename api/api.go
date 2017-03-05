@@ -47,36 +47,36 @@ func initMiddleware(router *chi.Mux) {
 
 // basicRoutes set basic routes for the API
 func basicRoutes(router *chi.Mux) {
-	// swagger:route GET / Test getter
+	// swagger:route GET / Test hello
 	//
 	// Hello World
 	//
 	// 	Responses:
-	//    200
+	//    200: generalOk
 	// 	  default: genericError
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Welcome to PopCube api. Let's chat all together :O"))
 	})
-	// swagger:route GET /ping Test getter
+	// swagger:route GET /ping Test ping
 	//
 	// Pong
 	//
 	// Test api ping
 	//
 	// 	Responses:
-	//    200
+	//    200: generalOk
 	// 	  default: genericError
 	router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
 	})
-	// swagger:route GET /panic Test getter
+	// swagger:route GET /panic Test panic
 	//
 	// Should result in 500
 	//
 	// Test panic cautching
 	//
 	// 	Responses:
-	//    500
+	//    500: genericError
 	// 	  default: genericError
 	router.Get("/panic", func(w http.ResponseWriter, r *http.Request) {
 		panic("C'est la panique, panique, panique. Sur le périphérique")
