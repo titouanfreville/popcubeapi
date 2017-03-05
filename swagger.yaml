@@ -36,7 +36,7 @@ paths:
       - "Avatars"
       summary: "Get avatars"
       description: "This will get all the avatars available in the organisation."
-      operationId: "Avatar"
+      operationId: "getAllAvatar"
       parameters: []
       responses:
         200:
@@ -59,18 +59,20 @@ paths:
       - "Avatars"
       summary: "New avatar"
       description: "This will create an avatar for organisation avatars library."
-      operationId: "Avatar"
-      parameters: []
+      operationId: "newAvatar"
+      parameters:
+      - in: "body"
+        name: "avatar"
+        description: "Link of the avatar in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Avatar"
+        x-go-name: "Avatar"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"
           schema:
             $ref: "#/definitions/Avatar"
-        422:
-          description: "wrongEntityError is an error object to inform that the provided\
-            \ object was not correctly formated"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
         503:
           description: "databaseError is an error object to tell what is happening\
             \ when we encounter issue with database"
@@ -86,7 +88,7 @@ paths:
       - "Avatars"
       summary: "Get avatars"
       description: "This will get all the avatars available in the organisation."
-      operationId: "Avatar"
+      operationId: "getAllAvatar"
       parameters: []
       responses:
         200:
@@ -110,8 +112,14 @@ paths:
       - "Avatars"
       summary: "Get avatar from link"
       description: "This will return the avatar object corresponding to provided link"
-      operationId: "Avatar"
-      parameters: []
+      operationId: "getAvatarFromLink"
+      parameters:
+      - name: "avatarLink"
+        in: "path"
+        description: "Link of the avatar in server."
+        required: true
+        type: "string"
+        x-go-name: "AvatarLink"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"
@@ -132,8 +140,15 @@ paths:
       - "Avatars"
       summary: "New avatar"
       description: "This will create an avatar for organisation avatars library."
-      operationId: "Avatar"
-      parameters: []
+      operationId: "newAvatar"
+      parameters:
+      - in: "body"
+        name: "avatar"
+        description: "Link of the avatar in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Avatar"
+        x-go-name: "Avatar"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"

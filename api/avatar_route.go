@@ -35,9 +35,23 @@ type avatarObjectSuccess struct {
 	Avatar models.Avatar `json:"avatar"`
 }
 
+// swagger:parameters getAvatarFromLink
+type avatarLinkParam struct {
+	//Link of the avatar in server.
+	// in:path
+	AvatarLink string `json:"avatarLink"`
+}
+
+// swagger:parameters newAvatar
+type avatarObjectParam struct {
+	//Link of the avatar in server.
+	// in:body
+	Avatar models.Avatar `json:"avatar"`
+}
+
 func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
-		// swagger:route GET /avatar Avatars Avatar
+		// swagger:route GET /avatar Avatars getAllAvatar
 		//
 		// Get avatars
 		//
@@ -48,7 +62,7 @@ func initAvatarRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Get("/", getAllAvatar)
-		// swagger:route POST /avatar Avatars Avatar
+		// swagger:route POST /avatar Avatars newAvatar
 		//
 		// New avatar
 		//
@@ -60,7 +74,7 @@ func initAvatarRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newAvatar)
-		// swagger:route GET /avatar/all Avatars Avatar
+		// swagger:route GET /avatar/all Avatars getAllAvatar
 		//
 		// Get avatars
 		//
@@ -71,7 +85,7 @@ func initAvatarRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Get("/all", getAllAvatar)
-		// swagger:route POST /avatar/new Avatars Avatar
+		// swagger:route POST /avatar/new Avatars newAvatar
 		//
 		// New avatar
 		//
@@ -85,7 +99,7 @@ func initAvatarRoute(router chi.Router) {
 		r.Route("/link/", func(r chi.Router) {
 			r.Route("/:avatarLink", func(r chi.Router) {
 				r.Use(avatarContext)
-				// swagger:route GET /avatar/link/:avatarLink Avatars Avatar
+				// swagger:route GET /avatar/link/:avatarLink Avatars getAvatarFromLink
 				//
 				// Get avatar from link
 				//
