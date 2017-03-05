@@ -18,37 +18,6 @@ const (
 	oldAvatarKey  key = "oldAvatar"
 )
 
-// avatarSlice Array of avatars
-//
-// swagger:response avatarArraySuccess
-type avatarArraySuccess struct {
-	// in:body
-	Avatars []models.Avatar
-}
-
-// avatarObjectSuccess list of avatars
-//
-// swagger:response avatarObjectSuccess
-type avatarObjectSuccess struct {
-	// in:body
-	// List of avatars returned
-	Avatar models.Avatar `json:"avatar"`
-}
-
-// swagger:parameters getAvatarFromLink
-type avatarLinkParam struct {
-	//Link of the avatar in server.
-	// in:path
-	AvatarLink string `json:"avatarLink"`
-}
-
-// swagger:parameters newAvatar
-type avatarObjectParam struct {
-	//Link of the avatar in server.
-	// in:body
-	Avatar models.Avatar `json:"avatar"`
-}
-
 func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
 		// swagger:route GET /avatar Avatars getAllAvatar
@@ -115,12 +84,43 @@ func initAvatarRoute(router chi.Router) {
 		r.Route("/name/", func(r chi.Router) {
 			r.Route("/:avatarName", func(r chi.Router) {
 				r.Use(avatarContext)
+				// swagger:route GET /avatar/name/:avatarName Avatars getAvatarFromName
+				//y
+				// Get avatar from name
+				//
+				// This will return the avatar object corresponding to provided name
+				//
+				// 	Responses:
+				//    200: avatarObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
 				r.Get("/", getAvatarFromName)
 			})
 		})
 		r.Route("/:avatarID", func(r chi.Router) {
 			r.Use(avatarContext)
+			// swagger:route PUT /avatar/:avatarID Avatars updateAvatar
+			//
+			// Update avatar
+			//
+			// This will return the new avatar object
+			//
+			// 	Responses:
+			//    200: avatarObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Put("/update", updateAvatar)
+			// swagger:route DELETE /avatar/:avatarID Avatars deleteAvatar
+			//
+			// Delete avatar
+			//
+			// This will return an object describing the deletion
+			//
+			// 	Responses:
+			//    200: deleteMessage
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Delete("/delete", deleteAvatar)
 		})
 	})

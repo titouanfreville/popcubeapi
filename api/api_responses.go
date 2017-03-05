@@ -1,6 +1,9 @@
 package api
 
-import "github.com/titouanfreville/popcubeapi/utils"
+import (
+	"github.com/titouanfreville/popcubeapi/models"
+	"github.com/titouanfreville/popcubeapi/utils"
+)
 
 // Success -------------------------------------------
 
@@ -85,3 +88,45 @@ func newDeleteMessage(succes bool, message string) deleteMessageModel {
 }
 
 // ---------------------------------------------------
+
+// <><><><><> AVATAR RESPONSES <><><><><> //
+
+// avatarSlice Array of avatars
+//
+// swagger:response avatarArraySuccess
+type avatarArraySuccess struct {
+	// in:body
+	Avatars []models.Avatar
+}
+
+// avatarObjectSuccess list of avatars
+//
+// swagger:response avatarObjectSuccess
+type avatarObjectSuccess struct {
+	// in:body
+	// List of avatars returned
+	Avatar models.Avatar `json:"avatar"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+
+// <><><><><> CHANNEL RESPONSES <><><><><> //
+
+// channelSlice Array of channels
+//
+// swagger:response channelArraySuccess
+type channelArraySuccess struct {
+	// in:body
+	Channels []models.Channel
+}
+
+// channelObjectSuccess list of channels
+//
+// swagger:response channelObjectSuccess
+type channelObjectSuccess struct {
+	// in:body
+	// List of channels returned
+	Channel models.Channel `json:"channel"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
