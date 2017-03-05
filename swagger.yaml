@@ -147,7 +147,7 @@ paths:
     get:
       tags:
       - "Avatars"
-      summary: "y\nGet avatar from name"
+      summary: "Get avatar from name"
       description: "This will return the avatar object corresponding to provided name"
       operationId: "getAvatarFromName"
       parameters:
@@ -2056,7 +2056,7 @@ paths:
     get:
       tags:
       - "Users"
-      summary: "y\nGet user from firstname"
+      summary: "Get user from firstname"
       description: "This will return the user object corresponding to provided firstname"
       operationId: "getUserFromFirstName"
       parameters:
@@ -2084,7 +2084,7 @@ paths:
     get:
       tags:
       - "Users"
-      summary: "y\nGet user from lastname"
+      summary: "Get user from lastname"
       description: "This will return the user object corresponding to provided lastname"
       operationId: "getUserFromLastName"
       parameters:
@@ -2146,7 +2146,7 @@ paths:
     get:
       tags:
       - "Users"
-      summary: "y\nGet user from nickname"
+      summary: "Get user from nickname"
       description: "This will return the user object corresponding to provided nickname"
       operationId: "getUserFromNickName"
       parameters:
@@ -2210,7 +2210,7 @@ paths:
     get:
       tags:
       - "Users"
-      summary: "y\nGet user from username"
+      summary: "Get user from username"
       description: "This will return the user object corresponding to provided username"
       operationId: "getUserFromName"
       parameters:

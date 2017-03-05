@@ -86,7 +86,7 @@ func initAvatarRoute(router chi.Router) {
 			r.Route("/:avatarName", func(r chi.Router) {
 				r.Use(avatarContext)
 				// swagger:route GET /avatar/name/{avatarName} Avatars getAvatarFromName
-				//y
+				//
 				// Get avatar from name
 				//
 				// This will return the avatar object corresponding to provided name

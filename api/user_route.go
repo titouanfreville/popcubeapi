@@ -114,7 +114,7 @@ func initUserRoute(router chi.Router) {
 			r.Route("/:userName", func(r chi.Router) {
 				r.Use(userContext)
 				// swagger:route GET /user/username/{userName} Users getUserFromName
-				//y
+				//
 				// Get user from username
 				//
 				// This will return the user object corresponding to provided username
@@ -130,7 +130,7 @@ func initUserRoute(router chi.Router) {
 			r.Route("/:nickName", func(r chi.Router) {
 				r.Use(userContext)
 				// swagger:route GET /user/nickname/{nickName} Users getUserFromNickName
-				//y
+				//
 				// Get user from nickname
 				//
 				// This will return the user object corresponding to provided nickname
@@ -146,7 +146,7 @@ func initUserRoute(router chi.Router) {
 			r.Route("/:firstName", func(r chi.Router) {
 				r.Use(userContext)
 				// swagger:route GET /user/firstname/{firstName} Users getUserFromFirstName
-				//y
+				//
 				// Get user from firstname
 				//
 				// This will return the user object corresponding to provided firstname
@@ -162,7 +162,7 @@ func initUserRoute(router chi.Router) {
 			r.Route("/:lastName", func(r chi.Router) {
 				r.Use(userContext)
 				// swagger:route GET /user/lastname/{lastName} Users getUserFromLastName
-				//y
+				//
 				// Get user from lastname
 				//
 				// This will return the user object corresponding to provided lastname
