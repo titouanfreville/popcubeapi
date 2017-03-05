@@ -12,14 +12,70 @@ import (
 	renderPackage "github.com/unrolled/render"
 )
 
+const (
+	oldOrganisationKey key = "oldOrganisation"
+)
+
 func initOrganisationRoute(router chi.Router) {
 	router.Route("/organisation", func(r chi.Router) {
+		// swagger:route GET /organisation Organisations getAllOrganisation
+		//
+		// Get organisations
+		//
+		// This will get all the organisations available in the organisation.
+		//
+		// 	Responses:
+		//    200: organisationObjectSuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/", getAllOrganisation)
+		// swagger:route POST /organisation Organisations newOrganisation
+		//
+		// New organisation
+		//
+		// This will create an organisation for organisation organisations library.
+		//
+		// 	Responses:
+		//    200: organisationObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/", newOrganisation)
+		// swagger:route GET /organisation/all Organisations getAllOrganisation1
+		//
+		// Get organisations
+		//
+		// This will get all the organisations available in the organisation.
+		//
+		// 	Responses:
+		//    200: organisationObjectSuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/all", getAllOrganisation)
+		// swagger:route POST /organisation/new Organisations newOrganisation1
+		//
+		// New organisation
+		//
+		// This will create an organisation for organisation organisations library.
+		//
+		// 	Responses:
+		//    200: organisationObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/new", newOrganisation)
 		r.Route("/:organisationID", func(r chi.Router) {
 			r.Use(organisationContext)
+			// swagger:route PUT /organisation/{organisationID} Organisations updateOrganisation
+			//
+			// Get organisation from link
+			//
+			// This will return the organisation object corresponding to provided link
+			//
+			// 	Responses:
+			//    200: organisationObjectSuccess
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Put("/update", updateOrganisation)
 		})
 	})
@@ -32,7 +88,7 @@ func organisationContext(next http.Handler) http.Handler {
 		if err == nil {
 			oldOrganisation = datastores.Store().Organisation().Get(dbStore.db)
 		}
-		ctx := context.WithValue(r.Context(), "oldOrganisation", oldOrganisation)
+		ctx := context.WithValue(r.Context(), oldOrganisationKey, oldOrganisation)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -85,7 +141,7 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	organisation := r.Context().Value("oldOrganisation").(models.Organisation)
+	organisation := r.Context().Value(oldOrganisationKey).(models.Organisation)
 	if err != nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {

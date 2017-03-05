@@ -43,7 +43,7 @@ func initAvatarRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newAvatar)
-		// swagger:route GET /avatar/all Avatars getAllAvatar
+		// swagger:route GET /avatar/all Avatars getAllAvatar1
 		//
 		// Get avatars
 		//
@@ -54,21 +54,22 @@ func initAvatarRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Get("/all", getAllAvatar)
-		// swagger:route POST /avatar/new Avatars newAvatar
+		// swagger:route POST /avatar/new Avatars newAvatar1
 		//
 		// New avatar
 		//
 		// This will create an avatar for organisation avatars library.
 		//
 		// 	Responses:
-		// 	  default: genericError
-		// 	  503: databaseError
 		//    200: avatarObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/new", newAvatar)
 		r.Route("/link/", func(r chi.Router) {
 			r.Route("/:avatarLink", func(r chi.Router) {
 				r.Use(avatarContext)
-				// swagger:route GET /avatar/link/:avatarLink Avatars getAvatarFromLink
+				// swagger:route GET /avatar/link/{avatarLink} Avatars getAvatarFromLink
 				//
 				// Get avatar from link
 				//
@@ -84,7 +85,7 @@ func initAvatarRoute(router chi.Router) {
 		r.Route("/name/", func(r chi.Router) {
 			r.Route("/:avatarName", func(r chi.Router) {
 				r.Use(avatarContext)
-				// swagger:route GET /avatar/name/:avatarName Avatars getAvatarFromName
+				// swagger:route GET /avatar/name/{avatarName} Avatars getAvatarFromName
 				//y
 				// Get avatar from name
 				//
@@ -99,26 +100,27 @@ func initAvatarRoute(router chi.Router) {
 		})
 		r.Route("/:avatarID", func(r chi.Router) {
 			r.Use(avatarContext)
-			// swagger:route PUT /avatar/:avatarID Avatars updateAvatar
+			// swagger:route PUT /avatar/{avatarID} Avatars updateAvatar
 			//
 			// Update avatar
 			//
 			// This will return the new avatar object
 			//
 			// 	Responses:
-			//    200: avatzarObjectSuccess
+			//    200: avatarObjectSuccess
 			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: genericError
 			r.Put("/update", updateAvatar)
-			// swagger:route DELETE /avatar/:avatarID Avatars deleteAvatar
+			// swagger:route PUT /avatar/{avatarID} Avatars updateAvatar
 			//
-			// Delete avatar
+			// Update avatar
 			//
-			// This will return an object describing the deletion
+			// This will return the new avatar object
 			//
 			// 	Responses:
-			//    200: deleteMessage
+			//    200: avatarObjectSuccess
+			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: genericError
 			r.Delete("/delete", deleteAvatar)

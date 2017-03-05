@@ -14,7 +14,6 @@ type generalOk struct {
 	// What you want to say
 	// in:body
 	Message string `json:"message,omitempty"`
-	Status  int    `json:"-"`
 }
 
 // ---------------------------------------------------
@@ -74,7 +73,6 @@ type deleteMessage struct {
 
 func newGeneralOk(message string) generalOk {
 	return generalOk{
-		Status:  200,
 		Message: message,
 	}
 }
@@ -148,6 +146,133 @@ type emojiObjectSuccess struct {
 	// in:body
 	// List of emojis returned
 	Emoji models.Emoji `json:"emoji"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+
+// <><><><><> FOLDER RESPONSES <><><><><> //
+
+// folderSlice Array of folders
+//
+// swagger:response folderArraySuccess
+type folderArraySuccess struct {
+	// in:body
+	Folders []models.Folder
+}
+
+// folderObjectSuccess list of folders
+//
+// swagger:response folderObjectSuccess
+type folderObjectSuccess struct {
+	// in:body
+	// List of folders returned
+	Folder models.Folder `json:"folder"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+
+// <><><><><> MEMBER RESPONSES <><><><><> //
+
+// memberSlice Array of members
+//
+// swagger:response memberArraySuccess
+type memberArraySuccess struct {
+	// in:body
+	Members []models.Member
+}
+
+// memberObjectSuccess list of members
+//
+// swagger:response memberObjectSuccess
+type memberObjectSuccess struct {
+	// in:body
+	// List of members returned
+	Member models.Member `json:"member"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> MESSAGE RESPONSES <><><><><> //
+
+// messageSlice Array of messages
+//
+// swagger:response messageArraySuccess
+type messageArraySuccess struct {
+	// in:body
+	Messages []models.Message
+}
+
+// messageObjectSuccess list of messages
+//
+// swagger:response messageObjectSuccess
+type messageObjectSuccess struct {
+	// in:body
+	// List of messages returned
+	Message models.Message `json:"message"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> ORGANISATION RESPONSES <><><><><> //
+
+// organisationObjectSuccess list of organisations
+//
+// swagger:response organisationObjectSuccess
+type organisationObjectSuccess struct {
+	// in:body
+	// List of organisations returned
+	Organisation models.Organisation `json:"organisation"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+
+// <><><><><> PARAMETERS RESPONSES <><><><><> //
+
+// parameterObjectSuccess list of parameters
+//
+// swagger:response parameterObjectSuccess
+type parameterObjectSuccess struct {
+	// in:body
+	// List of parameters returned
+	Parameter models.Parameter `json:"parameter"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> ROLE RESPONSES <><><><><> //
+
+// roleSlice Array of roles
+//
+// swagger:response roleArraySuccess
+type roleArraySuccess struct {
+	// in:body
+	Roles []models.Role
+}
+
+// roleObjectSuccess list of roles
+//
+// swagger:response roleObjectSuccess
+type roleObjectSuccess struct {
+	// in:body
+	// List of roles returned
+	Role models.Role `json:"role"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> USER RESPONSES <><><><><> //
+
+// userSlice Array of users
+//
+// swagger:response userArraySuccess
+type userArraySuccess struct {
+	// in:body
+	Users []models.User
+}
+
+// userObjectSuccess list of users
+//
+// swagger:response userObjectSuccess
+type userObjectSuccess struct {
+	// in:body
+	// List of users returned
+	User models.User `json:"user"`
 }
 
 // <><><><><> <><><><><> <><><><><> <><><><><> //

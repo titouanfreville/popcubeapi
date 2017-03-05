@@ -12,22 +12,110 @@ import (
 	renderPackage "github.com/unrolled/render"
 )
 
+const (
+	roleNameKey key = "roleName"
+	oldRoleKey  key = "oldRole"
+)
+
 func initRoleRoute(router chi.Router) {
 	router.Route("/role", func(r chi.Router) {
+		// swagger:route GET /role Roles getAllRole
+		//
+		// Get roles
+		//
+		// This will get all the roles available in the organisation.
+		//
+		// 	Responses:
+		//    200: roleArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/", getAllRole)
+		// swagger:route GET /role Roles getAllRole
+		//
+		// Get roles
+		//
+		// This will get all the roles available in the organisation.
+		//
+		// 	Responses:
+		//    200: roleArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/", newRole)
+		// swagger:route GET /role/all Roles getAllRole1
+		//
+		// Get roles
+		//
+		// This will get all the roles available in the organisation.
+		//
+		// 	Responses:
+		//    200: roleArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/all", getAllRole)
+		// swagger:route POST /role/new Roles newRole1
+		//
+		// New role
+		//
+		// This will create an role for organisation roles library.
+		//
+		// 	Responses:
+		//    200: roleObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/new", newRole)
+		// swagger:route POST /role/rights Roles getRoleFromRights
+		//
+		// Get role having provided rights
+		//
+		// Return an array of roles corresponding to rights
+		//
+		// 	Responses:
+		//    200: roleArraySuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/rights", getRoleFromRight)
 		r.Route("/name/", func(r chi.Router) {
 			r.Route("/:roleName", func(r chi.Router) {
 				r.Use(roleContext)
+				// swagger:route GET /role/name/{roleName} Roles getRoleFromName
+				//
+				// Get role from name
+				//
+				// This will return the role object corresponding to provided name
+				//
+				// 	Responses:
+				//    200: roleObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
 				r.Get("/", getRoleFromName)
 			})
 		})
 		r.Route("/:roleID", func(r chi.Router) {
 			r.Use(roleContext)
+			// swagger:route PUT /role/{roleID} Roles updateRole
+			//
+			// Update role
+			//
+			// This will return the new role object
+			//
+			// 	Responses:
+			//    200: avatarObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Put("/update", updateRole)
+			// swagger:route DELETE /role/{roleID} Roles deleteRole
+			//
+			// Delete role
+			//
+			// This will return an object describing the deletion
+			//
+			// 	Responses:
+			//    200: deleteMessage
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Delete("/delete", deleteRole)
 		})
 	})
@@ -38,11 +126,11 @@ func roleContext(next http.Handler) http.Handler {
 		roleID, err := strconv.ParseUint(chi.URLParam(r, "roleID"), 10, 64)
 		name := chi.URLParam(r, "roleName")
 		oldRole := models.Role{}
-		ctx := context.WithValue(r.Context(), "roleName", name)
+		ctx := context.WithValue(r.Context(), roleNameKey, name)
 		if err == nil {
 			oldRole = datastores.Store().Role().GetByID(roleID, dbStore.db)
 		}
-		ctx = context.WithValue(ctx, "oldRole", oldRole)
+		ctx = context.WithValue(ctx, oldRoleKey, oldRole)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -63,7 +151,7 @@ func getRoleFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	name := r.Context().Value("roleName").(string)
+	name := r.Context().Value(roleNameKey).(string)
 	role := store.Role().GetByName(name, db)
 	render.JSON(w, 200, role)
 }
@@ -126,7 +214,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	role := r.Context().Value("oldRole").(models.Role)
+	role := r.Context().Value(oldRoleKey).(models.Role)
 	if err != nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
@@ -144,7 +232,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteRole(w http.ResponseWriter, r *http.Request) {
-	role := r.Context().Value("role").(models.Role)
+	role := r.Context().Value(oldRoleKey).(models.Role)
 	store := datastores.Store()
 	render := renderPackage.New()
 	message := deleteMessageModel{

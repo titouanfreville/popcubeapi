@@ -12,24 +12,124 @@ import (
 	renderPackage "github.com/unrolled/render"
 )
 
+const (
+	messageDateKey key = "messageDate"
+	oldMessageKey  key = "oldMessage"
+)
+
 func initMessageRoute(router chi.Router) {
 	router.Route("/message", func(r chi.Router) {
-		r.Route("/get", func(r chi.Router) {
-			r.Get("/", getAllMessage)
-			r.Get("/all", getAllMessage)
-			r.Post("/channel", getMessageFromChannel)
-			r.Post("/creator", getMessageFromUser)
-			r.Route("/date/", func(r chi.Router) {
-				r.Route("/:date", func(r chi.Router) {
-					r.Use(messageContext)
-					r.Get("/", getMessageFromDate)
-				})
+		// swagger:route GET /message Messages getAllMessage
+		//
+		// Get messages
+		//
+		// This will get all the messages available in the organisation.
+		//
+		// 	Responses:
+		//    200: messageArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Get("/", getAllMessage)
+		// swagger:route POST /message Messages newMessage
+		//
+		// New message
+		//
+		// This will create an message for organisation messages library.
+		//
+		// 	Responses:
+		//    200: messageObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Post("/", newMessage)
+		// swagger:route GET /message/all Messages getAllMessage1
+		//
+		// Get messages
+		//
+		// This will get all the messages available in the organisation.
+		//
+		// 	Responses:
+		//    200: messageArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Get("/all", getAllMessage)
+		// swagger:route POST /message/new Messages newMessage1
+		//
+		// New message
+		//
+		// This will create an message for organisation messages library.
+		//
+		// 	Responses:
+		//    200: messageObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Post("/new", newMessage)
+		// swagger:route POST /channel Messages getMessageFromChannel
+		//
+		// Get message from channel
+		//
+		// This will return all mesages in provided channel
+		//
+		// 	Responses:
+		//    200: messageObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Post("/channel", getMessageFromChannel)
+		// swagger:route POST /user Messages getMessageFromUser
+		//
+		// Get message from user
+		//
+		// This will return all mesage created by provided user
+		//
+		// 	Responses:
+		//    200: messageObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Post("/creator", getMessageFromUser)
+		r.Route("/date/", func(r chi.Router) {
+			r.Route("/:messageDate", func(r chi.Router) {
+				r.Use(messageContext)
+				// swagger:route GET /message/date/{messageDate} Messages getMessageFromDate
+				//
+				// Get message from date
+				//
+				// This will return the message object corresponding to provided date
+				//
+				// 	Responses:
+				//    200: messageObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
+				r.Get("/", getMessageFromDate)
 			})
 		})
-		r.Post("/new", newMessage)
 		r.Route("/:messageID", func(r chi.Router) {
 			r.Use(messageContext)
+			// swagger:route PUT /message/{messageID} Messages updateMessage
+			//
+			// Update message
+			//
+			// This will return the new message object
+			//
+			// 	Responses:
+			//    200: messageObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Put("/update", updateMessage)
+			// swagger:route PUT /message/{messageID} Messages updateMessage
+			//
+			// Update message
+			//
+			// This will return the new message object
+			//
+			// 	Responses:
+			//    200: messageObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Delete("/delete", deleteMessageFunction)
 		})
 	})
@@ -38,13 +138,13 @@ func initMessageRoute(router chi.Router) {
 func messageContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		messageID, err := strconv.ParseUint(chi.URLParam(r, "messageID"), 10, 64)
-		date, _ := strconv.ParseInt(chi.URLParam(r, "date"), 10, 64)
+		date, _ := strconv.ParseInt(chi.URLParam(r, "messageDate"), 10, 64)
 		oldMessage := models.Message{}
-		ctx := context.WithValue(r.Context(), "date", date)
+		ctx := context.WithValue(r.Context(), messageDateKey, date)
 		if err == nil {
 			oldMessage = datastores.Store().Message().GetByID(messageID, dbStore.db)
 		}
-		ctx = context.WithValue(ctx, "oldMessage", oldMessage)
+		ctx = context.WithValue(ctx, oldMessageKey, oldMessage)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -65,7 +165,7 @@ func getMessageFromDate(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	date := r.Context().Value("date").(int)
+	date := r.Context().Value(messageDateKey).(int)
 	message := store.Message().GetByDate(date, db)
 	render.JSON(w, 200, message)
 }
@@ -150,7 +250,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	message := r.Context().Value("oldMessage").(models.Message)
+	message := r.Context().Value(oldMessageKey).(models.Message)
 	if err != nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
@@ -168,7 +268,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteMessageFunction(w http.ResponseWriter, r *http.Request) {
-	message := r.Context().Value("message").(models.Message)
+	message := r.Context().Value(oldMessageKey).(models.Message)
 	store := datastores.Store()
 	render := renderPackage.New()
 	dmessage := deleteMessageModel{

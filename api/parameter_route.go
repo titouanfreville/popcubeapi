@@ -12,14 +12,71 @@ import (
 	renderPackage "github.com/unrolled/render"
 )
 
+const (
+	oldParameterKey key = "oldParameter"
+)
+
 func initParameterRoute(router chi.Router) {
 	router.Route("/parameter", func(r chi.Router) {
+		// swagger:route GET /parameter Parameters getAllParameter
+		//
+		// Get parameters
+		//
+		// This will get all the parameters available in the organisation.
+		//
+		// 	Responses:
+		//    200: parameterObjectSuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/", getAllParameter)
+		// swagger:route POST /parameter Parameters newParameter
+		//
+		// New parameter
+		//
+		// This will create an parameter for organisation parameters library.
+		//
+		// 	Responses:
+		//    200: parameterObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/", newParameter)
+		// swagger:route GET /parameter/all Parameters getAllParameter1
+		//
+		// Get parameters
+		//
+		// This will get all the parameters available in the organisation.
+		//
+		// 	Responses:
+		//    200: parameterObjectSuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/all", getAllParameter)
+		// swagger:route POST /parameter/new Parameters newParameter1
+		//
+		// New parameter
+		//
+		// This will create an parameter for organisation parameters library.
+		//
+		// 	Responses:
+		//    200: parameterObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/new", newParameter)
 		r.Route("/:parameterID", func(r chi.Router) {
 			r.Use(parameterContext)
+			// swagger:route PUT /parameter/{parameterID} Parameters updateParameter
+			//
+			// Update parameter
+			//
+			// This will return the new parameter object
+			//
+			// 	Responses:
+			//    200: avatarObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Put("/update", updateParameter)
 		})
 	})
@@ -32,7 +89,7 @@ func parameterContext(next http.Handler) http.Handler {
 		if err == nil {
 			parameter = datastores.Store().Parameter().Get(dbStore.db)
 		}
-		ctx := context.WithValue(r.Context(), "parameter", parameter)
+		ctx := context.WithValue(r.Context(), oldParameterKey, parameter)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -85,7 +142,7 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	parameter := r.Context().Value("parameter").(models.Parameter)
+	parameter := r.Context().Value(oldParameterKey).(models.Parameter)
 	if err != nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {

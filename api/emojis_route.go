@@ -21,31 +21,124 @@ const (
 
 func initEmojiRoute(router chi.Router) {
 	router.Route("/emoji", func(r chi.Router) {
+		// swagger:route GET /emoji Emojis getAllEmoji
+		//
+		// Get emojis
+		//
+		// This will get all the emojis available in the organisation.
+		//
+		// 	Responses:
+		//    200: emojiArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/", getAllEmoji)
+		// swagger:route POST /emoji Emojis newEmoji
+		//
+		// New emoji
+		//
+		// This will create an emoji for organisation emojis library.
+		//
+		// 	Responses:
+		//    200: emojiObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/", newEmoji)
+		// swagger:route GET /emoji/all Emojis getAllEmoji1
+		//
+		// Get emojis
+		//
+		// This will get all the emojis available in the organisation.
+		//
+		// 	Responses:
+		//    200: emojiArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/all", getAllEmoji)
+		// swagger:route POST /emoji Emojis newEmoji1
+		//
+		// New emoji
+		//
+		// This will create an emoji for organisation emojis library.
+		//
+		// 	Responses:
+		//    200: emojiObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/new", newEmoji)
 		r.Route("/link/", func(r chi.Router) {
 			r.Route("/:emojiLink", func(r chi.Router) {
 				r.Use(emojiContext)
+				// swagger:route GET /emoji/link/{emojiLink} Emojis getEmojiFromLink
+				//
+				// Get emoji from link
+				//
+				// This will return the emoji object corresponding to provided link
+				//
+				// 	Responses:
+				//    200: emojiObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
 				r.Get("/", getEmojiFromLink)
 			})
 		})
 		r.Route("/name/", func(r chi.Router) {
 			r.Route("/:emojiName", func(r chi.Router) {
 				r.Use(emojiContext)
+				// swagger:route GET /emoji/name/{emojiName} Emojis getEmojiFromName
+				//
+				// Get emoji from name
+				//
+				// This will return the emoji object corresponding to provided name
+				//
+				// 	Responses:
+				//    200: emojiObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
 				r.Get("/", getEmojiFromName)
 			})
 		})
 		r.Route("/shortcut/", func(r chi.Router) {
 			r.Route("/:emojiShortcut", func(r chi.Router) {
 				r.Use(emojiContext)
+				// swagger:route GET /emoji/shortcut/{emojiShortcut} Emojis getEmojiFromShortcut
+				//
+				// Get emoji from shortcut
+				//
+				// This will return the emoji object corresponding to provided shortcut
+				//
+				// 	Responses:
+				//    200: emojiObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
 				r.Get("/", getEmojiFromShortcut)
 			})
 		})
 		r.Route("/:emojiID", func(r chi.Router) {
 			r.Use(emojiContext)
+			// swagger:route PUT /emoji/{emojiID} Emojis updateEmoji
+			//
+			// Update emoji
+			//
+			// This will return the new emoji object
+			//
+			// 	Responses:
+			//    200: avatarObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Put("/update", updateEmoji)
+			// swagger:route DELETE /emoji/{emojiID} Emojis deleteEmoji
+			//
+			// Delete emoji
+			//
+			// This will return an object describing the deletion
+			//
+			// 	Responses:
+			//    200: deleteMessage
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Delete("/delete", deleteEmoji)
 		})
 	})
