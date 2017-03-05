@@ -26,241 +26,531 @@ paths:
       operationId: "getter"
       parameters: []
       responses:
-        200:
-          $ref: "#/responses/%2Asuccess%2A"
         default:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
   /avatar:
     get:
+      tags:
+      - "Avatars"
       summary: "Get avatars"
       description: "This will get all the avatars available in the organisation."
-      operationId: "Avatars"
+      operationId: "getAllAvatar"
       parameters: []
       responses:
         200:
-          $ref: "#/responses/avatarArraySuccess"
+          description: "avatarSlice Array of avatars"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Avatar"
         503:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
         default:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
     post:
+      tags:
+      - "Avatars"
       summary: "New avatar"
       description: "This will create an avatar for organisation avatars library."
-      operationId: "Avatars"
-      parameters: []
+      operationId: "newAvatar"
+      parameters:
+      - in: "body"
+        name: "avatar"
+        description: "Link of the avatar in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Avatar"
+        x-go-name: "Avatar"
       responses:
         200:
-          $ref: "#/responses/avatarObjectSuccess"
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
         503:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
         default:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /avatar/:avatarID:
+    put:
+      tags:
+      - "Avatars"
+      summary: "Update avatar"
+      description: "This will return the new avatar object"
+      operationId: "updateAvatar"
+      parameters:
+      - name: "avatarID"
+        in: "path"
+        description: "Link of the avatar in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "AvatarID"
+      - in: "body"
+        name: "avatar"
+        description: "Link of the avatar in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Avatar"
+        x-go-name: "Avatar"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    delete:
+      tags:
+      - "Avatars"
+      summary: "Delete avatar"
+      description: "This will return an object describing the deletion"
+      operationId: "deleteAvatar"
+      parameters:
+      - name: "avatarID"
+        in: "path"
+        description: "Link of the avatar in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "AvatarID"
+      responses:
+        200:
+          description: "deleteMessage"
+          schema:
+            $ref: "#/definitions/deleteMessage"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
   /avatar/all:
     get:
+      tags:
+      - "Avatars"
       summary: "Get avatars"
       description: "This will get all the avatars available in the organisation."
-      operationId: "Avatars"
+      operationId: "getAllAvatar"
       parameters: []
       responses:
         200:
-          $ref: "#/responses/avatarArraySuccess"
+          description: "avatarSlice Array of avatars"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Avatar"
         503:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
         default:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /avatar/link/:avatarLink:
+    get:
+      tags:
+      - "Avatars"
+      summary: "Get avatar from link"
+      description: "This will return the avatar object corresponding to provided link"
+      operationId: "getAvatarFromLink"
+      parameters:
+      - name: "avatarLink"
+        in: "path"
+        description: "Link of the avatar in server."
+        required: true
+        type: "string"
+        x-go-name: "AvatarLink"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /avatar/name/:avatarName:
+    get:
+      tags:
+      - "Avatars"
+      summary: "y\nGet avatar from name"
+      description: "This will return the avatar object corresponding to provided name"
+      operationId: "getAvatarFromName"
+      parameters:
+      - name: "avatarName"
+        in: "path"
+        description: "Link of the avatar in server."
+        required: true
+        type: "string"
+        x-go-name: "AvatarName"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
   /avatar/new:
     post:
+      tags:
+      - "Avatars"
       summary: "New avatar"
       description: "This will create an avatar for organisation avatars library."
-      operationId: "Avatars"
+      operationId: "newAvatar"
+      parameters:
+      - in: "body"
+        name: "avatar"
+        description: "Link of the avatar in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Avatar"
+        x-go-name: "Avatar"
+      responses:
+        200:
+          description: "avatarObjectSuccess list of avatars"
+          schema:
+            $ref: "#/definitions/Avatar"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /channel:
+    get:
+      tags:
+      - "Channels"
+      summary: "Get channels"
+      description: "This will get all the channels available in the organisation."
+      operationId: "getAllChannel"
       parameters: []
       responses:
         200:
-          $ref: "#/responses/avatarObjectSuccess"
+          description: "channelSlice Array of channels"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Channel"
         503:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
         default:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    post:
+      tags:
+      - "Channels"
+      summary: "New channel"
+      description: "This will create an channel for organisation channels library."
+      operationId: "newChannel"
+      parameters:
+      - in: "body"
+        name: "channel"
+        description: "Link of the channel in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Channel"
+        x-go-name: "Channel"
+      responses:
+        200:
+          description: "channelObjectSuccess list of channels"
+          schema:
+            $ref: "#/definitions/Channel"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /channel/:channelID:
+    put:
+      tags:
+      - "Channels"
+      summary: "Update channel"
+      description: "This will return the new channel object"
+      operationId: "updateChannel"
+      parameters:
+      - name: "channelID"
+        in: "path"
+        description: "Link of the channel in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "ChannelID"
+      - in: "body"
+        name: "channel"
+        description: "Link of the channel in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Channel"
+        x-go-name: "Channel"
+      responses:
+        200:
+          description: "channelObjectSuccess list of channels"
+          schema:
+            $ref: "#/definitions/Channel"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    delete:
+      tags:
+      - "Channels"
+      summary: "Delete channel"
+      description: "This will return an object describing the deletion"
+      operationId: "deleteChannel"
+      parameters:
+      - name: "channelID"
+        in: "path"
+        description: "Link of the channel in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "ChannelID"
+      responses:
+        200:
+          description: "deleteMessage"
+          schema:
+            $ref: "#/definitions/deleteMessage"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /channel/all:
+    get:
+      tags:
+      - "Channels"
+      summary: "Get channels"
+      description: "This will get all the channels available in the organisation."
+      operationId: "getAllChannel"
+      parameters: []
+      responses:
+        200:
+          description: "channelSlice Array of channels"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Channel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /channel/name/:channelName:
+    get:
+      tags:
+      - "Channels"
+      summary: "Get nammed channel"
+      description: "This will get the channels having provided name in the organisation."
+      operationId: "getChannelFromName"
+      parameters:
+      - name: "channelName"
+        in: "path"
+        description: "Link of the channel in server."
+        required: true
+        type: "string"
+        x-go-name: "ChannelName"
+      responses:
+        200:
+          description: "channelObjectSuccess list of channels"
+          schema:
+            $ref: "#/definitions/Channel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /channel/new:
+    post:
+      tags:
+      - "Channels"
+      summary: "New channel"
+      description: "This will create an channel for organisation channels library."
+      operationId: "newChannel"
+      parameters:
+      - in: "body"
+        name: "channel"
+        description: "Link of the channel in server."
+        required: false
+        schema:
+          $ref: "#/definitions/Channel"
+        x-go-name: "Channel"
+      responses:
+        200:
+          description: "channelObjectSuccess list of channels"
+          schema:
+            $ref: "#/definitions/Channel"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /channel/private:
+    get:
+      tags:
+      - "Channels"
+      summary: "Get private channels"
+      description: "This will get all the private channels available in the organisation."
+      operationId: "getPrivateChannel"
+      parameters: []
+      responses:
+        200:
+          description: "channelSlice Array of channels"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Channel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /channel/public:
+    get:
+      tags:
+      - "Channels"
+      summary: "Get public channels"
+      description: "This will get all the public channels available in the organisation."
+      operationId: "getPublicChannel"
+      parameters: []
+      responses:
+        200:
+          description: "channelSlice Array of channels"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Channel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /channel/type/:channelType:
+    get:
+      tags:
+      - "Channels"
+      summary: "Get channels of provided type"
+      description: "This will get all the channels of provided type available in the\
+        \ organisation."
+      operationId: "getChannelFromType"
+      parameters:
+      - name: "channelType"
+        in: "path"
+        description: "Link of the channel in server."
+        required: true
+        type: "string"
+        x-go-name: "ChannelType"
+      responses:
+        200:
+          description: "channelSlice Array of channels"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Channel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
   /panic:
     get:
       tags:
@@ -270,30 +560,10 @@ paths:
       operationId: "getter"
       parameters: []
       responses:
-        500:
-          $ref: "#/responses/%2Asuccess%2A"
         default:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
   /ping:
     get:
       tags:
@@ -303,30 +573,10 @@ paths:
       operationId: "getter"
       parameters: []
       responses:
-        200:
-          $ref: "#/responses/%2Asuccess%2A"
         default:
-          description: "AppError Type used to structure error reporting for popcube\
-            \ chat project."
-          headers:
-            detailed_error:
-              type: "string"
-              description: "Detail of error"
-            id:
-              type: "string"
-              description: "ID for the error"
-            is_oauth:
-              type: "boolean"
-            message:
-              type: "string"
-              description: "Error's message"
-            request_id:
-              type: "string"
-              description: "Id of the request if exist"
-            status_code:
-              type: "integer"
-              format: "int64"
-              description: "Error's status code"
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
 definitions:
   Avatar:
     type: "object"
@@ -731,26 +981,172 @@ definitions:
       \ Each user is unique inside a given organisation, but users are not shared\
       \ between\norganisations. Required apply only for creation of the object."
     x-go-package: "github.com/titouanfreville/popcubeapi/models"
-responses:
+  avatarArraySuccess:
+    type: "object"
+    properties:
+      Avatars:
+        type: "array"
+        description: "in:body"
+        items:
+          $ref: "#/definitions/Avatar"
+    description: "avatarSlice Array of avatars"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  avatarObjectSuccess:
+    type: "object"
+    properties:
+      avatar:
+        description: "in:body\nList of avatars returned"
+        $ref: "#/definitions/Avatar"
+    description: "avatarObjectSuccess list of avatars"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  channelArraySuccess:
+    type: "object"
+    properties:
+      Channels:
+        type: "array"
+        description: "in:body"
+        items:
+          $ref: "#/definitions/Channel"
+    description: "channelSlice Array of channels"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  channelObjectSuccess:
+    type: "object"
+    properties:
+      channel:
+        description: "in:body\nList of channels returned"
+        $ref: "#/definitions/Channel"
+    description: "channelObjectSuccess list of channels"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  databaseError:
+    type: "object"
+    properties:
+      Error:
+        description: "in:body"
+        $ref: "#/definitions/genericErrorModel"
+    description: "databaseError is an error object to tell what is happening when\
+      \ we encounter issue with database"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  deleteMessage:
+    type: "object"
+    properties:
+      Message:
+        description: "in:body"
+        $ref: "#/definitions/deleteMessageModel"
+    title: "deleteMessage return object to confirm correct deletion of an item."
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  deleteMessageModel:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+        description: "More information about why is it or isn't it removed"
+        x-go-name: "Message"
+      removed_object:
+        type: "object"
+        description: "The object we where trying to remove"
+        properties: {}
+        x-go-name: "Object"
+      status:
+        type: "integer"
+        format: "int64"
+        description: "Status"
+        x-go-name: "Status"
+      success:
+        type: "boolean"
+        description: "Correctly removed ?"
+        x-go-name: "Success"
+    title: "deleteMessageModel is an object to confirm correct deletion of an item."
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  generalOk:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+        description: "What you want to say\nin:body"
+        x-go-name: "Message"
+    description: "generalOk default object style to return if correct"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
   genericError:
-    description: "AppError Type used to structure error reporting for popcube chat\
-      \ project."
-    headers:
+    type: "object"
+    properties:
+      Error:
+        description: "in:body"
+        $ref: "#/definitions/genericErrorModel"
+    description: "genericError general error when unexpected errors occured"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  genericErrorModel:
+    type: "object"
+    properties:
       detailed_error:
         type: "string"
         description: "Detail of error"
+        x-go-name: "DetailedError"
       id:
         type: "string"
         description: "ID for the error"
+        x-go-name: "ID"
       is_oauth:
         type: "boolean"
+        x-go-name: "IsOAuth"
       message:
         type: "string"
         description: "Error's message"
+        x-go-name: "Message"
       request_id:
         type: "string"
         description: "Id of the request if exist"
+        x-go-name: "RequestID"
       status_code:
         type: "integer"
         format: "int64"
-        description: "Error's status code"
+        description: "EgenericErrorModelrror's status code"
+        x-go-name: "StatusCode"
+    title: "AppError Type used to structure error reporting for popcube chat project."
+    x-go-name: "AppError"
+    x-go-package: "github.com/titouanfreville/popcubeapi/utils"
+  wrongEntityError:
+    type: "object"
+    properties:
+      Error:
+        description: "in:body"
+        $ref: "#/definitions/genericErrorModel"
+    description: "wrongEntityError is an error object to inform that the provided\
+      \ object was not correctly formated"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+responses:
+  avatarArraySuccess:
+    description: "avatarSlice Array of avatars"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/Avatar"
+  avatarObjectSuccess:
+    description: "avatarObjectSuccess list of avatars"
+    schema:
+      $ref: "#/definitions/Avatar"
+  channelArraySuccess:
+    description: "channelSlice Array of channels"
+    schema:
+      type: "array"
+      items:
+        $ref: "#/definitions/Channel"
+  channelObjectSuccess:
+    description: "channelObjectSuccess list of channels"
+    schema:
+      $ref: "#/definitions/Channel"
+  databaseError:
+    description: "databaseError is an error object to tell what is happening when\
+      \ we encounter issue with database"
+    schema:
+      $ref: "#/definitions/genericErrorModel"
+  defaultOk:
+    description: "generalOk default object style to return if correct"
+  genericError:
+    description: "genericError general error when unexpected errors occured"
+    schema:
+      $ref: "#/definitions/genericErrorModel"
+  wrongEntity:
+    description: "wrongEntityError is an error object to inform that the provided\
+      \ object was not correctly formated"
+    schema:
+      $ref: "#/definitions/genericErrorModel"

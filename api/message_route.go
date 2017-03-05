@@ -57,7 +57,7 @@ func getAllMessage(w http.ResponseWriter, r *http.Request) {
 		result := store.Message().GetAll(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
@@ -81,13 +81,13 @@ func getMessageFromUser(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			role := store.Message().GetByCreator(data.User, db)
 			render.JSON(w, 200, role)
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -103,13 +103,13 @@ func getMessageFromChannel(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			role := store.Message().GetByChannel(data.Channel, db)
 			render.JSON(w, 200, role)
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -125,7 +125,7 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Message().Save(data.Message, db)
@@ -135,7 +135,7 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -152,7 +152,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	err := chiRender.Bind(request, &data)
 	message := r.Context().Value("oldMessage").(models.Message)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Message().Update(&message, data.Message, db)
@@ -162,7 +162,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -171,7 +171,7 @@ func deleteMessageFunction(w http.ResponseWriter, r *http.Request) {
 	message := r.Context().Value("message").(models.Message)
 	store := datastores.Store()
 	render := renderPackage.New()
-	dmessage := deleteMessage{
+	dmessage := deleteMessageModel{
 		Object: message,
 	}
 	db := dbStore.db

@@ -45,7 +45,7 @@ func getAllParameter(w http.ResponseWriter, r *http.Request) {
 		result := store.Parameter().Get(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
@@ -70,7 +70,7 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -87,7 +87,7 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 	err := chiRender.Bind(request, &data)
 	parameter := r.Context().Value("parameter").(models.Parameter)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Parameter().Update(&parameter, data.Parameter, db)
@@ -97,7 +97,7 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }

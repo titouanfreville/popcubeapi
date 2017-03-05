@@ -26,4 +26,4 @@ RUN set -x \
     && apk del .gosu-deps
 
 
-ENTRYPOINT entrypoint /$GOCOPYPATH $WATCHING
+ENTRYPOINT waitforit database:3306 -t 0 -- echo "Db is ready" && entrypoint /$GOCOPYPATH $WATCHING

@@ -256,3 +256,5 @@ vendor/*
 .env*
 !.env.dist
 !.env.test
+docker_resources/*
+!docker_resources/README.md
