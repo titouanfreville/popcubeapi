@@ -76,6 +76,22 @@ func (usi UserStoreImpl) GetByUserName(userName string, db *gorm.DB) models.User
 	return user
 }
 
+// Login Used to log user in
+func (usi UserStoreImpl) Login(userName string, pass string, db *gorm.DB) (models.User, *u.AppError) {
+	user := models.User{}
+	empty := models.User{}
+	err := u.NewAPIError(404, "Wrong user name or password", "Can't proceed to login. Password or user name is not correct")
+	db.Where("userName = ?", userName).First(&user)
+	if (user == models.User{}) {
+		return empty, err
+	}
+	hash := models.HashPassword(pass)
+	if models.ComparePassword(hash, user.Password) {
+		return user, nil
+	}
+	return empty, err
+}
+
 // GetByEmail Used to get user from DB by email
 func (usi UserStoreImpl) GetByEmail(userEmail string, db *gorm.DB) models.User {
 	user := models.User{}

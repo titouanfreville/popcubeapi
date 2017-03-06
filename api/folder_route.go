@@ -9,7 +9,6 @@ import (
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -176,7 +175,7 @@ func folderContext(next http.Handler) http.Handler {
 
 func getAllFolder(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Folder().GetAll(db)
@@ -188,7 +187,7 @@ func getAllFolder(w http.ResponseWriter, r *http.Request) {
 
 func getFolderFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	name := r.Context().Value(folderNameKey).(string)
 	folder := store.Folder().GetByName(name, db)
@@ -197,7 +196,7 @@ func getFolderFromName(w http.ResponseWriter, r *http.Request) {
 
 func getFolderFromType(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	folderType := r.Context().Value(folderTypeKey).(string)
 	folder := store.Folder().GetByType(folderType, db)
@@ -206,7 +205,7 @@ func getFolderFromType(w http.ResponseWriter, r *http.Request) {
 
 func getFolderFromLink(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	link := r.Context().Value(folderLinkKey).(string)
 	folder := store.Folder().GetByLink(link, db)
@@ -219,7 +218,7 @@ func getFolderFromMessage(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -241,7 +240,7 @@ func newFolder(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -267,7 +266,7 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -291,7 +290,7 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 func deleteFolder(w http.ResponseWriter, r *http.Request) {
 	folder := r.Context().Value("folder").(models.Folder)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	message := deleteMessageModel{
 		Object: folder,
 	}

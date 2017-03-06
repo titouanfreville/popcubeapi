@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/goware/jwtauth"
 	"github.com/jinzhu/gorm"
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/docgen"
@@ -12,6 +14,7 @@ import (
 	"github.com/titouanfreville/popcubeapi/configs"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/utils"
+	renderPackage "github.com/unrolled/render"
 )
 
 type saveDb struct {
@@ -22,11 +25,24 @@ type saveDb struct {
 type key string
 
 var (
-	routes   = flag.Bool("routes", false, "Generate router documentation")
-	dbStore  = saveDb{}
-	error422 = utils.NewAPIError(422, "parse.request.body", "Request json object not correct.")
-	error503 = utils.NewAPIError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
+	tokenAuth *jwtauth.JwtAuth
+	userToken *jwt.Token
+	render    = renderPackage.New()
+	routes    = flag.Bool("routes", false, "Generate router documentation")
+	dbStore   = saveDb{}
+	error401  = utils.NewAPIError(401, "unauthorized", "You did not login into the app. Please login to access those resources")
+	error422  = utils.NewAPIError(422, "parse.request.body", "Request json object not correct.")
+	error503  = utils.NewAPIError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
 )
+
+func initAuth() {
+	tokenAuth = jwtauth.New("HS256", []byte("secret"), nil)
+}
+
+// createToken create JWT auth token for current login user
+func createToken() {
+	userToken = jwt.New(jwt.SigningMethodHS256)
+}
 
 // newRouter initialise api serveur.
 func newRouter() *chi.Mux {
@@ -81,6 +97,41 @@ func basicRoutes(router *chi.Mux) {
 	router.Get("/panic", func(w http.ResponseWriter, r *http.Request) {
 		panic("C'est la panique, panique, panique. Sur le périphérique")
 	})
+	// swagger:route POST /login Login login
+	//
+	// Try to log user in
+	//
+	// Login user with provided USERNAME && Password
+	//
+	// Responses:
+	// 		200: correctLogin
+	// 		404: incorrectIds
+	// 	  422: wrongEntity
+	// 	  503: databaseError
+	router.Post("/login", loginMiddleware)
+}
+
+// Check if user is correctly logged
+func authenticator(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		if jwtErr, ok := ctx.Value("jwt.err").(error); ok {
+			if jwtErr != nil {
+				render.JSON(w, error401.StatusCode, error401)
+				return
+			}
+		}
+
+		jwtToken, ok := ctx.Value("jwt").(*jwt.Token)
+		if !ok || jwtToken == nil || !jwtToken.Valid {
+			render.JSON(w, error401.StatusCode, error401)
+			return
+		}
+
+		// Token is authenticated, pass it through
+		next.ServeHTTP(w, r)
+	})
 }
 
 // StartAPI initialise the api with provided host and port.
@@ -93,7 +144,7 @@ func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnecti
 	host := DbConnectionInfo.Host
 	dbport := DbConnectionInfo.Port
 	dbStore.db = datastores.Store().InitConnection(user, db, pass, host, dbport)
-
+	initAuth()
 	initMiddleware(router)
 	basicRoutes(router)
 	initAvatarRoute(router)

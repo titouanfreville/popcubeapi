@@ -9,7 +9,6 @@ import (
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -164,7 +163,7 @@ func emojiContext(next http.Handler) http.Handler {
 
 func getAllEmoji(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Emoji().GetAll(db)
@@ -176,7 +175,7 @@ func getAllEmoji(w http.ResponseWriter, r *http.Request) {
 
 func getEmojiFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	name := r.Context().Value(emojiNameKey).(string)
 	emoji := store.Emoji().GetByName(name, db)
@@ -185,7 +184,7 @@ func getEmojiFromName(w http.ResponseWriter, r *http.Request) {
 
 func getEmojiFromShortcut(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	link := r.Context().Value(emojiShortcutKey).(string)
 	emoji := store.Emoji().GetByShortcut(link, db)
@@ -194,7 +193,7 @@ func getEmojiFromShortcut(w http.ResponseWriter, r *http.Request) {
 
 func getEmojiFromLink(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	link := r.Context().Value(emojiLinkKey).(string)
 	emoji := store.Emoji().GetByLink(link, db)
@@ -207,7 +206,7 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -233,7 +232,7 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -257,7 +256,7 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 func deleteEmoji(w http.ResponseWriter, r *http.Request) {
 	emoji := r.Context().Value(oldEmojiKey).(models.Emoji)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	message := deleteMessageModel{
 		Object: emoji,
 	}

@@ -9,7 +9,6 @@ import (
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -20,6 +19,9 @@ const (
 
 func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
+		// Seek, verify and validate JWT tokens
+		r.Use(tokenAuth.Verifier)
+		r.Use(authenticator)
 		// swagger:route GET /avatar Avatars getAllAvatar
 		//
 		// Get avatars
@@ -146,7 +148,6 @@ func avatarContext(next http.Handler) http.Handler {
 
 func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Avatar().GetAll(db)
@@ -158,7 +159,7 @@ func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 
 func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		name := r.Context().Value(avatarNameKey).(string)
@@ -171,7 +172,7 @@ func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
 
 func getAvatarFromLink(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		link := r.Context().Value(avatarLinkKey).(string)
@@ -188,7 +189,7 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -214,7 +215,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -238,7 +239,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 func deleteAvatar(w http.ResponseWriter, r *http.Request) {
 	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	message := deleteMessageModel{
 		Object: avatar,
 	}

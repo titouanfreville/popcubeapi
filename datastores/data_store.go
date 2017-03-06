@@ -242,4 +242,5 @@ type UserStore interface {
 	GetByRole(role *models.Role, db *gorm.DB) []models.User
 	GetAll(db *gorm.DB) []models.User
 	Delete(user *models.User, db *gorm.DB) *u.AppError
+	Login(userName string, pass string, db *gorm.DB) (models.User, *u.AppError)
 }
