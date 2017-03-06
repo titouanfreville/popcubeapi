@@ -1,10 +1,10 @@
 FROM rails
 
-## ADD ressources to serve slate ;)
-ADD docker_resources/slate_resources /home/slate
-ADD swagger.yaml /tmp/swagger
-ADD docker_resources/swagger /home/swagger
-ADD logo.png /home/slate/source/images/logo.png
+## COPY ressources to serve slate ;)
+COPY docker_resources/slate_resources /home/slate
+COPY swagger.yaml /tmp/swagger
+COPY docker_resources/swagger /home/swagger
+COPY logo.png /home/slate/source/images/logo.png
 
 RUN apt-get -q update && \
  apt-get -q install -yyy --auto-remove --no-install-recommends \
