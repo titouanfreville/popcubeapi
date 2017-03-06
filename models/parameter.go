@@ -17,13 +17,32 @@ const (
 	maxTime         = 1440
 )
 
-// Parameter Type descibe the Parameter table for Popcube DB
+// Parameter object
+//
+// Global parameters to apply within organisation. unique object in database
+//
+// swagger:model
 type Parameter struct {
+	// id of the parameter
+	//
+	// min: 0
 	IDParameter uint64 `gorm:"primary_key;column:idParameter;AUTO_INCREMENT" json:"id,omitempty"`
-	Local       string `gorm:"column:local;not null; unique" json:"local,omitempty"`
-	TimeZone    string `gorm:"column:timeZone;not null; unique;" json:"time_zone,omitempty"`
-	SleepStart  int    `gorm:"column:sleepStart;not null;unique" json:"sleep_start,omitempty"`
-	SleepEnd    int    `gorm:"column:sleepEnd;not null;unique" json:"sleep_end,omitempty"`
+	// Default langage
+	//
+	// required: true
+	Local string `gorm:"column:local;not null; unique" json:"local,omitempty"`
+	// Default time zone
+	//
+	// required: true
+	TimeZone string `gorm:"column:timeZone;not null; unique;" json:"time_zone,omitempty"`
+	// Default start of non notification period
+	//
+	// required: true
+	SleepStart int `gorm:"column:sleepStart;not null;unique" json:"sleep_start,omitempty"`
+	// Default end of non notification period
+	//
+	// required: true
+	SleepEnd int `gorm:"column:sleepEnd;not null;unique" json:"sleep_end,omitempty"`
 }
 
 // ToJSON transfoorm an Parameter into JSON

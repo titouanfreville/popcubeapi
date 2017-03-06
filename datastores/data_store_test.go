@@ -16,7 +16,7 @@ import (
 func TestDbStores(t *testing.T) {
 	Convey("Testing DB initialisation and closure", t, func() {
 		Convey("Given a datastore", func() {
-			ds := NewStore()
+			ds := Store()
 			Convey("Initialising should provide a db", func() {
 				resDb := ds.InitConnection("root", "popcube_test", "popcube_dev", "database", "3306")
 				db, _ := gorm.Open("mysql", "root:popcube_dev@/?charset=utf8&parseTime=True&loc=Local")

@@ -17,14 +17,27 @@ const (
 	organisationSubjectMaxRunes     = 250
 )
 
-// Organisation Type descibe the Organisation table for Popcube DB
+// Organisation object
+//
+// Describe organisation you are in. It is an unique object in the database.
+//
+// swagger:model
 type Organisation struct {
-	IDOrganisation   uint64 `gorm:"primary_key;column:idOrganisation;AUTO_INCREMENT" json:"id,omitempty"`
-	DockerStack      int    `gorm:"column:dockerStack;not null;unique" json:"docker_stack,omitempty"`
+	// id of the organisation
+	//
+	// min: 0
+	IDOrganisation uint64 `gorm:"primary_key;column:idOrganisation;AUTO_INCREMENT" json:"id,omitempty"`
+	// Stack into docker swarm
+	//
+	// required: true
+	//min: 0
+	DockerStack int `gorm:"column:dockerStack;not null;unique" json:"docker_stack,omitempty"`
+	// required: true
 	OrganisationName string `gorm:"column:organisationName;not null;unique" json:"name,omitempty"`
 	Description      string `gorm:"column:description" json:"description,omitempty"`
 	Avatar           string `gorm:"column:avatar" json:"avatar,omitempty"`
-	Domain           string `gorm:"column:domain" json:"domain,omitempty"`
+	// Domain name of the organisation
+	Domain string `gorm:"column:domain" json:"domain,omitempty"`
 }
 
 // ToJSON transfoorm an Organisation into JSON

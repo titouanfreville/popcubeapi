@@ -10,15 +10,21 @@ import (
 )
 
 // AppError Type used to structure error reporting for popcube chat project.
+// swagger:model genericErrorModel
 type AppError struct {
-	ID            string                 `json:"id"`
-	Message       string                 `json:"message"`               // Message to be display to the end user without debugging information
-	DetailedError string                 `json:"detailed_error"`        // Internal error string to help the developer
-	RequestID     string                 `json:"request_id,omitempty"`  // The RequestID that's also set in the header
-	StatusCode    int                    `json:"status_code,omitempty"` // The http status code
-	Where         string                 `json:"-"`                     // The function where it happened in the form of Struct.Func
-	IsOAuth       bool                   `json:"is_oauth,omitempty"`    // Whether the error is OAuth specific
-	params        map[string]interface{} `json:"-"`
+	// ID for the error
+	ID string `json:"id"`
+	// Error's message
+	Message string `json:"message"` // Message to be display to the end user without debugging information
+	// EgenericErrorModelrror's status code
+	StatusCode int `json:"status_code,omitempty"` // The http status code
+	// Detail of error
+	DetailedError string `json:"detailed_error"` // Internal error string to help the developer
+	// Id of the request if exist
+	RequestID string `json:"request_id,omitempty"` // The RequestID that's also set in the header
+	Where     string `json:"-"`                    // The function where it happened in the form of Struct.Func
+	IsOAuth   bool   `json:"is_oauth,omitempty"`   // Whether the error is OAuth specific
+	params    map[string]interface{}
 }
 
 // Error return a string for AppError Type
@@ -83,8 +89,8 @@ func NewLocAppError(where string, id string, params map[string]interface{}, deta
 	return ap
 }
 
-// NewApiError is used to generate server errors
-func NewApiError(statusCode int, id string, message string) *AppError {
+// NewAPIError is used to generate server errors
+func NewAPIError(statusCode int, id string, message string) *AppError {
 	ap := &AppError{}
 	ap.ID = id
 	ap.Message = message

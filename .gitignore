@@ -24,6 +24,7 @@ bld/
 
 # Visual Studio 2015 cache/options directory
 .vs/
+.vscode
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
@@ -254,3 +255,6 @@ paket-files/
 vendor/*
 .env*
 !.env.dist
+!.env.test
+docker_resources/*
+!docker_resources/README.md

@@ -12,20 +12,98 @@ import (
 	renderPackage "github.com/unrolled/render"
 )
 
+const (
+	userNameKey  key = "userName"
+	nickNameKey  key = "nickName"
+	firstNameKey key = "firstName"
+	lastNameKey  key = "lastName"
+	userDateKey  key = "userDate"
+	userEmailKey key = "userEmail"
+	oldUserKey   key = "oldUser"
+)
+
 func initUserRoute(router chi.Router) {
 	router.Route("/user", func(r chi.Router) {
+		// swagger:route GET /user Users getAllUser
+		//
+		// Get users
+		//
+		// This will get all the users available in the organisation.
+		//
+		// 	Responses:
+		//    200: userArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/", getAllUser)
+		// swagger:route POST /user Users newUser
+		//
+		// New user
+		//
+		// This will create an user for organisation users library.
+		//
+		// 	Responses:
+		//    200: userObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/", newUser)
+		// swagger:route GET /user/all Users getAllUser1
+		//
+		// Get users
+		//
+		// This will get all the users available in the organisation.
+		//
+		// 	Responses:
+		//    200: userArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/all", getAllUser)
+		// swagger:route POST /user/new Users newUser1
+		//
+		// New user
+		//
+		// This will create an user for organisation users library.
+		//
+		// 	Responses:
+		//    200: userObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/new", newUser)
+		// swagger:route GET /user/all Users getDeletedUser
+		//
+		// Get deleted user
+		//
+		// This will get all the deleted users still present in database.
+		//
+		// 	Responses:
+		//    200: userArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/deleted", getDeletedUser)
+		// swagger:route POST /user/role Users getUserFromRole
+		//
+		// Get users from its role
+		//
+		// This will return the users having provided role.
+		//
+		// 	Responses:
+		//    200: userArraySuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/role", getUserFromRole)
-		r.Route("/date/", func(r chi.Router) {
-			r.Route("/:date", func(r chi.Router) {
-				r.Use(userContext)
-				r.Get("/", getUserFromDate)
-			})
-		})
+		// swagger:route GET /user/date Users getOrderedByDate
+		//
+		// Get user ordered by date
+		//
+		// This will get all the users ordered by date.
+		//
+		// 	Responses:
+		//    200: userArraySuccess
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Get("/date", getOrderedByDate)
 		r.Route("/email/", func(r chi.Router) {
 			r.Route("/:userEmail", func(r chi.Router) {
 				r.Use(userContext)
@@ -35,30 +113,92 @@ func initUserRoute(router chi.Router) {
 		r.Route("/username/", func(r chi.Router) {
 			r.Route("/:userName", func(r chi.Router) {
 				r.Use(userContext)
+				// swagger:route GET /user/username/{userName} Users getUserFromName
+				//y
+				// Get user from username
+				//
+				// This will return the user object corresponding to provided username
+				//
+				// 	Responses:
+				//    200: userObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
 				r.Get("/", getUserFromName)
 			})
 		})
 		r.Route("/nickname/", func(r chi.Router) {
 			r.Route("/:nickName", func(r chi.Router) {
 				r.Use(userContext)
+				// swagger:route GET /user/nickname/{nickName} Users getUserFromNickName
+				//y
+				// Get user from nickname
+				//
+				// This will return the user object corresponding to provided nickname
+				//
+				// 	Responses:
+				//    200: userObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
 				r.Get("/", getUserFromNickName)
 			})
 		})
 		r.Route("/firstname/", func(r chi.Router) {
 			r.Route("/:firstName", func(r chi.Router) {
 				r.Use(userContext)
+				// swagger:route GET /user/firstname/{firstName} Users getUserFromFirstName
+				//y
+				// Get user from firstname
+				//
+				// This will return the user object corresponding to provided firstname
+				//
+				// 	Responses:
+				//    200: userObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
 				r.Get("/", getUserFromFirstName)
 			})
 		})
 		r.Route("/lastname/", func(r chi.Router) {
 			r.Route("/:lastName", func(r chi.Router) {
 				r.Use(userContext)
+				// swagger:route GET /user/lastname/{lastName} Users getUserFromLastName
+				//y
+				// Get user from lastname
+				//
+				// This will return the user object corresponding to provided lastname
+				//
+				// 	Responses:
+				//    200: userObjectSuccess
+				// 	  503: databaseError
+				// 	  default: genericError
 				r.Get("/", getUserFromLastName)
 			})
 		})
 		r.Route("/:userID", func(r chi.Router) {
 			r.Use(userContext)
+			// swagger:route PUT /user/{userID} Users updateUser
+			//
+			// Update user
+			//
+			// This will return the new user object
+			//
+			// 	Responses:
+			//    200: userObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Put("/update", updateUser)
+			// swagger:route PUT /user/{userID} Users updateUser
+			//
+			// Update user
+			//
+			// This will return the new user object
+			//
+			// 	Responses:
+			//    200: userObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Delete("/delete", deleteUser)
 		})
 	})
@@ -74,46 +214,46 @@ func userContext(next http.Handler) http.Handler {
 		email := chi.URLParam(r, "email")
 		date, _ := strconv.ParseInt(chi.URLParam(r, "date"), 10, 64)
 		oldUser := models.User{}
-		ctx := context.WithValue(r.Context(), "userName", name)
-		ctx = context.WithValue(r.Context(), "nickName", nickName)
-		ctx = context.WithValue(ctx, "firstName", firstName)
-		ctx = context.WithValue(ctx, "lastName", lastName)
-		ctx = context.WithValue(ctx, "email", email)
-		ctx = context.WithValue(ctx, "date", date)
+		ctx := context.WithValue(r.Context(), userNameKey, name)
+		ctx = context.WithValue(r.Context(), nickNameKey, nickName)
+		ctx = context.WithValue(ctx, firstNameKey, firstName)
+		ctx = context.WithValue(ctx, lastNameKey, lastName)
+		ctx = context.WithValue(ctx, userEmailKey, email)
+		ctx = context.WithValue(ctx, userDateKey, date)
 		if err == nil {
-			oldUser = datastores.NewStore().User().GetByID(userID, dbStore.db)
+			oldUser = datastores.Store().User().GetByID(userID, dbStore.db)
 		}
-		ctx = context.WithValue(ctx, "oldUser", oldUser)
+		ctx = context.WithValue(ctx, oldUserKey, oldUser)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
 func getAllUser(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.User().GetAll(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
 func getDeletedUser(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.User().GetDeleted(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
 func getUserFromName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	name := r.Context().Value("userName").(string)
@@ -122,46 +262,46 @@ func getUserFromName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromNickName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	name := r.Context().Value("nickName").(string)
+	name := r.Context().Value(nickNameKey).(string)
 	user := store.User().GetByNickName(name, db)
 	render.JSON(w, 200, user)
 }
 
 func getUserFromFirstName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	name := r.Context().Value("firstName").(string)
+	name := r.Context().Value(firstNameKey).(string)
 	user := store.User().GetByFirstName(name, db)
 	render.JSON(w, 200, user)
 }
 
 func getUserFromLastName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	name := r.Context().Value("lastName").(string)
+	name := r.Context().Value(lastNameKey).(string)
 	user := store.User().GetByLastName(name, db)
 	render.JSON(w, 200, user)
 }
 
 func getUserFromEmail(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	email := r.Context().Value("email").(string)
+	email := r.Context().Value(userEmailKey).(string)
 	user := store.User().GetByEmail(email, db)
 	render.JSON(w, 200, user)
 }
 
-func getUserFromDate(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+func getOrderedByDate(w http.ResponseWriter, r *http.Request) {
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
-	date := r.Context().Value("date").(int)
+	date := r.Context().Value(userDateKey).(int)
 	user := store.User().GetOrderedByDate(date, db)
 	render.JSON(w, 200, user)
 }
@@ -171,19 +311,19 @@ func getUserFromRole(w http.ResponseWriter, r *http.Request) {
 		Role   *models.Role
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			role := store.User().GetByRole(data.Role, db)
 			render.JSON(w, 200, role)
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -193,13 +333,13 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 		User   *models.User
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.User().Save(data.User, db)
@@ -209,7 +349,7 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -219,14 +359,14 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		User   *models.User
 		OmitID interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	user := r.Context().Value("oldUser").(models.User)
+	user := r.Context().Value(oldUserKey).(models.User)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.User().Update(&user, data.User, db)
@@ -236,16 +376,16 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value("user").(models.User)
-	store := datastores.NewStore()
+	user := r.Context().Value(oldUserKey).(models.User)
+	store := datastores.Store()
 	render := renderPackage.New()
-	message := deleteMessage{
+	message := deleteMessageModel{
 		Object: user,
 	}
 	db := dbStore.db

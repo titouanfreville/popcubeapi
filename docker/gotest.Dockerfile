@@ -1,13 +1,14 @@
 FROM registry.le-corre.eu:5000/go:base
+MAINTAINER FREVILLE Titouan titouanfreville@gmail.com
 
 ENV TERM xterm-256color
-
-MAINTAINER FREVILLE Titouan titouanfreville@gmail.com
 ENV WATCHING 0
 ENV TERM xterm-256color
 ENV GOCOPYPATH go/src/github.com/titouanfreville/popcubeapi
-
 ENV GOSU_VERSION 1.9
+
+WORKDIR /go/src
+
 RUN set -x \
     && apk add --no-cache --virtual .gosu-deps \
         dpkg \
@@ -23,7 +24,6 @@ RUN set -x \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
     && apk del .gosu-deps
-    
-COPY utils/go_test_entrypoint.sh /bin/entrypoint
 
-ENTRYPOINT entrypoint /$GOCOPYPATH $WATCHING
+
+ENTRYPOINT waitforit database:3306 -t 0 -- echo "Db is ready" && entrypoint /$GOCOPYPATH $WATCHING

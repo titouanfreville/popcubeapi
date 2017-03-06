@@ -12,14 +12,70 @@ import (
 	renderPackage "github.com/unrolled/render"
 )
 
+const (
+	oldOrganisationKey key = "oldOrganisation"
+)
+
 func initOrganisationRoute(router chi.Router) {
 	router.Route("/organisation", func(r chi.Router) {
+		// swagger:route GET /organisation Organisations getAllOrganisation
+		//
+		// Get organisations
+		//
+		// This will get all the organisations available in the organisation.
+		//
+		// 	Responses:
+		//    200: organisationObjectSuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/", getAllOrganisation)
+		// swagger:route POST /organisation Organisations newOrganisation
+		//
+		// New organisation
+		//
+		// This will create an organisation for organisation organisations library.
+		//
+		// 	Responses:
+		//    200: organisationObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/", newOrganisation)
+		// swagger:route GET /organisation/all Organisations getAllOrganisation1
+		//
+		// Get organisations
+		//
+		// This will get all the organisations available in the organisation.
+		//
+		// 	Responses:
+		//    200: organisationObjectSuccess
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Get("/all", getAllOrganisation)
+		// swagger:route POST /organisation/new Organisations newOrganisation1
+		//
+		// New organisation
+		//
+		// This will create an organisation for organisation organisations library.
+		//
+		// 	Responses:
+		//    200: organisationObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
 		r.Post("/new", newOrganisation)
 		r.Route("/:organisationID", func(r chi.Router) {
 			r.Use(organisationContext)
+			// swagger:route PUT /organisation/{organisationID} Organisations updateOrganisation
+			//
+			// Get organisation from link
+			//
+			// This will return the organisation object corresponding to provided link
+			//
+			// 	Responses:
+			//    200: organisationObjectSuccess
+			// 	  503: databaseError
+			// 	  default: genericError
 			r.Put("/update", updateOrganisation)
 		})
 	})
@@ -30,22 +86,22 @@ func organisationContext(next http.Handler) http.Handler {
 		_, err := strconv.ParseUint(chi.URLParam(r, "organisationID"), 10, 64)
 		oldOrganisation := models.Organisation{}
 		if err == nil {
-			oldOrganisation = datastores.NewStore().Organisation().Get(dbStore.db)
+			oldOrganisation = datastores.Store().Organisation().Get(dbStore.db)
 		}
-		ctx := context.WithValue(r.Context(), "oldOrganisation", oldOrganisation)
+		ctx := context.WithValue(r.Context(), oldOrganisationKey, oldOrganisation)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
 func getAllOrganisation(w http.ResponseWriter, r *http.Request) {
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Organisation().Get(db)
 		render.JSON(w, 200, result)
 	} else {
-		render.JSON(w, 500, "Connection failure : DATABASE")
+		render.JSON(w, error503.StatusCode, error503)
 	}
 }
 
@@ -54,13 +110,13 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 		Organisation *models.Organisation
 		OmitID       interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Organisation().Save(data.Organisation, db)
@@ -70,7 +126,7 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
@@ -80,14 +136,14 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 		Organisation *models.Organisation
 		OmitID       interface{} `json:"id,omitempty"`
 	}
-	store := datastores.NewStore()
+	store := datastores.Store()
 	render := renderPackage.New()
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	organisation := r.Context().Value("oldOrganisation").(models.Organisation)
+	organisation := r.Context().Value(oldOrganisationKey).(models.Organisation)
 	if err != nil {
-		render.JSON(w, 500, "Internal server error")
+		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Organisation().Update(&organisation, data.Organisation, db)
@@ -97,7 +153,7 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, err.StatusCode, err)
 			}
 		} else {
-			render.JSON(w, 500, "Connection failure : DATABASE")
+			render.JSON(w, error503.StatusCode, error503)
 		}
 	}
 }
