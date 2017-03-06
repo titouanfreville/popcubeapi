@@ -38,7 +38,7 @@ func initAvatarRoute(router chi.Router) {
 		// This will create an avatar for organisation avatars library.
 		//
 		// 	Responses:
-		//    200: avatarObjectSuccess
+		//    201: avatarObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -61,7 +61,7 @@ func initAvatarRoute(router chi.Router) {
 		// This will create an avatar for organisation avatars library.
 		//
 		// 	Responses:
-		//    200: avatarObjectSuccess
+		//    201: avatarObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -86,7 +86,7 @@ func initAvatarRoute(router chi.Router) {
 			r.Route("/:avatarName", func(r chi.Router) {
 				r.Use(avatarContext)
 				// swagger:route GET /avatar/name/{avatarName} Avatars getAvatarFromName
-				//y
+				//
 				// Get avatar from name
 				//
 				// This will return the avatar object corresponding to provided name
@@ -192,13 +192,13 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Avatar == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Avatar().Save(data.Avatar, db)
 			if err == nil {
-				render.JSON(w, 200, data.Avatar)
+				render.JSON(w, 201, data.Avatar)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -219,7 +219,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
-	if err != nil {
+	if err != nil || data.Avatar == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

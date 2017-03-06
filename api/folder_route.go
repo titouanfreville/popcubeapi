@@ -39,7 +39,7 @@ func initFolderRoute(router chi.Router) {
 		// This will create an folder for organisation folders library.
 		//
 		// 	Responses:
-		//    200: folderObjectSuccess
+		//    201: folderObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -62,7 +62,7 @@ func initFolderRoute(router chi.Router) {
 		// This will create an folder for organisation folders library.
 		//
 		// 	Responses:
-		//    200: folderObjectSuccess
+		//    201: folderObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -245,13 +245,13 @@ func newFolder(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Folder == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Folder().Save(data.Folder, db)
 			if err == nil {
-				render.JSON(w, 200, data.Folder)
+				render.JSON(w, 201, data.Folder)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -272,7 +272,7 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	folder := r.Context().Value(oldFolderKey).(models.Folder)
-	if err != nil {
+	if err != nil || data.Folder == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

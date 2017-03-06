@@ -8,11 +8,8 @@ COMPOSER="docker run --rm --name composer -v $(pwd)/docker_resources/swagger:/ap
 sudo rm -rf ./docker_resources/slate_resources
 git clone https://github.com/tripit/slate.git ./docker_resources/slate_resources
 
-# cd tmp
-# cp -r deploy.sh config.rb font-selection.json Gemfile Gemfile.lock 'source'  ../docker_resources/slate_resources
-
-# cd ..
-# rm -rf tmp
 git clone https://github.com/E96/swagger2slate.git docker_resources/swagger
 $COMPOSER
 wget http://repo1.maven.org/maven2/io/swagger/swagger-codegen-cli/2.1.6/swagger-codegen-cli-2.1.6.jar -O docker_resources/swagger/swagger-codegen-cli.jar
+
+go get -u github.com/go-swagger/go-swagger/cmd/swagger

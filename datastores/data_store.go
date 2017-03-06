@@ -17,11 +17,12 @@ The following is a list of stores described:
 package datastores
 
 import (
-	"github.com/titouanfreville/popcubeapi/models"
-	u "github.com/titouanfreville/popcubeapi/utils"
-	// Importing sql driver. They are used by gorm package and used by default from blank.
 	"log"
 
+	"github.com/titouanfreville/popcubeapi/models"
+	u "github.com/titouanfreville/popcubeapi/utils"
+
+	// Importing sql driver. They are used by gorm package and used by default from blank.
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )

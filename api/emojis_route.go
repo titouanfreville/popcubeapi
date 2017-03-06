@@ -39,7 +39,7 @@ func initEmojiRoute(router chi.Router) {
 		// This will create an emoji for organisation emojis library.
 		//
 		// 	Responses:
-		//    200: emojiObjectSuccess
+		//    201: emojiObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -62,7 +62,7 @@ func initEmojiRoute(router chi.Router) {
 		// This will create an emoji for organisation emojis library.
 		//
 		// 	Responses:
-		//    200: emojiObjectSuccess
+		//    201: emojiObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -211,13 +211,13 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Emoji == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Emoji().Save(data.Emoji, db)
 			if err == nil {
-				render.JSON(w, 200, data.Emoji)
+				render.JSON(w, 201, data.Emoji)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -238,7 +238,7 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	emoji := r.Context().Value(oldEmojiKey).(models.Emoji)
-	if err != nil {
+	if err != nil || data.Emoji == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
