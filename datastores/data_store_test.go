@@ -34,11 +34,11 @@ func TestDbStores(t *testing.T) {
 				So(resDb.Error, ShouldEqual, db.Error)
 				So(resDb.RowsAffected, ShouldEqual, db.RowsAffected)
 			})
-			Convey("Stoping the connection should destroy the Db stored.", func() {
-				resDb := ds.InitConnection("test_user", "popcube_test", "test", "database", "3306")
-				ds.CloseConnection(resDb)
-				So(resDb, ShouldResemble, &gorm.DB{})
-			})
+			// Convey("Stoping the connection should destroy the Db stored.", func() {
+			// 	resDb := ds.InitConnection("test_user", "popcube_test", "test", "database", "3306")
+			// 	ds.CloseConnection(resDb)
+			// 	So(resDb, ShouldResemble, &gorm.DB{})
+			// })
 		})
 	})
 }

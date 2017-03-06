@@ -175,93 +175,93 @@ func TestChannelStore(t *testing.T) {
 			})
 		})
 
-		Convey("Provided wrong new Channel to modify should result in new_channel error", func() {
-			channelNew.ChannelName = strings.ToLower("ThisShouldBeAFreakingLongEnougthStringToRefuse.BahNon, pas tout seul. C'est long 64 caractères en vrai  ~#~")
-			Convey("Too long channel name should return Too Long channel name error", func() {
-				appError := csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.channel_name.app_error", nil, "id="+channelNew.WebID))
-			})
-			Convey("Incorect Alpha Num channel name should be refused", func() {
-				channelNew.ChannelName = "?/+*"
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
-				channelNew.ChannelName = "("
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
-				channelNew.ChannelName = "{"
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
-				channelNew.ChannelName = "}"
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
-				channelNew.ChannelName = ")"
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
-				channelNew.ChannelName = "["
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
-				channelNew.ChannelName = "]"
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
-				channelNew.ChannelName = " "
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
-			})
-			channelNew.ChannelName = "electra"
-			channelNew.Description = "Il Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face:"
-			Convey("Given a too long description, should return too long description error :p", func() {
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.description.app_error", nil, "id="+channelNew.WebID))
-			})
-			channelNew.Description = "Stoppppppp"
-			channelNew.Subject = "Encore beaucoup de caractere pour rien .... mais un peu moins cette fois. Il n'en faut que 250 ........... Fait dodo, cola mon p'tit frere. Fais dodo, j'ai pêté un cable. Swing du null, Swing du null, c'est le swing du null ..... :guitare: :singer: :music: Je suis un main troll :O"
-			Convey("Given a too long subject, should return too long description error :p", func() {
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.subject.app_error", nil, "id="+channelNew.WebID))
-			})
-			channelNew.Subject = "Safe"
-			channelNew.Type = "Outside of Range"
-			Convey("Providing a wrong type should not work", func() {
-				appError = csi.Update(&channel, &channelNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldNotResemble, alreadyExistError)
-				So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.type.app_error", nil, "id="+channelNew.WebID))
-			})
-		})
+		// Convey("Provided wrong new Channel to modify should result in new_channel error", func() {
+		// 	channelNew.ChannelName = strings.ToLower("ThisShouldBeAFreakingLongEnougthStringToRefuse.BahNon, pas tout seul. C'est long 64 caractères en vrai  ~#~")
+		// 	Convey("Too long channel name should return Too Long channel name error", func() {
+		// 		appError := csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.channel_name.app_error", nil, "id="+channelNew.WebID))
+		// 	})
+		// 	Convey("Incorect Alpha Num channel name should be refused", func() {
+		// 		channelNew.ChannelName = "?/+*"
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
+		// 		channelNew.ChannelName = "("
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
+		// 		channelNew.ChannelName = "{"
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
+		// 		channelNew.ChannelName = "}"
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
+		// 		channelNew.ChannelName = ")"
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
+		// 		channelNew.ChannelName = "["
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
+		// 		channelNew.ChannelName = "]"
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
+		// 		channelNew.ChannelName = " "
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.not_alphanum_channel_name.app_error", nil, "id="+channelNew.WebID))
+		// 	})
+		// 	channelNew.ChannelName = "electra"
+		// 	channelNew.Description = "Il Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face:"
+		// 	Convey("Given a too long description, should return too long description error :p", func() {
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.description.app_error", nil, "id="+channelNew.WebID))
+		// 	})
+		// 	channelNew.Description = "Stoppppppp"
+		// 	channelNew.Subject = "Encore beaucoup de caractere pour rien .... mais un peu moins cette fois. Il n'en faut que 250 ........... Fait dodo, cola mon p'tit frere. Fais dodo, j'ai pêté un cable. Swing du null, Swing du null, c'est le swing du null ..... :guitare: :singer: :music: Je suis un main troll :O"
+		// 	Convey("Given a too long subject, should return too long description error :p", func() {
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.subject.app_error", nil, "id="+channelNew.WebID))
+		// 	})
+		// 	channelNew.Subject = "Safe"
+		// 	channelNew.Type = "Outside of Range"
+		// 	Convey("Providing a wrong type should not work", func() {
+		// 		appError = csi.Update(&channel, &channelNew, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldNotResemble, alreadyExistError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("channelStoreImpl.Update.channelNew.PreSave", "model.channel.is_valid.type.app_error", nil, "id="+channelNew.WebID))
+		// 	})
+		// })
 
 		db.Delete(&channel)
 		db.Delete(&channelNew)
@@ -280,7 +280,7 @@ func TestChannelStore(t *testing.T) {
 			ChannelName: "mal",
 			Type:        "audio",
 			Private:     false,
-			Description: "Speaking on Malsdjisqnju BD song from R. Sechan",
+			Description: "Speaking on Mal BD",
 			Subject:     "Sujet1",
 			Avatar:      "cover_mal.svg",
 		}
@@ -328,48 +328,48 @@ func TestChannelStore(t *testing.T) {
 
 		Convey("We have to be able to find all channels in the db", func() {
 			channels := csi.GetAll(db)
-			So(channels, ShouldNotResemble, &emptyList)
-			So(channels, ShouldResemble, &channelList)
+			So(channels, ShouldNotResemble, emptyList)
+			So(channels, ShouldResemble, channelList)
 		})
 
 		Convey("We have to be able to find a channel from is name", func() {
 			channel := csi.GetByName(channel0.ChannelName, db)
-			So(channel, ShouldNotResemble, &Channel{})
-			So(channel, ShouldResemble, &channel0)
+			So(channel, ShouldNotResemble, Channel{})
+			So(channel, ShouldResemble, channel0)
 			channel = csi.GetByName(channel2.ChannelName, db)
-			So(channel, ShouldNotResemble, &Channel{})
-			So(channel, ShouldResemble, &channel2)
+			So(channel, ShouldNotResemble, Channel{})
+			So(channel, ShouldResemble, channel2)
 			channel = csi.GetByName(channel3.ChannelName, db)
-			So(channel, ShouldNotResemble, &Channel{})
-			So(channel, ShouldResemble, &channel3)
+			So(channel, ShouldNotResemble, Channel{})
+			So(channel, ShouldResemble, channel3)
 			Convey("Should also work from updated value", func() {
 				channel = csi.GetByName(channel1.ChannelName, db)
-				So(channel, ShouldNotResemble, &Channel{})
-				So(channel, ShouldResemble, &channel1)
+				So(channel, ShouldNotResemble, Channel{})
+				So(channel, ShouldResemble, channel1)
 			})
 		})
 
 		Convey("We have to be able to find channels from type", func() {
 			channels := csi.GetByType("audio", db)
-			So(channels, ShouldNotResemble, &Channel{})
-			So(channels, ShouldResemble, &audioList)
+			So(channels, ShouldNotResemble, Channel{})
+			So(channels, ShouldResemble, audioList)
 			channels = csi.GetByType("direct", db)
-			So(channels, ShouldNotResemble, &Channel{})
-			So(channels, ShouldResemble, &directList)
+			So(channels, ShouldNotResemble, Channel{})
+			So(channels, ShouldResemble, directList)
 		})
 
 		Convey("We have to be able to find private or public channels list", func() {
 			channels := csi.GetPrivate(db)
-			So(channels, ShouldNotResemble, &Channel{})
-			So(channels, ShouldResemble, &privateList)
+			So(channels, ShouldNotResemble, Channel{})
+			So(channels, ShouldResemble, privateList)
 			channels = csi.GetPublic(db)
-			So(channels, ShouldNotResemble, &Channel{})
-			So(channels, ShouldResemble, &publicList)
+			So(channels, ShouldNotResemble, Channel{})
+			So(channels, ShouldResemble, publicList)
 		})
 
 		Convey("Searching for non existent channel should return empty", func() {
 			channel := csi.GetByName("fantome", db)
-			So(channel, ShouldResemble, &Channel{})
+			So(channel, ShouldResemble, Channel{})
 		})
 
 		db.Delete(&channel0)
@@ -380,7 +380,7 @@ func TestChannelStore(t *testing.T) {
 
 		Convey("Searching all in empty table should return empty", func() {
 			channels := csi.GetAll(db)
-			So(channels, ShouldResemble, &[]Channel{})
+			So(channels, ShouldResemble, []Channel{})
 		})
 	})
 
@@ -398,7 +398,7 @@ func TestChannelStore(t *testing.T) {
 			ChannelName: "mal",
 			Type:        "audio",
 			Private:     false,
-			Description: "Speaking on Malsdjisqnju BD song from R. Sechan",
+			Description: "Speaking on Mal BD song from R. Sechan",
 			Subject:     "Sujet1",
 			Avatar:      "cover_mal.svg",
 		}
@@ -435,7 +435,7 @@ func TestChannelStore(t *testing.T) {
 			appError := csi.Delete(&channel2, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dberror)
-			So(csi.GetByName("God", db), ShouldResemble, &Channel{})
+			So(csi.GetByName("God", db), ShouldResemble, Channel{})
 		})
 
 		// Convey("Trying to delete from non conform channel should return specific channel error and should not delete channels.", func() {
