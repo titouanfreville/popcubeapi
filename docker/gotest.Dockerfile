@@ -7,6 +7,8 @@ ENV TERM xterm-256color
 ENV GOCOPYPATH go/src/github.com/titouanfreville/popcubeapi
 ENV GOSU_VERSION 1.9
 
+COPY scripts/wait-for-it.sh /bin/waitforit
+
 WORKDIR /go/src
 
 RUN set -x \
