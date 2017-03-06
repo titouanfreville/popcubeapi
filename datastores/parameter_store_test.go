@@ -40,26 +40,15 @@ func TestParameterStore(t *testing.T) {
 			})
 		})
 		Convey("Given an incorrect parameter.", func() {
-			empty := Parameter{}
-			Convey("Empty parameter should return first error from is valid error", func() {
-				appError := psi.Save(&empty, db)
-				So(appError, ShouldResemble, u.NewLocAppError("parameterStoreImpl.Save.parameter.PreSave", "model.parameter.is_valid.parameter_local.app_error", nil, ""))
-			})
-			parameter.Local = "en_ENG"
+			parameter.Local = "en_ENGA"
 			Convey("Given empty local or too long local should return Local error", func() {
 				appError := psi.Save(&parameter, db)
-				So(appError, ShouldResemble, u.NewLocAppError("parameterStoreImpl.Save.parameter.PreSave", "model.parameter.is_valid.parameter_local.app_error", nil, ""))
-				parameter.Local = ""
-				appError = psi.Save(&parameter, db)
 				So(appError, ShouldResemble, u.NewLocAppError("parameterStoreImpl.Save.parameter.PreSave", "model.parameter.is_valid.parameter_local.app_error", nil, ""))
 			})
 			parameter.Local = "en_EN"
 			parameter.TimeZone = "UTF+134"
 			Convey("Given empty time zone or too long time zone should return Time Zone error", func() {
 				appError := psi.Save(&parameter, db)
-				So(appError, ShouldResemble, u.NewLocAppError("parameterStoreImpl.Save.parameter.PreSave", "model.parameter.is_valid.parameter_timezone.app_error", nil, ""))
-				parameter.TimeZone = ""
-				appError = psi.Save(&parameter, db)
 				So(appError, ShouldResemble, u.NewLocAppError("parameterStoreImpl.Save.parameter.PreSave", "model.parameter.is_valid.parameter_timezone.app_error", nil, ""))
 			})
 			parameter.TimeZone = "UTF+12"

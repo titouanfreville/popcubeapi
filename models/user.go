@@ -97,7 +97,7 @@ type User struct {
 	FirstName string `gorm:"column:firstName;" json:"first_name, omitempty"`
 	// User Lastname
 	LastName       string `gorm:"column:lastName;" json:"last_name, omitempty"`
-	LastActivityAt int64  `db:"-" json:"last_activity_at,omitempty"`
+	LastActivityAt int64  `gorm:"-" db:"-" json:"last_activity_at, omitempty"`
 }
 
 // IsValid valwebIDates the user and returns an error if it isn't configured
