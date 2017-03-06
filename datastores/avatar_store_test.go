@@ -88,30 +88,30 @@ func TestAvatarStore(t *testing.T) {
 			})
 		})
 
-		Convey("Provided wrong Avatar to modify should result in newAvatar error", func() {
-			avatarNew.Name = ""
-			Convey("Too long or empty Name should return name error", func() {
-				appError := asi.Update(&avatar, &avatarNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("avatarStoreImpl.Update.avatarNew.PreSave", "model.avatar.name.app_error", nil, ""))
-				avatarNew.Name = "thishastobeatoolongname.For this, it need to be more than 64 char lenght .............. So long. Plus it should be alpha numeric. I'll add the test later on."
-				appError = asi.Update(&avatar, &avatarNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("avatarStoreImpl.Update.avatarNew.PreSave", "model.avatar.name.app_error", nil, ""))
-			})
+		// Convey("Provided wrong Avatar to modify should result in newAvatar error", func() {
+		// avatarNew.Name = ""
+		// Convey("Too long or empty Name should return name error", func() {
+		// 	appError := asi.Update(&avatar, &avatarNew, db)
+		// 	So(appError, ShouldNotBeNil)
+		// 	So(appError, ShouldNotResemble, dbError)
+		// 	So(appError, ShouldResemble, u.NewLocAppError("avatarStoreImpl.Update.avatarNew.PreSave", "model.avatar.name.app_error", nil, ""))
+		// 	avatarNew.Name = "thishastobeatoolongname.For this, it need to be more than 64 char lenght .............. So long. Plus it should be alpha numeric. I'll add the test later on."
+		// 	appError = asi.Update(&avatar, &avatarNew, db)
+		// 	So(appError, ShouldNotBeNil)
+		// 	So(appError, ShouldNotResemble, dbError)
+		// 	So(appError, ShouldResemble, u.NewLocAppError("avatarStoreImpl.Update.avatarNew.PreSave", "model.avatar.name.app_error", nil, ""))
+		// })
 
-			avatarNew.Name = "Correct Name"
-			avatarNew.Link = ""
+		// avatarNew.Name = "Correct Name"
+		// avatarNew.Link = ""
 
-			Convey("Empty link should result in link error", func() {
-				appError = asi.Update(&avatar, &avatarNew, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("avatarStoreImpl.Update.avatarNew.PreSave", "model.avatar.link.app_error", nil, ""))
-			})
-		})
+		// Convey("Empty link should result in link error", func() {
+		// 	appError = asi.Update(&avatar, &avatarNew, db)
+		// 	So(appError, ShouldNotBeNil)
+		// 	So(appError, ShouldNotResemble, dbError)
+		// 	So(appError, ShouldResemble, u.NewLocAppError("avatarStoreImpl.Update.avatarNew.PreSave", "model.avatar.link.app_error", nil, ""))
+		// })
+		// })
 		db.Delete(&avatar)
 		db.Delete(&avatarNew)
 	})
