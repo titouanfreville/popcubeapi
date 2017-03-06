@@ -1,0 +1,14 @@
+version: "3"
+services:
+  back:
+    image: registry.le-corre.eu:5000/popcubeapi:alpha
+    env_file: .env.preprod.back
+    network_mode: "bridge"
+    links:
+      - database
+    depends_on:
+      - database    
+  database:
+    image: registry.le-corre.eu:5000/popcubedb:alpha
+    env_file: .env.preprod
+    network_mode: "bridge"
