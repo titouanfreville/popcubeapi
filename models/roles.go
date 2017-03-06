@@ -23,27 +23,27 @@ type Role struct {
 	// User can use private channel
 	//
 	// required: true
-	CanUsePrivate bool `gorm:"column:canUsePrivate;not null" json:"can_use_private,omitempty"`
+	CanUsePrivate bool `gorm:"column:canUsePrivate;not null" json:"can_use_private"`
 	// User can moderate channels
 	//
 	// required: true
-	CanModerate bool `gorm:"column:canModerate;not null" json:"can_moderate,omitempty"`
+	CanModerate bool `gorm:"column:canModerate;not null" json:"can_moderate"`
 	// User can archive channels
 	//
 	// required: true
-	CanArchive bool `gorm:"column:canArchive;not null" json:"can_archive,omitempty"`
+	CanArchive bool `gorm:"column:canArchive;not null" json:"can_archive"`
 	// User can invite others to private channel or organisation
 	//
 	// required: true
-	CanInvite bool `gorm:"column:canInvite;not null" json:"can_invite,omitempty"`
+	CanInvite bool `gorm:"column:canInvite;not null" json:"can_invite"`
 	// User can manage organisation/channel parameters and data
 	//
 	// required: true
-	CanManage bool `gorm:"column:canManage;not null" json:"can_manage,omitempty"`
+	CanManage bool `gorm:"column:canManage;not null" json:"can_manage"`
 	// User can manage other organisation/channel user
 	//
 	// required: true
-	CanManageUser bool `gorm:"column:canManageUser;not null" json:"can_manage_user,omitempty"`
+	CanManageUser bool `gorm:"column:canManageUser;not null" json:"can_manage_user"`
 }
 
 var (

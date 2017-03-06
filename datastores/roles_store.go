@@ -1,8 +1,6 @@
 package datastores
 
 import (
-	"strings"
-
 	"github.com/jinzhu/gorm"
 	"github.com/titouanfreville/popcubeapi/models"
 	u "github.com/titouanfreville/popcubeapi/utils"
@@ -46,21 +44,18 @@ func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, db *gor
 	// 	transaction.Rollback()
 	// 	return u.NewLocAppError("roleStoreImpl.Update.roleNew.PreSave", appError.ID, nil, appError.DetailedError)
 	// }
-	transitionRole := models.Role{
-		CanUsePrivate: newRole.CanUsePrivate,
-		CanModerate:   newRole.CanModerate,
-		CanArchive:    newRole.CanArchive,
-		CanInvite:     newRole.CanInvite,
-		CanManage:     newRole.CanManage,
-		CanManageUser: newRole.CanManageUser,
-	}
-	json := transitionRole.ToJSON()
-	rights := u.StringInterfaceFromJSON(strings.NewReader(json))
 	if err := transaction.Model(&role).Updates(&newRole).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("roleStoreImpl.Update", "update.transaction.updates.encounterError :"+err.Error(), nil, "")
 	}
-	if err := transaction.Model(&role).Updates(rights).Error; err != nil {
+	if err := transaction.Model(&role).Updates(map[string]interface{}{
+		"canUsePrivate": newRole.CanUsePrivate,
+		"canModerate":   newRole.CanModerate,
+		"canArchive":    newRole.CanArchive,
+		"canInvite":     newRole.CanInvite,
+		"canManage":     newRole.CanManage,
+		"CanManageUser": newRole.CanManageUser,
+	}).Error; err != nil {
 		transaction.Rollback()
 		return u.NewLocAppError("roleStoreImpl.Update", "update.transaction.updates.encounterError :"+err.Error(), nil, "")
 	}
