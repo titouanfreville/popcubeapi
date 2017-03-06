@@ -36,7 +36,7 @@ func initOrganisationRoute(router chi.Router) {
 		// This will create an organisation for organisation organisations library.
 		//
 		// 	Responses:
-		//    200: organisationObjectSuccess
+		//    201: organisationObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -59,7 +59,7 @@ func initOrganisationRoute(router chi.Router) {
 		// This will create an organisation for organisation organisations library.
 		//
 		// 	Responses:
-		//    200: organisationObjectSuccess
+		//    201: organisationObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -115,13 +115,13 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Organisation == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Organisation().Save(data.Organisation, db)
 			if err == nil {
-				render.JSON(w, 200, data.Organisation)
+				render.JSON(w, 201, data.Organisation)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -142,7 +142,7 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	organisation := r.Context().Value(oldOrganisationKey).(models.Organisation)
-	if err != nil {
+	if err != nil || data.Organisation == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

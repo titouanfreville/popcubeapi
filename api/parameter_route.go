@@ -36,7 +36,7 @@ func initParameterRoute(router chi.Router) {
 		// This will create an parameter for organisation parameters library.
 		//
 		// 	Responses:
-		//    200: parameterObjectSuccess
+		//    201: parameterObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -59,7 +59,7 @@ func initParameterRoute(router chi.Router) {
 		// This will create an parameter for organisation parameters library.
 		//
 		// 	Responses:
-		//    200: parameterObjectSuccess
+		//    201: parameterObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -116,7 +116,7 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Parameter == nil {
 		render.JSON(w, 500, err)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -143,7 +143,7 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	parameter := r.Context().Value(oldParameterKey).(models.Parameter)
-	if err != nil {
+	if err != nil || data.Parameter == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

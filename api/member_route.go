@@ -36,7 +36,7 @@ func initMemberRoute(router chi.Router) {
 		// This will create an member for organisation members library.
 		//
 		// 	Responses:
-		//    200: memberObjectSuccess
+		//    201: memberObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -95,7 +95,7 @@ func initMemberRoute(router chi.Router) {
 		// This will create an member for organisation members library.
 		//
 		// 	Responses:
-		//    200: memberObjectSuccess
+		//    201: memberObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -164,7 +164,7 @@ func getMemberFromUser(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -186,7 +186,7 @@ func getMemberFromChannel(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Channel == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -208,7 +208,7 @@ func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -230,13 +230,13 @@ func newMember(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Member == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Member().Save(data.Member, db)
 			if err == nil {
-				render.JSON(w, 200, data.Member)
+				render.JSON(w, 201, data.Member)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -257,7 +257,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	member := r.Context().Value(oldMemberKey).(models.Member)
-	if err != nil {
+	if err != nil || data.Member == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

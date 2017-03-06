@@ -8,8 +8,8 @@ info:
   contact:
     name: "Titouan Freville"
     email: "titouanfreville@gmail.com"
-host: "api.popcube"
-basePath: "/alpha"
+host: "api-alpha.popcube.xyz"
+basePath: "/"
 schemes:
 - "http"
 - "https"
@@ -73,7 +73,7 @@ paths:
           $ref: "#/definitions/Avatar"
         x-go-name: "Avatar"
       responses:
-        200:
+        201:
           description: "avatarObjectSuccess list of avatars"
           schema:
             $ref: "#/definitions/Avatar"
@@ -187,7 +187,7 @@ paths:
           $ref: "#/definitions/Avatar"
         x-go-name: "Avatar"
       responses:
-        200:
+        201:
           description: "avatarObjectSuccess list of avatars"
           schema:
             $ref: "#/definitions/Avatar"
@@ -371,7 +371,7 @@ paths:
           $ref: "#/definitions/Channel"
         x-go-name: "Channel"
       responses:
-        200:
+        201:
           description: "channelObjectSuccess list of channels"
           schema:
             $ref: "#/definitions/Channel"
@@ -576,7 +576,7 @@ paths:
           $ref: "#/definitions/Emoji"
         x-go-name: "Emoji"
       responses:
-        200:
+        201:
           description: "emojiObjectSuccess list of emojis"
           schema:
             $ref: "#/definitions/Emoji"
@@ -810,7 +810,7 @@ paths:
           $ref: "#/definitions/Folder"
         x-go-name: "Folder"
       responses:
-        200:
+        201:
           description: "folderObjectSuccess list of folders"
           schema:
             $ref: "#/definitions/Folder"
@@ -960,7 +960,7 @@ paths:
           $ref: "#/definitions/Folder"
         x-go-name: "Folder"
       responses:
-        200:
+        201:
           description: "folderObjectSuccess list of folders"
           schema:
             $ref: "#/definitions/Folder"
@@ -1114,7 +1114,7 @@ paths:
           $ref: "#/definitions/Member"
         x-go-name: "Member"
       responses:
-        200:
+        201:
           description: "memberObjectSuccess list of members"
           schema:
             $ref: "#/definitions/Member"
@@ -1172,7 +1172,7 @@ paths:
           $ref: "#/definitions/Member"
         x-go-name: "Member"
       responses:
-        200:
+        201:
           description: "memberObjectSuccess list of members"
           schema:
             $ref: "#/definitions/Member"
@@ -1263,7 +1263,7 @@ paths:
           $ref: "#/definitions/Message"
         x-go-name: "Message"
       responses:
-        200:
+        201:
           description: "messageObjectSuccess list of messages"
           schema:
             $ref: "#/definitions/Message"
@@ -1351,7 +1351,7 @@ paths:
           $ref: "#/definitions/Message"
         x-go-name: "Message"
       responses:
-        200:
+        201:
           description: "messageObjectSuccess list of messages"
           schema:
             $ref: "#/definitions/Message"
@@ -1448,7 +1448,7 @@ paths:
           $ref: "#/definitions/Organisation"
         x-go-name: "Organisation"
       responses:
-        200:
+        201:
           description: "organisationObjectSuccess list of organisations"
           schema:
             $ref: "#/definitions/Organisation"
@@ -1505,7 +1505,7 @@ paths:
           $ref: "#/definitions/Organisation"
         x-go-name: "Organisation"
       responses:
-        200:
+        201:
           description: "organisationObjectSuccess list of organisations"
           schema:
             $ref: "#/definitions/Organisation"
@@ -1607,7 +1607,7 @@ paths:
           $ref: "#/definitions/Parameter"
         x-go-name: "Parameter"
       responses:
-        200:
+        201:
           description: "parameterObjectSuccess list of parameters"
           schema:
             $ref: "#/definitions/Parameter"
@@ -1663,7 +1663,7 @@ paths:
           $ref: "#/definitions/Parameter"
         x-go-name: "Parameter"
       responses:
-        200:
+        201:
           description: "parameterObjectSuccess list of parameters"
           schema:
             $ref: "#/definitions/Parameter"
@@ -1741,7 +1741,7 @@ paths:
       operationId: "getAllRole"
       parameters: []
       responses:
-        200:
+        201:
           description: "roleSlice Array of roles"
           schema:
             type: "array"
@@ -1824,7 +1824,7 @@ paths:
           $ref: "#/definitions/Role"
         x-go-name: "Role"
       responses:
-        200:
+        201:
           description: "roleObjectSuccess list of roles"
           schema:
             $ref: "#/definitions/Role"
@@ -1986,7 +1986,7 @@ paths:
           $ref: "#/definitions/User"
         x-go-name: "User"
       responses:
-        200:
+        201:
           description: "userObjectSuccess list of users"
           schema:
             $ref: "#/definitions/User"
@@ -2124,7 +2124,7 @@ paths:
           $ref: "#/definitions/User"
         x-go-name: "User"
       responses:
-        200:
+        201:
           description: "userObjectSuccess list of users"
           schema:
             $ref: "#/definitions/User"

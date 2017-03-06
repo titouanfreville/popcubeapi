@@ -37,7 +37,7 @@ func initMessageRoute(router chi.Router) {
 		// This will create an message for organisation messages library.
 		//
 		// 	Responses:
-		//    200: messageObjectSuccess
+		//    201: messageObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -60,7 +60,7 @@ func initMessageRoute(router chi.Router) {
 		// This will create an message for organisation messages library.
 		//
 		// 	Responses:
-		//    200: messageObjectSuccess
+		//    201: messageObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -180,7 +180,7 @@ func getMessageFromUser(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -202,7 +202,7 @@ func getMessageFromChannel(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Channel == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -224,13 +224,13 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Message == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Message().Save(data.Message, db)
 			if err == nil {
-				render.JSON(w, 200, data.Message)
+				render.JSON(w, 201, data.Message)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -251,7 +251,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	message := r.Context().Value(oldMessageKey).(models.Message)
-	if err != nil {
+	if err != nil || data.Message == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

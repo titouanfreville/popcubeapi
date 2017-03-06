@@ -38,7 +38,7 @@ func initChannelRoute(router chi.Router) {
 		// This will create an channel for organisation channels library.
 		//
 		// 	Responses:
-		//    200: channelObjectSuccess
+		//    201: channelObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -61,7 +61,7 @@ func initChannelRoute(router chi.Router) {
 		// This will create an channel for organisation channels library.
 		//
 		// 	Responses:
-		//    200: channelObjectSuccess
+		//    201: channelObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -229,13 +229,13 @@ func newChannel(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Channel == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Channel().Save(data.Channel, db)
 			if err == nil {
-				render.JSON(w, 200, data.Channel)
+				render.JSON(w, 201, data.Channel)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -256,7 +256,7 @@ func updateChannel(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	channel := r.Context().Value(oldChannelKey).(models.Channel)
-	if err != nil {
+	if err != nil || data.Channel == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

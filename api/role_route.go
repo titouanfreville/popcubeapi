@@ -37,7 +37,7 @@ func initRoleRoute(router chi.Router) {
 		// This will get all the roles available in the organisation.
 		//
 		// 	Responses:
-		//    200: roleArraySuccess
+		//    201: roleArraySuccess
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newRole)
@@ -59,7 +59,7 @@ func initRoleRoute(router chi.Router) {
 		// This will create an role for organisation roles library.
 		//
 		// 	Responses:
-		//    200: roleObjectSuccess
+		//    201: roleObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -166,7 +166,7 @@ func getRoleFromRight(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -188,13 +188,13 @@ func newRole(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Role().Save(data.Role, db)
 			if err == nil {
-				render.JSON(w, 200, data.Role)
+				render.JSON(w, 201, data.Role)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -215,7 +215,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	role := r.Context().Value(oldRoleKey).(models.Role)
-	if err != nil {
+	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

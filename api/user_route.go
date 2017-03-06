@@ -42,7 +42,7 @@ func initUserRoute(router chi.Router) {
 		// This will create an user for organisation users library.
 		//
 		// 	Responses:
-		//    200: userObjectSuccess
+		//    201: userObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -65,7 +65,7 @@ func initUserRoute(router chi.Router) {
 		// This will create an user for organisation users library.
 		//
 		// 	Responses:
-		//    200: userObjectSuccess
+		//    201: userObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -316,7 +316,7 @@ func getUserFromRole(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -338,13 +338,13 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.User().Save(data.User, db)
 			if err == nil {
-				render.JSON(w, 200, data.User)
+				render.JSON(w, 201, data.User)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -365,7 +365,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	user := r.Context().Value(oldUserKey).(models.User)
-	if err != nil {
+	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
