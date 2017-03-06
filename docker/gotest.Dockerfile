@@ -27,5 +27,5 @@ RUN set -x \
     && gosu nobody true \
     && apk del .gosu-deps
 
-
-ENTRYPOINT waitforit database:3306 -t 0 -- echo "Db is ready" && entrypoint /$GOCOPYPATH $WATCHING
+# waitforit database:3306 -t 0 -- echo "Db is ready" && 
+ENTRYPOINT entrypoint /$GOCOPYPATH $WATCHING
