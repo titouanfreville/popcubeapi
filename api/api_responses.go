@@ -21,9 +21,21 @@ type generalOk struct {
 // swagger:response loginOk
 type loginOk struct {
 	// in:body
-	User models.User
+	User models.User `json:"user,omitempty"`
 	// in:body
-	Token string
+	Token string `json:"token,omitempty"`
+}
+
+// inviteOk when invite correctly proceed, return the invite token information and the JWT token.
+//
+// swagger:response loginOk
+type inviteOk struct {
+	// in:body
+	Email string `json:"email,omitempty"`
+	// in:body
+	Organisation string `json:"organisation,omitempty"`
+	// in:body
+	Token string `json:"token,omitempty"`
 }
 
 // ---------------------------------------------------

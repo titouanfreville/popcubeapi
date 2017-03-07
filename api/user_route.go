@@ -71,6 +71,18 @@ func initUserRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/new", newUser)
+		// swagger:route POST /user/invite Users inviteUser
+		//
+		// Invite user
+		//
+		// This will create an invitation token for a user.
+		//
+		// 	Responses:
+		//    201: userObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Post("/invite", inviteUser)
 		// swagger:route GET /user/all Users getDeletedUser
 		//
 		// Get deleted user
@@ -216,7 +228,7 @@ func userContext(next http.Handler) http.Handler {
 		date, _ := strconv.ParseInt(chi.URLParam(r, "date"), 10, 64)
 		oldUser := models.User{}
 		ctx := context.WithValue(r.Context(), userNameKey, name)
-		ctx = context.WithValue(r.Context(), nickNameKey, nickName)
+		ctx = context.WithValue(ctx, nickNameKey, nickName)
 		ctx = context.WithValue(ctx, firstNameKey, firstName)
 		ctx = context.WithValue(ctx, lastNameKey, lastName)
 		ctx = context.WithValue(ctx, userEmailKey, email)
@@ -348,6 +360,37 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 				render.JSON(w, 201, data.User)
 			} else {
 				render.JSON(w, err.StatusCode, err)
+			}
+		} else {
+			render.JSON(w, error503.StatusCode, error503)
+		}
+	}
+}
+
+func inviteUser(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		Email   string      `json:"email"`
+		Message string      `json:"message"`
+		OmitID  interface{} `json:"id,omitempty"`
+	}
+	store := datastores.Store()
+	db := dbStore.db
+	organisation := store.Organisation().Get(db)
+	response := inviteOk{}
+	request := r.Body
+	err := chiRender.Bind(request, &data)
+	if err != nil || data.Email == "" {
+		render.JSON(w, error422.StatusCode, error422)
+	} else {
+		if err := db.DB().Ping(); err == nil {
+			var terr error
+			response.Email = data.Email
+			response.Organisation = organisation.OrganisationName
+			response.Token, terr = createInviteToken(data.Email, organisation.OrganisationName)
+			if terr == nil {
+				render.JSON(w, 201, response)
+			} else {
+				render.JSON(w, 422, "Could not generate token")
 			}
 		} else {
 			render.JSON(w, error503.StatusCode, error503)

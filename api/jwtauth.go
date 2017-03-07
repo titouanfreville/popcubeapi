@@ -12,6 +12,7 @@ import (
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/titouanfreville/popcubeapi/datastores"
 )
 
 var (
@@ -202,10 +203,7 @@ func (ja *JwtAuth) IsExpired(t *jwt.Token) bool {
 	return false
 }
 
-// Authenticator is a default authentication middleware to enforce access following
-// the Verifier middleware. The Authenticator sends a 401 Unauthorized response for
-// all unverified tokens and passes the good ones through. It's just fine until you
-// decide to write something similar and customize your client response.
+// Authenticator validate that user has a valid user auth token before letting him access.
 func Authenticator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -223,6 +221,65 @@ func Authenticator(next http.Handler) http.Handler {
 			return
 		}
 
+		tokenType, ok := jwtToken.Claims.(jwt.MapClaims)["type"]
+
+		if !ok {
+			render.JSON(w, 401, "Token is not valid. Type is undifined")
+			return
+		}
+
+		if tokenType != "userauth" {
+			render.JSON(w, 401, "Token is not an user auth one")
+			return
+		}
+
+		// Token is authenticated, pass it through
+		next.ServeHTTP(w, r)
+	})
+}
+
+// allowUserCreationFromToken check the provided token is an invitation one
+func allowUserCreationFromToken(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		if jwtErr, ok := ctx.Value(jwtErrorKey).(error); ok {
+			if jwtErr != nil {
+				render.JSON(w, 401, jwtErr)
+				return
+			}
+		}
+
+		jwtToken, ok := ctx.Value(jwtTokenKey).(*jwt.Token)
+		if !ok || jwtToken == nil || !jwtToken.Valid {
+			render.JSON(w, 401, "token is not valid or does not exist")
+			return
+		}
+
+		tokenType, ok := jwtToken.Claims.(jwt.MapClaims)["type"]
+
+		if !ok {
+			render.JSON(w, 401, "Token is not valid. Type is undifined")
+			return
+		}
+
+		if tokenType != "invitation" {
+			render.JSON(w, 401, "Token is not an invitation one")
+			return
+		}
+
+		tokenOrganisation, ok := jwtToken.Claims.(jwt.MapClaims)["organisation"].(string)
+
+		if !ok {
+			render.JSON(w, 401, "Token is not valid. Organisation is undifined")
+			return
+		}
+		apiOrganisation := datastores.Store().Organisation().Get(dbStore.db)
+
+		if tokenOrganisation != apiOrganisation.OrganisationName {
+			render.JSON(w, 401, "Token is not valid. Organisation does not match current organsisation")
+			return
+		}
 		// Token is authenticated, pass it through
 		next.ServeHTTP(w, r)
 	})
