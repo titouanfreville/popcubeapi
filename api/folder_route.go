@@ -9,7 +9,6 @@ import (
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -21,6 +20,8 @@ const (
 
 func initFolderRoute(router chi.Router) {
 	router.Route("/folder", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(Authenticator)
 		// swagger:route GET /folder Folders getAllFolder
 		//
 		// Get folders
@@ -39,7 +40,7 @@ func initFolderRoute(router chi.Router) {
 		// This will create an folder for organisation folders library.
 		//
 		// 	Responses:
-		//    200: folderObjectSuccess
+		//    201: folderObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -62,7 +63,7 @@ func initFolderRoute(router chi.Router) {
 		// This will create an folder for organisation folders library.
 		//
 		// 	Responses:
-		//    200: folderObjectSuccess
+		//    201: folderObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -176,7 +177,7 @@ func folderContext(next http.Handler) http.Handler {
 
 func getAllFolder(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Folder().GetAll(db)
@@ -188,7 +189,7 @@ func getAllFolder(w http.ResponseWriter, r *http.Request) {
 
 func getFolderFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	name := r.Context().Value(folderNameKey).(string)
 	folder := store.Folder().GetByName(name, db)
@@ -197,7 +198,7 @@ func getFolderFromName(w http.ResponseWriter, r *http.Request) {
 
 func getFolderFromType(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	folderType := r.Context().Value(folderTypeKey).(string)
 	folder := store.Folder().GetByType(folderType, db)
@@ -206,7 +207,7 @@ func getFolderFromType(w http.ResponseWriter, r *http.Request) {
 
 func getFolderFromLink(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	link := r.Context().Value(folderLinkKey).(string)
 	folder := store.Folder().GetByLink(link, db)
@@ -219,7 +220,7 @@ func getFolderFromMessage(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -241,17 +242,17 @@ func newFolder(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Folder == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Folder().Save(data.Folder, db)
 			if err == nil {
-				render.JSON(w, 200, data.Folder)
+				render.JSON(w, 201, data.Folder)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -267,12 +268,12 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	folder := r.Context().Value(oldFolderKey).(models.Folder)
-	if err != nil {
+	if err != nil || data.Folder == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -291,7 +292,7 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 func deleteFolder(w http.ResponseWriter, r *http.Request) {
 	folder := r.Context().Value("folder").(models.Folder)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	message := deleteMessageModel{
 		Object: folder,
 	}

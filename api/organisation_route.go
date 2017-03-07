@@ -9,7 +9,6 @@ import (
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -18,6 +17,8 @@ const (
 
 func initOrganisationRoute(router chi.Router) {
 	router.Route("/organisation", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(Authenticator)
 		// swagger:route GET /organisation Organisations getAllOrganisation
 		//
 		// Get organisations
@@ -36,7 +37,7 @@ func initOrganisationRoute(router chi.Router) {
 		// This will create an organisation for organisation organisations library.
 		//
 		// 	Responses:
-		//    200: organisationObjectSuccess
+		//    201: organisationObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -59,7 +60,7 @@ func initOrganisationRoute(router chi.Router) {
 		// This will create an organisation for organisation organisations library.
 		//
 		// 	Responses:
-		//    200: organisationObjectSuccess
+		//    201: organisationObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -95,7 +96,7 @@ func organisationContext(next http.Handler) http.Handler {
 
 func getAllOrganisation(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Organisation().Get(db)
@@ -111,17 +112,17 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 		OmitID       interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Organisation == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Organisation().Save(data.Organisation, db)
 			if err == nil {
-				render.JSON(w, 200, data.Organisation)
+				render.JSON(w, 201, data.Organisation)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -137,12 +138,12 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 		OmitID       interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	organisation := r.Context().Value(oldOrganisationKey).(models.Organisation)
-	if err != nil {
+	if err != nil || data.Organisation == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

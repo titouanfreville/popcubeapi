@@ -9,7 +9,6 @@ import (
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -19,6 +18,8 @@ const (
 
 func initRoleRoute(router chi.Router) {
 	router.Route("/role", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(Authenticator)
 		// swagger:route GET /role Roles getAllRole
 		//
 		// Get roles
@@ -37,7 +38,7 @@ func initRoleRoute(router chi.Router) {
 		// This will get all the roles available in the organisation.
 		//
 		// 	Responses:
-		//    200: roleArraySuccess
+		//    201: roleArraySuccess
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newRole)
@@ -59,7 +60,7 @@ func initRoleRoute(router chi.Router) {
 		// This will create an role for organisation roles library.
 		//
 		// 	Responses:
-		//    200: roleObjectSuccess
+		//    201: roleObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -137,7 +138,7 @@ func roleContext(next http.Handler) http.Handler {
 
 func getAllRole(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Role().GetAll(db)
@@ -149,7 +150,7 @@ func getAllRole(w http.ResponseWriter, r *http.Request) {
 
 func getRoleFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	name := r.Context().Value(roleNameKey).(string)
 	role := store.Role().GetByName(name, db)
@@ -162,11 +163,11 @@ func getRoleFromRight(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -184,17 +185,17 @@ func newRole(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Role().Save(data.Role, db)
 			if err == nil {
-				render.JSON(w, 200, data.Role)
+				render.JSON(w, 201, data.Role)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -210,12 +211,12 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	role := r.Context().Value(oldRoleKey).(models.Role)
-	if err != nil {
+	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -234,7 +235,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 func deleteRole(w http.ResponseWriter, r *http.Request) {
 	role := r.Context().Value(oldRoleKey).(models.Role)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	message := deleteMessageModel{
 		Object: role,
 	}

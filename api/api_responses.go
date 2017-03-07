@@ -16,6 +16,16 @@ type generalOk struct {
 	Message string `json:"message,omitempty"`
 }
 
+// loginOk when login correctly proceed, return the user and an auth token.
+//
+// swagger:response loginOk
+type loginOk struct {
+	// in:body
+	User models.User
+	// in:body
+	Token string
+}
+
 // ---------------------------------------------------
 // Errors --------------------------------------------
 
@@ -39,6 +49,14 @@ type wrongEntityError struct {
 //
 // swagger:response databaseError
 type databaseError struct {
+	// in:body
+	Error utils.AppError
+}
+
+// incorrectIds return error login message
+//
+// swagger:response incorrectIds
+type incorrectIds struct {
 	// in:body
 	Error utils.AppError
 }

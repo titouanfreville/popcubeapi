@@ -7,6 +7,8 @@ ENV TERM xterm-256color
 ENV GOCOPYPATH go/src/github.com/titouanfreville/popcubeapi
 ENV GOSU_VERSION 1.9
 
+COPY scripts/wait-for-it.sh /bin/waitforit
+
 WORKDIR /go/src
 
 RUN set -x \
@@ -25,5 +27,5 @@ RUN set -x \
     && gosu nobody true \
     && apk del .gosu-deps
 
-
-ENTRYPOINT waitforit database:3306 -t 0 -- echo "Db is ready" && entrypoint /$GOCOPYPATH $WATCHING
+# waitforit database:3306 -t 0 -- echo "Db is ready" && 
+ENTRYPOINT entrypoint /$GOCOPYPATH $WATCHING

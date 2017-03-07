@@ -9,7 +9,6 @@ import (
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -19,6 +18,8 @@ const (
 
 func initMessageRoute(router chi.Router) {
 	router.Route("/message", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(Authenticator)
 		// swagger:route GET /message Messages getAllMessage
 		//
 		// Get messages
@@ -37,7 +38,7 @@ func initMessageRoute(router chi.Router) {
 		// This will create an message for organisation messages library.
 		//
 		// 	Responses:
-		//    200: messageObjectSuccess
+		//    201: messageObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -60,7 +61,7 @@ func initMessageRoute(router chi.Router) {
 		// This will create an message for organisation messages library.
 		//
 		// 	Responses:
-		//    200: messageObjectSuccess
+		//    201: messageObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -151,7 +152,7 @@ func messageContext(next http.Handler) http.Handler {
 
 func getAllMessage(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Message().GetAll(db)
@@ -163,7 +164,7 @@ func getAllMessage(w http.ResponseWriter, r *http.Request) {
 
 func getMessageFromDate(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	date := r.Context().Value(messageDateKey).(int)
 	message := store.Message().GetByDate(date, db)
@@ -176,11 +177,11 @@ func getMessageFromUser(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -198,11 +199,11 @@ func getMessageFromChannel(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Channel == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -220,17 +221,17 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Message == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Message().Save(data.Message, db)
 			if err == nil {
-				render.JSON(w, 200, data.Message)
+				render.JSON(w, 201, data.Message)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -246,12 +247,12 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	message := r.Context().Value(oldMessageKey).(models.Message)
-	if err != nil {
+	if err != nil || data.Message == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -270,7 +271,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 func deleteMessageFunction(w http.ResponseWriter, r *http.Request) {
 	message := r.Context().Value(oldMessageKey).(models.Message)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	dmessage := deleteMessageModel{
 		Object: message,
 	}

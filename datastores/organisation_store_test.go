@@ -165,92 +165,92 @@ func TestOrganisationStore(t *testing.T) {
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dbError)
 		})
-		Convey("Providing an incorrect user as new should result in errors", func() {
-			empty := Organisation{}
-			newOrganisation.OrganisationName = ""
-			Convey("Empty organisation or no Organisation Name organisation should return No name error", func() {
-				appError := osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.organisation_name.app_error", nil,
-					"id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-				appError = osi.Update(&organisation, &empty, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.organisation_name.app_error", nil,
-					"id="+strconv.FormatUint(empty.IDOrganisation, 10)))
-			})
-			newOrganisation.OrganisationName = strings.ToLower("ThisShouldBeAFreakingLongEnougthStringToRefuse.BahNon, pas tout seul. C'est long 64 caractères en vrai  ~#~")
-			Convey("Too long organisation name should return Too Long organisation name error", func() {
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.organisation_name.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-			})
-			Convey("Incorect Alpha Num organisation name should be refused ", func() {
-				newOrganisation.OrganisationName = "?/+*"
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-				newOrganisation.OrganisationName = "("
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-				newOrganisation.OrganisationName = "{"
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-				newOrganisation.OrganisationName = "}"
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-				newOrganisation.OrganisationName = ")"
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-				newOrganisation.OrganisationName = "["
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-				newOrganisation.OrganisationName = "]"
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-				newOrganisation.OrganisationName = " "
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-			})
-			newOrganisation.OrganisationName = "electra"
+		// Convey("Providing an incorrect user as new should result in errors", func() {
+		// 	empty := Organisation{}
+		// 	newOrganisation.OrganisationName = ""
+		// 	Convey("Empty organisation or no Organisation Name organisation should return No name error", func() {
+		// 		appError := osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.organisation_name.app_error", nil,
+		// 			"id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 		appError = osi.Update(&organisation, &empty, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.organisation_name.app_error", nil,
+		// 			"id="+strconv.FormatUint(empty.IDOrganisation, 10)))
+		// 	})
+		// 	newOrganisation.OrganisationName = strings.ToLower("ThisShouldBeAFreakingLongEnougthStringToRefuse.BahNon, pas tout seul. C'est long 64 caractères en vrai  ~#~")
+		// 	Convey("Too long organisation name should return Too Long organisation name error", func() {
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.organisation_name.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 	})
+		// 	Convey("Incorect Alpha Num organisation name should be refused ", func() {
+		// 		newOrganisation.OrganisationName = "?/+*"
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 		newOrganisation.OrganisationName = "("
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 		newOrganisation.OrganisationName = "{"
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 		newOrganisation.OrganisationName = "}"
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 		newOrganisation.OrganisationName = ")"
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 		newOrganisation.OrganisationName = "["
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 		newOrganisation.OrganisationName = "]"
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 		newOrganisation.OrganisationName = " "
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.not_alphanum_organisation_name.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 	})
+		// 	newOrganisation.OrganisationName = "electra"
 
-			newOrganisation.Description = "Il Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face:"
-			Convey("Given a too long description, should return too long description error :p", func() {
-				appError = osi.Update(&organisation, &newOrganisation, db)
-				So(appError, ShouldNotBeNil)
-				So(appError, ShouldNotResemble, dbError)
-				So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.description.app_error",
-					nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
-			})
-			newOrganisation.Description = "Stoppppppp"
+		// 	newOrganisation.Description = "Il Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face: Alors, la, c'était 250 en fait .... Du coup, on va multiplier par 4 un ? OK ? l Me faut beaucoup trop de character  ..... 1024, c'est grand. Très grand. Comme l'infini. C'est long. Surtout à la fin. Et puis même après tout ça, je suis pas sur que ce soit assez .... Compteur ??? Vous êtes la ? :p :'( :docker: :troll-face:"
+		// 	Convey("Given a too long description, should return too long description error :p", func() {
+		// 		appError = osi.Update(&organisation, &newOrganisation, db)
+		// 		So(appError, ShouldNotBeNil)
+		// 		So(appError, ShouldNotResemble, dbError)
+		// 		So(appError, ShouldResemble, u.NewLocAppError("organisationStoreImpl.Update.organisationNew.PreSave", "model.organisation.is_valid.description.app_error",
+		// 			nil, "id="+strconv.FormatUint(newOrganisation.IDOrganisation, 10)))
+		// 	})
+		// 	newOrganisation.Description = "Stoppppppp"
 
-		})
+		// })
 		Convey("Providing an incorrect user as old should result in errors", func() {
 			empty := Organisation{}
 			organisation.OrganisationName = ""
@@ -349,13 +349,13 @@ func TestOrganisationStore(t *testing.T) {
 			Domain:           "zeus.popcube",
 		}
 		Convey("Trying to get organisation from empty DB should return empty", func() {
-			So(&Organisation{}, ShouldResemble, osi.Get(db))
+			So(osi.Get(db), ShouldResemble, Organisation{})
 		})
 		appError := osi.Save(&organisation, db)
 		So(appError, ShouldBeNil)
 		Convey("Trying to get organisation from non empty DB should return a correct organisation object", func() {
 			got := osi.Get(db)
-			So(&organisation, ShouldResemble, got)
+			So(got, ShouldResemble, organisation)
 			So(got.IsValid(), ShouldBeNil)
 		})
 		db.Delete(&organisation)

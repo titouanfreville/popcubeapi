@@ -9,7 +9,6 @@ import (
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -18,6 +17,8 @@ const (
 
 func initParameterRoute(router chi.Router) {
 	router.Route("/parameter", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(Authenticator)
 		// swagger:route GET /parameter Parameters getAllParameter
 		//
 		// Get parameters
@@ -36,7 +37,7 @@ func initParameterRoute(router chi.Router) {
 		// This will create an parameter for organisation parameters library.
 		//
 		// 	Responses:
-		//    200: parameterObjectSuccess
+		//    201: parameterObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -59,7 +60,7 @@ func initParameterRoute(router chi.Router) {
 		// This will create an parameter for organisation parameters library.
 		//
 		// 	Responses:
-		//    200: parameterObjectSuccess
+		//    201: parameterObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -96,7 +97,7 @@ func parameterContext(next http.Handler) http.Handler {
 
 func getAllParameter(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Parameter().Get(db)
@@ -112,11 +113,11 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 		OmitID    interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Parameter == nil {
 		render.JSON(w, 500, err)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -138,12 +139,12 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 		OmitID    interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	parameter := r.Context().Value(oldParameterKey).(models.Parameter)
-	if err != nil {
+	if err != nil || data.Parameter == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

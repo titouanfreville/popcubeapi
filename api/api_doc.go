@@ -3,8 +3,8 @@
  * The inner API of Popcube aim to define every methods need to manage communication organisation inside PopCube chat project
  *
  * Schemes : http, https
- * Host: api.popcube
- * BasePath: /alpha
+ * Host: api-alpha.popcube.xyz
+ * BasePath: /
  * Version: alpha
  * Contact: Titouan Freville <titouanfreville@gmail.com>
  *

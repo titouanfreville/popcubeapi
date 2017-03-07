@@ -9,7 +9,6 @@ import (
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -20,6 +19,8 @@ const (
 
 func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(Authenticator)
 		// swagger:route GET /avatar Avatars getAllAvatar
 		//
 		// Get avatars
@@ -38,7 +39,7 @@ func initAvatarRoute(router chi.Router) {
 		// This will create an avatar for organisation avatars library.
 		//
 		// 	Responses:
-		//    200: avatarObjectSuccess
+		//    201: avatarObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -61,7 +62,7 @@ func initAvatarRoute(router chi.Router) {
 		// This will create an avatar for organisation avatars library.
 		//
 		// 	Responses:
-		//    200: avatarObjectSuccess
+		//    201: avatarObjectSuccess
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
@@ -86,7 +87,7 @@ func initAvatarRoute(router chi.Router) {
 			r.Route("/:avatarName", func(r chi.Router) {
 				r.Use(avatarContext)
 				// swagger:route GET /avatar/name/{avatarName} Avatars getAvatarFromName
-				//y
+				//
 				// Get avatar from name
 				//
 				// This will return the avatar object corresponding to provided name
@@ -146,7 +147,6 @@ func avatarContext(next http.Handler) http.Handler {
 
 func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Avatar().GetAll(db)
@@ -158,7 +158,7 @@ func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 
 func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		name := r.Context().Value(avatarNameKey).(string)
@@ -171,7 +171,7 @@ func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
 
 func getAvatarFromLink(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		link := r.Context().Value(avatarLinkKey).(string)
@@ -188,17 +188,17 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	if err != nil {
+	if err != nil || data.Avatar == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
 			err := store.Avatar().Save(data.Avatar, db)
 			if err == nil {
-				render.JSON(w, 200, data.Avatar)
+				render.JSON(w, 201, data.Avatar)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}
@@ -214,12 +214,12 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
-	if err != nil {
+	if err != nil || data.Avatar == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
@@ -238,7 +238,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 func deleteAvatar(w http.ResponseWriter, r *http.Request) {
 	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	message := deleteMessageModel{
 		Object: avatar,
 	}
