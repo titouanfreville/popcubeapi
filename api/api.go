@@ -5,14 +5,11 @@ import (
 	"crypto/rand"
 	"encoding/base32"
 	"flag"
-	"log"
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/goware/jwtauth"
 	"github.com/jinzhu/gorm"
 	"github.com/pressly/chi"
-	"github.com/pressly/chi/docgen"
 	"github.com/pressly/chi/middleware"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/configs"
@@ -29,9 +26,20 @@ type saveDb struct {
 // Key type to be sure the context key is the one we want.
 type key string
 
+// Token A JWT Token.  Different fields will be used depending on whether you're
+// creating or parsing/verifying a token.
+// type Token struct {
+// 	Raw       string                 // The raw token.  Populated when you Parse a token
+// 	Method    SigningMethod          // The signing method used or to be used
+// 	Header    map[string]interface{} // The first segment of the token
+// 	Claims    Claims                 // The second segment of the token
+// 	Signature string                 // The third segment of the token.  Populated when you Parse a token
+// 	Valid     bool                   // Is the token valid?  Populated when you Parse/Verify a token
+// }
+
 var (
 	hmacSampleSecret []byte
-	tokenAuth        *jwtauth.JwtAuth
+	tokenAuth        *JwtAuth
 	userToken        *jwt.Token
 	encoding         = base32.NewEncoding("ybndrfg8ejkmcpqxot1uwisza345h769")
 	render           = renderPackage.New()
@@ -55,7 +63,7 @@ func newRandomString(length int) string {
 func initAuth() {
 	secret := newRandomString(100)
 	hmacSampleSecret = []byte(secret)
-	tokenAuth = jwtauth.New("HS256", hmacSampleSecret, hmacSampleSecret)
+	tokenAuth = New("HS256", hmacSampleSecret, hmacSampleSecret)
 }
 
 // createToken create JWT auth token for current login user
@@ -63,6 +71,7 @@ func createToken(user models.User) (string, error) {
 	claims := jwt.MapClaims{
 		"name":  user.Username,
 		"email": user.Email,
+		"role":  user.IDRole,
 	}
 	unsignedToken := *jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := unsignedToken.SignedString(hmacSampleSecret)
@@ -140,6 +149,18 @@ func basicRoutes(router *chi.Mux) {
 	// 	  422: wrongEntity
 	// 	  503: databaseError
 	router.Post("/login", loginMiddleware)
+	// swagger:route POST /user Users newPublicUser
+	//
+	// New user
+	//
+	// This will create an user for organisation if organisation is Public OR Email match parametetered emails
+	//
+	// 	Responses:
+	//    201: userObjectSuccess
+	// 	  422: wrongEntity
+	// 	  503: databaseError
+	// 	  default: genericError
+	router.Post("/publicuser", newPublicUser)
 }
 
 // loginMiddleware login funcion providing user && jwt auth token
@@ -176,6 +197,32 @@ func loginMiddleware(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func newPublicUser(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		User   *models.User
+		OmitID interface{} `json:"id,omitempty"`
+	}
+	store := datastores.Store()
+
+	db := dbStore.db
+	request := r.Body
+	err := chiRender.Bind(request, &data)
+	if err != nil || data.User == nil {
+		render.JSON(w, error422.StatusCode, error422)
+	} else {
+		if err := db.DB().Ping(); err == nil {
+			err := store.User().Save(data.User, db)
+			if err == nil {
+				render.JSON(w, 201, data.User)
+			} else {
+				render.JSON(w, err.StatusCode, err)
+			}
+		} else {
+			render.JSON(w, error503.StatusCode, error503)
+		}
+	}
+}
+
 // StartAPI initialise the api with provided host and port.
 func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnection) {
 	router := newRouter()
@@ -202,12 +249,12 @@ func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnecti
 	// Passing -routes to the program will generate docs for the above
 	// router definition. See the `routes.json` file in this folder for
 	// the output.
-	log.Println(docgen.JSONRoutesDoc(router))
-	log.Println(docgen.BuildDoc(router))
-	log.Println(docgen.MarkdownRoutesDoc(router, docgen.MarkdownOpts{
-		ProjectPath: "github.com/titouanfreville/popcubeapi",
-		Intro:       "Welcomme to popcube user api.",
-	}))
+	// log.Println(docgen.JSONRoutesDoc(router))
+	// log.Println(docgen.BuildDoc(router))
+	// log.Println(docgen.MarkdownRoutesDoc(router, docgen.MarkdownOpts{
+	// 	ProjectPath: "github.com/titouanfreville/popcubeapi",
+	// 	Intro:       "Welcomme to popcube user api.",
+	// }))
 
 	http.ListenAndServe(hostname+":"+port, router)
 }
