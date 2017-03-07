@@ -62,7 +62,7 @@ curl -X POST --header 'Content-Type: application/json' \
    \"Image\": \"${REPO}/popcubeapi:$1\",
    \"Env\": [
      \"VIRTUAL_NETWORK=nginx-proxy\",
-     \"VIRTUAL_HOST=alpha-api.popcube.xyz\",
+     \"VIRTUAL_HOST=api-alpha.popcube.xyz\",
      \"VIRTUAL_PORT=3000\"
    ],
     \"HostConfig\": {
