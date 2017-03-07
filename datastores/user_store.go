@@ -85,8 +85,7 @@ func (usi UserStoreImpl) Login(userName string, pass string, db *gorm.DB) (model
 	if (user == models.User{}) {
 		return empty, err
 	}
-	hash := models.HashPassword(pass)
-	if models.ComparePassword(hash, user.Password) {
+	if models.ComparePassword(user.Password, pass) {
 		return user, nil
 	}
 	return empty, err

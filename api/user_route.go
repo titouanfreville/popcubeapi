@@ -353,34 +353,6 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func loginMiddleware(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Login    string      `json:"login"`
-		Password string      `json:"password"`
-		OmitID   interface{} `json:"id,omitempty"`
-	}
-	store := datastores.Store()
-
-	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil {
-		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			user, err := store.User().Login(data.Login, data.Password, db)
-			if err == nil {
-				createToken()
-				render.JSON(w, 200, user)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
-	}
-}
-
 func updateUser(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		User   *models.User

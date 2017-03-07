@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/goware/jwtauth"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -21,7 +22,7 @@ func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
 		// Seek, verify and validate JWT tokens
 		r.Use(tokenAuth.Verifier)
-		r.Use(authenticator)
+		r.Use(jwtauth.Authenticator)
 		// swagger:route GET /avatar Avatars getAllAvatar
 		//
 		// Get avatars

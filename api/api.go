@@ -1,6 +1,9 @@
 package api
 
 import (
+	"bytes"
+	"crypto/rand"
+	"encoding/base32"
 	"flag"
 	"log"
 	"net/http"
@@ -11,8 +14,10 @@ import (
 	"github.com/pressly/chi"
 	"github.com/pressly/chi/docgen"
 	"github.com/pressly/chi/middleware"
+	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/configs"
 	"github.com/titouanfreville/popcubeapi/datastores"
+	"github.com/titouanfreville/popcubeapi/models"
 	"github.com/titouanfreville/popcubeapi/utils"
 	renderPackage "github.com/unrolled/render"
 )
@@ -25,23 +30,49 @@ type saveDb struct {
 type key string
 
 var (
-	tokenAuth *jwtauth.JwtAuth
-	userToken *jwt.Token
-	render    = renderPackage.New()
-	routes    = flag.Bool("routes", false, "Generate router documentation")
-	dbStore   = saveDb{}
-	error401  = utils.NewAPIError(401, "unauthorized", "You did not login into the app. Please login to access those resources")
-	error422  = utils.NewAPIError(422, "parse.request.body", "Request json object not correct.")
-	error503  = utils.NewAPIError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
+	hmacSampleSecret []byte
+	tokenAuth        *jwtauth.JwtAuth
+	userToken        *jwt.Token
+	encoding         = base32.NewEncoding("ybndrfg8ejkmcpqxot1uwisza345h769")
+	render           = renderPackage.New()
+	routes           = flag.Bool("routes", false, "Generate router documentation")
+	dbStore          = saveDb{}
+	error401         = utils.NewAPIError(401, "unauthorized", "You did not login into the app. Please login to access those resources")
+	error422         = utils.NewAPIError(422, "parse.request.body", "Request json object not correct.")
+	error503         = utils.NewAPIError(503, "database.maintenance", "Database is currently in maintenance state. We are doing our best to get it back online ASAP.")
 )
 
+func newRandomString(length int) string {
+	var b bytes.Buffer
+	str := make([]byte, length+8)
+	rand.Read(str)
+	encoder := base32.NewEncoder(encoding, &b)
+	encoder.Write(str)
+	encoder.Close()
+	b.Truncate(length)
+	return b.String()
+}
 func initAuth() {
-	tokenAuth = jwtauth.New("HS256", []byte("secret"), nil)
+	secret := newRandomString(100)
+	hmacSampleSecret = []byte(secret)
+	log.Print(secret)
+	tokenAuth = jwtauth.New("HS256", hmacSampleSecret, hmacSampleSecret)
 }
 
 // createToken create JWT auth token for current login user
-func createToken() {
-	userToken = jwt.New(jwt.SigningMethodHS256)
+func createToken(user models.User) (string, error) {
+	claims := jwt.MapClaims{
+		"name":  user.Username,
+		"email": user.Email,
+	}
+	unsignedToken := *jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := unsignedToken.SignedString(hmacSampleSecret)
+
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
 
 // newRouter initialise api serveur.
@@ -57,7 +88,7 @@ func initMiddleware(router *chi.Mux) {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.StripSlashes)
 	router.Use(middleware.Timeout(5 * 1000))
-	// router.Use(middleware.Heartbeat("/heartbeat"))
+	router.Use(middleware.Heartbeat("/heartbeat"))
 	router.Use(middleware.CloseNotify)
 }
 
@@ -85,6 +116,7 @@ func basicRoutes(router *chi.Mux) {
 	router.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
 	})
+	router.Get("/heartbeat", func(w http.ResponseWriter, r *http.Request) {})
 	// swagger:route GET /panic Test panic
 	//
 	// Should result in 500
@@ -104,34 +136,45 @@ func basicRoutes(router *chi.Mux) {
 	// Login user with provided USERNAME && Password
 	//
 	// Responses:
-	// 		200: correctLogin
+	// 		200: loginOk
 	// 		404: incorrectIds
 	// 	  422: wrongEntity
 	// 	  503: databaseError
 	router.Post("/login", loginMiddleware)
 }
 
-// Check if user is correctly logged
-func authenticator(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-
-		if jwtErr, ok := ctx.Value("jwt.err").(error); ok {
-			if jwtErr != nil {
-				render.JSON(w, error401.StatusCode, error401)
+// loginMiddleware login funcion providing user && jwt auth token
+func loginMiddleware(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		Login    string      `json:"login"`
+		Password string      `json:"password"`
+		OmitID   interface{} `json:"id,omitempty"`
+	}
+	store := datastores.Store()
+	response := loginOk{}
+	db := dbStore.db
+	request := r.Body
+	err := chiRender.Bind(request, &data)
+	if err != nil {
+		render.JSON(w, error422.StatusCode, error422)
+		return
+	}
+	if err := db.DB().Ping(); err == nil {
+		user, err := store.User().Login(data.Login, data.Password, db)
+		if err == nil {
+			var terr error
+			response.User = user
+			response.Token, terr = createToken(user)
+			if terr == nil {
+				render.JSON(w, 200, response)
 				return
 			}
-		}
-
-		jwtToken, ok := ctx.Value("jwt").(*jwt.Token)
-		if !ok || jwtToken == nil || !jwtToken.Valid {
-			render.JSON(w, error401.StatusCode, error401)
+			render.JSON(w, err.StatusCode, err)
 			return
 		}
+	}
+	render.JSON(w, error503.StatusCode, error503)
 
-		// Token is authenticated, pass it through
-		next.ServeHTTP(w, r)
-	})
 }
 
 // StartAPI initialise the api with provided host and port.
