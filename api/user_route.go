@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/goware/jwtauth"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -23,6 +24,8 @@ const (
 
 func initUserRoute(router chi.Router) {
 	router.Route("/user", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(jwtauth.Authenticator)
 		// swagger:route GET /user Users getAllUser
 		//
 		// Get users

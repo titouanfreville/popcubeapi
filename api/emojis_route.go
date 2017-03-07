@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/goware/jwtauth"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -20,6 +21,8 @@ const (
 
 func initEmojiRoute(router chi.Router) {
 	router.Route("/emoji", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(jwtauth.Authenticator)
 		// swagger:route GET /emoji Emojis getAllEmoji
 		//
 		// Get emojis

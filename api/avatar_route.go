@@ -20,7 +20,6 @@ const (
 
 func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
-		// Seek, verify and validate JWT tokens
 		r.Use(tokenAuth.Verifier)
 		r.Use(jwtauth.Authenticator)
 		// swagger:route GET /avatar Avatars getAllAvatar

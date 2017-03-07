@@ -55,7 +55,6 @@ func newRandomString(length int) string {
 func initAuth() {
 	secret := newRandomString(100)
 	hmacSampleSecret = []byte(secret)
-	log.Print(secret)
 	tokenAuth = jwtauth.New("HS256", hmacSampleSecret, hmacSampleSecret)
 }
 
@@ -203,14 +202,12 @@ func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnecti
 	// Passing -routes to the program will generate docs for the above
 	// router definition. See the `routes.json` file in this folder for
 	// the output.
-	if *routes {
-		log.Println(docgen.JSONRoutesDoc(router))
-		log.Println(docgen.BuildDoc(router))
-		log.Println(docgen.MarkdownRoutesDoc(router, docgen.MarkdownOpts{
-			ProjectPath: "github.com/titouanfreville/popcubeapi",
-			Intro:       "Welcomme to popcube user api.",
-		}))
-	}
+	log.Println(docgen.JSONRoutesDoc(router))
+	log.Println(docgen.BuildDoc(router))
+	log.Println(docgen.MarkdownRoutesDoc(router, docgen.MarkdownOpts{
+		ProjectPath: "github.com/titouanfreville/popcubeapi",
+		Intro:       "Welcomme to popcube user api.",
+	}))
 
 	http.ListenAndServe(hostname+":"+port, router)
 }
