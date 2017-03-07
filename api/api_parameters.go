@@ -309,3 +309,23 @@ type userObjectParam struct {
 }
 
 // <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> LOGIN PARAMETERS <><><><><> //
+
+// loginParameterModel is the object you have to pass to login
+//
+// swagger:model loginParameterModel
+type loginParameterModel struct {
+	// user name
+	// required: true
+	Login string `json:"login"`
+	// user password hashed
+	// required: true
+	Password string `json:"password"`
+}
+
+// swagger:parameters Login
+type loginParam struct {
+	// Login informations
+	// in:body
+	Login loginParameterModel `json:"login"`
+}

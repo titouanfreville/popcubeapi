@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/goware/jwtauth"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -18,6 +18,8 @@ const (
 
 func initMemberRoute(router chi.Router) {
 	router.Route("/member", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(jwtauth.Authenticator)
 		// swagger:route GET /member Members getAllMember
 		//
 		// Get members
@@ -144,7 +146,7 @@ func memberContext(next http.Handler) http.Handler {
 
 func getAllMember(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Member().GetAll(db)
@@ -160,7 +162,7 @@ func getMemberFromUser(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -182,7 +184,7 @@ func getMemberFromChannel(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -204,7 +206,7 @@ func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -226,7 +228,7 @@ func newMember(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -252,7 +254,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -276,7 +278,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 func deleteMember(w http.ResponseWriter, r *http.Request) {
 	member := r.Context().Value(oldMemberKey).(models.Member)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	message := deleteMessageModel{
 		Object: member,
 	}

@@ -55,7 +55,7 @@
       {
         "pkg": "github.com/pressly/chi/middleware",
         "func": "CloseNotify",
-        "comment": "CloseNotify is a middleware that cancels ctx when the underlying\nconnection has gone away. It can be used to cancel long operations\non the server when the client disconnects before the response is ready.\n\nNote: this behaviour is standard in Go 1.8+ so the middleware is no\nlonger provided and exists just for backwards compatability.\n",
+        "comment": "CloseNotify is a middleware that cancels ctx when the underlying\nconnection has gone away. It can be used to cancel long operations\non the server when the client disconnects before the response is ready.\n\nNote: this behaviour is standard in Go 1.8+, so the middleware does nothing\non 1.8+ and exists just for backwards compatibility.\n",
         "file": "github.com/pressly/chi/middleware/closenotify17.go",
         "line": 16
       }
@@ -68,17 +68,55 @@
             "method": "GET",
             "pkg": "github.com/titouanfreville/popcubeapi/api",
             "func": "basicRoutes.func1",
-            "comment": "",
+            "comment": "swagger:route GET / Test hello\n\nHello World\n\n\tResponses:\n   200: generalOk\n\t  default: genericError\n",
             "file": "github.com/titouanfreville/popcubeapi/api/api.go",
-            "line": 44,
+            "line": 103,
             "anonymous": true
           }
         }
       },
       "/avatar": {
         "router": {
-          "middlewares": [],
+          "middlewares": [
+            {
+              "pkg": "",
+              "func": "github.com/goware/jwtauth.(*JwtAuth).Verifier-fm",
+              "comment": "",
+              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+              "line": 23,
+              "unresolvable": true
+            },
+            {
+              "pkg": "github.com/goware/jwtauth",
+              "func": "Authenticator",
+              "comment": "Authenticator is a default authentication middleware to enforce access following\nthe Verifier middleware. The Authenticator sends a 401 Unauthorized response for\nall unverified tokens and passes the good ones through. It's just fine until you\ndecide to write something similar and customize your client response.\n",
+              "file": "github.com/goware/jwtauth/jwtauth.go",
+              "line": 196
+            }
+          ],
           "routes": {
+            "/": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllAvatar",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+                  "line": 149
+                },
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "newAvatar",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+                  "line": 186
+                }
+              }
+            },
             "/:avatarID": {
               "router": {
                 "middlewares": [
@@ -87,7 +125,7 @@
                     "func": "avatarContext",
                     "comment": "",
                     "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                    "line": 42
+                    "line": 133
                   }
                 ],
                 "routes": {
@@ -100,7 +138,7 @@
                         "func": "deleteAvatar",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                        "line": 141
+                        "line": 239
                       }
                     }
                   },
@@ -113,107 +151,87 @@
                         "func": "updateAvatar",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                        "line": 114
+                        "line": 212
                       }
                     }
                   }
                 }
               }
             },
-            "/get": {
+            "/all": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllAvatar",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+                  "line": 149
+                }
+              }
+            },
+            "/link": {
               "router": {
                 "middlewares": [],
                 "routes": {
-                  "/": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllAvatar",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                        "line": 58
-                      }
-                    }
-                  },
-                  "/all": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllAvatar",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                        "line": 58
-                      }
-                    }
-                  },
-                  "/fromlink": {
+                  "/:avatarLink": {
                     "router": {
-                      "middlewares": [],
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "avatarContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+                          "line": 133
+                        }
+                      ],
                       "routes": {
-                        "/:avatarLink": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "avatarContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                                "line": 42
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getAvatarFromLink",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                                    "line": 79
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getAvatarFromLink",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+                              "line": 173
                             }
                           }
                         }
                       }
                     }
-                  },
-                  "/fromname": {
+                  }
+                }
+              }
+            },
+            "/name": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:avatarName": {
                     "router": {
-                      "middlewares": [],
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "avatarContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+                          "line": 133
+                        }
+                      ],
                       "routes": {
-                        "/:avatarName": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "avatarContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                                "line": 42
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getAvatarFromName",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                                    "line": 70
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getAvatarFromName",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+                              "line": 160
                             }
                           }
                         }
@@ -232,7 +250,7 @@
                   "func": "newAvatar",
                   "comment": "",
                   "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
-                  "line": 88
+                  "line": 186
                 }
               }
             }
@@ -241,8 +259,46 @@
       },
       "/channel": {
         "router": {
-          "middlewares": [],
+          "middlewares": [
+            {
+              "pkg": "",
+              "func": "github.com/goware/jwtauth.(*JwtAuth).Verifier-fm",
+              "comment": "",
+              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+              "line": 23,
+              "unresolvable": true
+            },
+            {
+              "pkg": "github.com/goware/jwtauth",
+              "func": "Authenticator",
+              "comment": "Authenticator is a default authentication middleware to enforce access following\nthe Verifier middleware. The Authenticator sends a 401 Unauthorized response for\nall unverified tokens and passes the good ones through. It's just fine until you\ndecide to write something similar and customize your client response.\n",
+              "file": "github.com/goware/jwtauth/jwtauth.go",
+              "line": 196
+            }
+          ],
           "routes": {
+            "/": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllChannel",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
+                  "line": 170
+                },
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "newChannel",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
+                  "line": 224
+                }
+              }
+            },
             "/:channelID": {
               "router": {
                 "middlewares": [
@@ -251,7 +307,7 @@
                     "func": "channelContext",
                     "comment": "",
                     "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                    "line": 44
+                    "line": 154
                   }
                 ],
                 "routes": {
@@ -264,7 +320,7 @@
                         "func": "deleteChannel",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                        "line": 169
+                        "line": 277
                       }
                     }
                   },
@@ -277,136 +333,55 @@
                         "func": "updateChannel",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                        "line": 142
+                        "line": 250
                       }
                     }
                   }
                 }
               }
             },
-            "/get": {
+            "/all": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllChannel",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
+                  "line": 170
+                }
+              }
+            },
+            "/name": {
               "router": {
                 "middlewares": [],
                 "routes": {
-                  "/": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllChannel",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                        "line": 62
-                      }
-                    }
-                  },
-                  "/all": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllChannel",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                        "line": 62
-                      }
-                    }
-                  },
-                  "/fromname": {
+                  "/:channelName": {
                     "router": {
-                      "middlewares": [],
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "channelContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
+                          "line": 154
+                        }
+                      ],
                       "routes": {
-                        "/:channelName": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "channelContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                                "line": 44
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getChannelFromName",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                                    "line": 98
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getChannelFromName",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
+                              "line": 206
                             }
                           }
                         }
-                      }
-                    }
-                  },
-                  "/fromtype": {
-                    "router": {
-                      "middlewares": [],
-                      "routes": {
-                        "/:channelType": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "channelContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                                "line": 44
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getChannelFromType",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                                    "line": 107
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "/private": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getPrivateChannel",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                        "line": 86
-                      }
-                    }
-                  },
-                  "/public": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getPublicChannel",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                        "line": 74
                       }
                     }
                   }
@@ -422,7 +397,68 @@
                   "func": "newChannel",
                   "comment": "",
                   "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
-                  "line": 116
+                  "line": 224
+                }
+              }
+            },
+            "/private": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getPrivateChannel",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
+                  "line": 194
+                }
+              }
+            },
+            "/public": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getPublicChannel",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
+                  "line": 182
+                }
+              }
+            },
+            "/type": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:channelType": {
+                    "router": {
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "channelContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
+                          "line": 154
+                        }
+                      ],
+                      "routes": {
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getChannelFromType",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/channel_route.go",
+                              "line": 215
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -431,8 +467,46 @@
       },
       "/emoji": {
         "router": {
-          "middlewares": [],
+          "middlewares": [
+            {
+              "pkg": "",
+              "func": "github.com/goware/jwtauth.(*JwtAuth).Verifier-fm",
+              "comment": "",
+              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+              "line": 23,
+              "unresolvable": true
+            },
+            {
+              "pkg": "github.com/goware/jwtauth",
+              "func": "Authenticator",
+              "comment": "Authenticator is a default authentication middleware to enforce access following\nthe Verifier middleware. The Authenticator sends a 401 Unauthorized response for\nall unverified tokens and passes the good ones through. It's just fine until you\ndecide to write something similar and customize your client response.\n",
+              "file": "github.com/goware/jwtauth/jwtauth.go",
+              "line": 196
+            }
+          ],
           "routes": {
+            "/": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllEmoji",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
+                  "line": 167
+                },
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "newEmoji",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
+                  "line": 206
+                }
+              }
+            },
             "/:emojiID": {
               "router": {
                 "middlewares": [
@@ -441,7 +515,7 @@
                     "func": "emojiContext",
                     "comment": "",
                     "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                    "line": 48
+                    "line": 149
                   }
                 ],
                 "routes": {
@@ -454,7 +528,7 @@
                         "func": "deleteEmoji",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                        "line": 158
+                        "line": 259
                       }
                     }
                   },
@@ -467,142 +541,87 @@
                         "func": "updateEmoji",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                        "line": 131
+                        "line": 232
                       }
                     }
                   }
                 }
               }
             },
-            "/get": {
+            "/all": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllEmoji",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
+                  "line": 167
+                }
+              }
+            },
+            "/link": {
               "router": {
                 "middlewares": [],
                 "routes": {
-                  "/": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllEmoji",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                        "line": 66
-                      }
-                    }
-                  },
-                  "/all": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllEmoji",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                        "line": 66
-                      }
-                    }
-                  },
-                  "/fromlink": {
+                  "/:emojiLink": {
                     "router": {
-                      "middlewares": [],
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "emojiContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
+                          "line": 149
+                        }
+                      ],
                       "routes": {
-                        "/:emojiLink": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "emojiContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                                "line": 48
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getEmojiFromLink",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                                    "line": 96
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getEmojiFromLink",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
+                              "line": 197
                             }
                           }
                         }
                       }
                     }
-                  },
-                  "/fromname": {
+                  }
+                }
+              }
+            },
+            "/name": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:emojiName": {
                     "router": {
-                      "middlewares": [],
-                      "routes": {
-                        "/:emojiName": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "emojiContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                                "line": 48
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getEmojiFromName",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                                    "line": 78
-                                  }
-                                }
-                              }
-                            }
-                          }
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "emojiContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
+                          "line": 149
                         }
-                      }
-                    }
-                  },
-                  "/fromshortcut": {
-                    "router": {
-                      "middlewares": [],
+                      ],
                       "routes": {
-                        "/:emojiShortcut": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "emojiContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                                "line": 48
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getEmojiFromShortcut",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                                    "line": 87
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getEmojiFromName",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
+                              "line": 179
                             }
                           }
                         }
@@ -621,7 +640,42 @@
                   "func": "newEmoji",
                   "comment": "",
                   "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
-                  "line": 105
+                  "line": 206
+                }
+              }
+            },
+            "/shortcut": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:emojiShortcut": {
+                    "router": {
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "emojiContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
+                          "line": 149
+                        }
+                      ],
+                      "routes": {
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getEmojiFromShortcut",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/emojis_route.go",
+                              "line": 188
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -630,8 +684,46 @@
       },
       "/folder": {
         "router": {
-          "middlewares": [],
+          "middlewares": [
+            {
+              "pkg": "",
+              "func": "github.com/goware/jwtauth.(*JwtAuth).Verifier-fm",
+              "comment": "",
+              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+              "line": 23,
+              "unresolvable": true
+            },
+            {
+              "pkg": "github.com/goware/jwtauth",
+              "func": "Authenticator",
+              "comment": "Authenticator is a default authentication middleware to enforce access following\nthe Verifier middleware. The Authenticator sends a 401 Unauthorized response for\nall unverified tokens and passes the good ones through. It's just fine until you\ndecide to write something similar and customize your client response.\n",
+              "file": "github.com/goware/jwtauth/jwtauth.go",
+              "line": 196
+            }
+          ],
           "routes": {
+            "/": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllFolder",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                  "line": 179
+                },
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "newFolder",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                  "line": 240
+                }
+              }
+            },
             "/:folderID": {
               "router": {
                 "middlewares": [
@@ -640,7 +732,7 @@
                     "func": "folderContext",
                     "comment": "",
                     "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                    "line": 49
+                    "line": 161
                   }
                 ],
                 "routes": {
@@ -653,7 +745,7 @@
                         "func": "deleteFolder",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                        "line": 181
+                        "line": 293
                       }
                     }
                   },
@@ -666,155 +758,100 @@
                         "func": "updateFolder",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                        "line": 154
+                        "line": 266
                       }
                     }
                   }
                 }
               }
             },
-            "/get": {
+            "/all": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllFolder",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                  "line": 179
+                }
+              }
+            },
+            "/link": {
               "router": {
                 "middlewares": [],
                 "routes": {
-                  "/": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllFolder",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                        "line": 67
-                      }
-                    }
-                  },
-                  "/all": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllFolder",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                        "line": 67
-                      }
-                    }
-                  },
-                  "/foldername": {
+                  "/:folderLink": {
                     "router": {
-                      "middlewares": [],
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "folderContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                          "line": 161
+                        }
+                      ],
                       "routes": {
-                        "/:folderName": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "folderContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                                "line": 49
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getFolderFromName",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                                    "line": 79
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getFolderFromLink",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                              "line": 209
                             }
                           }
                         }
                       }
                     }
-                  },
-                  "/link": {
+                  }
+                }
+              }
+            },
+            "/message": {
+              "handlers": {
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getFolderFromMessage",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                  "line": 218
+                }
+              }
+            },
+            "/name": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:folderName": {
                     "router": {
-                      "middlewares": [],
-                      "routes": {
-                        "/:folderLink": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "folderContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                                "line": 49
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getFolderFromLink",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                                    "line": 97
-                                  }
-                                }
-                              }
-                            }
-                          }
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "folderContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                          "line": 161
                         }
-                      }
-                    }
-                  },
-                  "/message": {
-                    "handlers": {
-                      "POST": {
-                        "middlewares": [],
-                        "method": "POST",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getFolderFromMessage",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                        "line": 106
-                      }
-                    }
-                  },
-                  "/type": {
-                    "router": {
-                      "middlewares": [],
+                      ],
                       "routes": {
-                        "/:folderType": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "folderContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                                "line": 49
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getFolderFromType",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                                    "line": 88
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getFolderFromName",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                              "line": 191
                             }
                           }
                         }
@@ -833,17 +870,117 @@
                   "func": "newFolder",
                   "comment": "",
                   "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
-                  "line": 128
+                  "line": 240
+                }
+              }
+            },
+            "/type": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:folderType": {
+                    "router": {
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "folderContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                          "line": 161
+                        }
+                      ],
+                      "routes": {
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getFolderFromType",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/folder_route.go",
+                              "line": 200
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
           }
         }
       },
+      "/heartbeat": {
+        "handlers": {
+          "GET": {
+            "middlewares": [],
+            "method": "GET",
+            "pkg": "github.com/titouanfreville/popcubeapi/api",
+            "func": "basicRoutes.func3",
+            "comment": "",
+            "file": "github.com/titouanfreville/popcubeapi/api/api.go",
+            "line": 118,
+            "anonymous": true
+          }
+        }
+      },
+      "/login": {
+        "handlers": {
+          "POST": {
+            "middlewares": [],
+            "method": "POST",
+            "pkg": "github.com/titouanfreville/popcubeapi/api",
+            "func": "loginMiddleware",
+            "comment": "loginMiddleware login funcion providing user \u0026\u0026 jwt auth token\n",
+            "file": "github.com/titouanfreville/popcubeapi/api/api.go",
+            "line": 146
+          }
+        }
+      },
       "/message": {
         "router": {
-          "middlewares": [],
+          "middlewares": [
+            {
+              "pkg": "",
+              "func": "github.com/goware/jwtauth.(*JwtAuth).Verifier-fm",
+              "comment": "",
+              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+              "line": 23,
+              "unresolvable": true
+            },
+            {
+              "pkg": "github.com/goware/jwtauth",
+              "func": "Authenticator",
+              "comment": "Authenticator is a default authentication middleware to enforce access following\nthe Verifier middleware. The Authenticator sends a 401 Unauthorized response for\nall unverified tokens and passes the good ones through. It's just fine until you\ndecide to write something similar and customize your client response.\n",
+              "file": "github.com/goware/jwtauth/jwtauth.go",
+              "line": 196
+            }
+          ],
           "routes": {
+            "/": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllMessage",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                  "line": 154
+                },
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "newMessage",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                  "line": 219
+                }
+              }
+            },
             "/:messageID": {
               "router": {
                 "middlewares": [
@@ -851,8 +988,8 @@
                     "pkg": "github.com/titouanfreville/popcubeapi/api",
                     "func": "messageContext",
                     "comment": "",
-                    "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                    "line": 38
+                    "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                    "line": 140
                   }
                 ],
                 "routes": {
@@ -862,10 +999,10 @@
                         "middlewares": [],
                         "method": "DELETE",
                         "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "deleteMessage",
+                        "func": "deleteMessageFunction",
                         "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                        "line": 170
+                        "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                        "line": 272
                       }
                     }
                   },
@@ -877,99 +1014,79 @@
                         "pkg": "github.com/titouanfreville/popcubeapi/api",
                         "func": "updateMessage",
                         "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                        "line": 143
+                        "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                        "line": 245
                       }
                     }
                   }
                 }
               }
             },
-            "/get": {
+            "/all": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllMessage",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                  "line": 154
+                }
+              }
+            },
+            "/channel": {
+              "handlers": {
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getMessageFromChannel",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                  "line": 197
+                }
+              }
+            },
+            "/creator": {
+              "handlers": {
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getMessageFromUser",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                  "line": 175
+                }
+              }
+            },
+            "/date": {
               "router": {
                 "middlewares": [],
                 "routes": {
-                  "/": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllMessage",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                        "line": 52
-                      }
-                    }
-                  },
-                  "/all": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllMessage",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                        "line": 52
-                      }
-                    }
-                  },
-                  "/channel": {
-                    "handlers": {
-                      "POST": {
-                        "middlewares": [],
-                        "method": "POST",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getMessageFromChannel",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                        "line": 95
-                      }
-                    }
-                  },
-                  "/creator": {
-                    "handlers": {
-                      "POST": {
-                        "middlewares": [],
-                        "method": "POST",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getMessageFromUser",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                        "line": 73
-                      }
-                    }
-                  },
-                  "/date": {
+                  "/:messageDate": {
                     "router": {
-                      "middlewares": [],
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "messageContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                          "line": 140
+                        }
+                      ],
                       "routes": {
-                        "/:date": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "messageContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                                "line": 38
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getMessageFromDate",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                                    "line": 64
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getMessageFromDate",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                              "line": 166
                             }
                           }
                         }
@@ -987,8 +1104,8 @@
                   "pkg": "github.com/titouanfreville/popcubeapi/api",
                   "func": "newMessage",
                   "comment": "",
-                  "file": "github.com/titouanfreville/popcubeapi/api/messge_route.go",
-                  "line": 117
+                  "file": "github.com/titouanfreville/popcubeapi/api/message_route.go",
+                  "line": 219
                 }
               }
             }
@@ -997,8 +1114,46 @@
       },
       "/organisation": {
         "router": {
-          "middlewares": [],
+          "middlewares": [
+            {
+              "pkg": "",
+              "func": "github.com/goware/jwtauth.(*JwtAuth).Verifier-fm",
+              "comment": "",
+              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+              "line": 23,
+              "unresolvable": true
+            },
+            {
+              "pkg": "github.com/goware/jwtauth",
+              "func": "Authenticator",
+              "comment": "Authenticator is a default authentication middleware to enforce access following\nthe Verifier middleware. The Authenticator sends a 401 Unauthorized response for\nall unverified tokens and passes the good ones through. It's just fine until you\ndecide to write something similar and customize your client response.\n",
+              "file": "github.com/goware/jwtauth/jwtauth.go",
+              "line": 196
+            }
+          ],
           "routes": {
+            "/": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllOrganisation",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/organisation_route.go",
+                  "line": 98
+                },
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "newOrganisation",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/organisation_route.go",
+                  "line": 110
+                }
+              }
+            },
             "/:organisationID": {
               "router": {
                 "middlewares": [
@@ -1007,7 +1162,7 @@
                     "func": "organisationContext",
                     "comment": "",
                     "file": "github.com/titouanfreville/popcubeapi/api/organisation_route.go",
-                    "line": 29
+                    "line": 86
                   }
                 ],
                 "routes": {
@@ -1020,43 +1175,23 @@
                         "func": "updateOrganisation",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/organisation_route.go",
-                        "line": 79
+                        "line": 136
                       }
                     }
                   }
                 }
               }
             },
-            "/get": {
-              "router": {
-                "middlewares": [],
-                "routes": {
-                  "/": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllOrganisation",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/organisation_route.go",
-                        "line": 41
-                      }
-                    }
-                  },
-                  "/all": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllOrganisation",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/organisation_route.go",
-                        "line": 41
-                      }
-                    }
-                  }
+            "/all": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllOrganisation",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/organisation_route.go",
+                  "line": 98
                 }
               }
             },
@@ -1069,7 +1204,7 @@
                   "func": "newOrganisation",
                   "comment": "",
                   "file": "github.com/titouanfreville/popcubeapi/api/organisation_route.go",
-                  "line": 53
+                  "line": 110
                 }
               }
             }
@@ -1082,18 +1217,56 @@
             "middlewares": [],
             "method": "GET",
             "pkg": "github.com/titouanfreville/popcubeapi/api",
-            "func": "basicRoutes.func3",
-            "comment": "",
+            "func": "basicRoutes.func4",
+            "comment": "swagger:route GET /panic Test panic\n\nShould result in 500\n\nTest panic cautching\n\n\tResponses:\n   500: genericError\n\t  default: genericError\n",
             "file": "github.com/titouanfreville/popcubeapi/api/api.go",
-            "line": 52,
+            "line": 128,
             "anonymous": true
           }
         }
       },
       "/parameter": {
         "router": {
-          "middlewares": [],
+          "middlewares": [
+            {
+              "pkg": "",
+              "func": "github.com/goware/jwtauth.(*JwtAuth).Verifier-fm",
+              "comment": "",
+              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+              "line": 23,
+              "unresolvable": true
+            },
+            {
+              "pkg": "github.com/goware/jwtauth",
+              "func": "Authenticator",
+              "comment": "Authenticator is a default authentication middleware to enforce access following\nthe Verifier middleware. The Authenticator sends a 401 Unauthorized response for\nall unverified tokens and passes the good ones through. It's just fine until you\ndecide to write something similar and customize your client response.\n",
+              "file": "github.com/goware/jwtauth/jwtauth.go",
+              "line": 196
+            }
+          ],
           "routes": {
+            "/": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllParameter",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/parameter_route.go",
+                  "line": 99
+                },
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "newParameter",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/parameter_route.go",
+                  "line": 111
+                }
+              }
+            },
             "/:parameterID": {
               "router": {
                 "middlewares": [
@@ -1102,7 +1275,7 @@
                     "func": "parameterContext",
                     "comment": "",
                     "file": "github.com/titouanfreville/popcubeapi/api/parameter_route.go",
-                    "line": 29
+                    "line": 87
                   }
                 ],
                 "routes": {
@@ -1115,43 +1288,23 @@
                         "func": "updateParameter",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/parameter_route.go",
-                        "line": 79
+                        "line": 137
                       }
                     }
                   }
                 }
               }
             },
-            "/get": {
-              "router": {
-                "middlewares": [],
-                "routes": {
-                  "/": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllParameter",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/parameter_route.go",
-                        "line": 41
-                      }
-                    }
-                  },
-                  "/all": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllParameter",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/parameter_route.go",
-                        "line": 41
-                      }
-                    }
-                  }
+            "/all": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllParameter",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/parameter_route.go",
+                  "line": 99
                 }
               }
             },
@@ -1164,7 +1317,7 @@
                   "func": "newParameter",
                   "comment": "",
                   "file": "github.com/titouanfreville/popcubeapi/api/parameter_route.go",
-                  "line": 53
+                  "line": 111
                 }
               }
             }
@@ -1178,17 +1331,55 @@
             "method": "GET",
             "pkg": "github.com/titouanfreville/popcubeapi/api",
             "func": "basicRoutes.func2",
-            "comment": "",
+            "comment": "swagger:route GET /ping Test ping\n\nPong\n\nTest api ping\n\n\tResponses:\n   200: generalOk\n\t  default: genericError\n",
             "file": "github.com/titouanfreville/popcubeapi/api/api.go",
-            "line": 48,
+            "line": 115,
             "anonymous": true
           }
         }
       },
       "/role": {
         "router": {
-          "middlewares": [],
+          "middlewares": [
+            {
+              "pkg": "",
+              "func": "github.com/goware/jwtauth.(*JwtAuth).Verifier-fm",
+              "comment": "",
+              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+              "line": 23,
+              "unresolvable": true
+            },
+            {
+              "pkg": "github.com/goware/jwtauth",
+              "func": "Authenticator",
+              "comment": "Authenticator is a default authentication middleware to enforce access following\nthe Verifier middleware. The Authenticator sends a 401 Unauthorized response for\nall unverified tokens and passes the good ones through. It's just fine until you\ndecide to write something similar and customize your client response.\n",
+              "file": "github.com/goware/jwtauth/jwtauth.go",
+              "line": 196
+            }
+          ],
           "routes": {
+            "/": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllRole",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
+                  "line": 140
+                },
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "newRole",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
+                  "line": 183
+                }
+              }
+            },
             "/:roleID": {
               "router": {
                 "middlewares": [
@@ -1197,7 +1388,7 @@
                     "func": "roleContext",
                     "comment": "",
                     "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
-                    "line": 37
+                    "line": 126
                   }
                 ],
                 "routes": {
@@ -1210,7 +1401,7 @@
                         "func": "deleteRole",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
-                        "line": 147
+                        "line": 236
                       }
                     }
                   },
@@ -1223,88 +1414,55 @@
                         "func": "updateRole",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
-                        "line": 120
+                        "line": 209
                       }
                     }
                   }
                 }
               }
             },
-            "/get": {
+            "/all": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllRole",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
+                  "line": 140
+                }
+              }
+            },
+            "/name": {
               "router": {
                 "middlewares": [],
                 "routes": {
-                  "/": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllRole",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
-                        "line": 51
-                      }
-                    }
-                  },
-                  "/all": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllRole",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
-                        "line": 51
-                      }
-                    }
-                  },
-                  "/fromname": {
+                  "/:roleName": {
                     "router": {
-                      "middlewares": [],
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "roleContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
+                          "line": 126
+                        }
+                      ],
                       "routes": {
-                        "/:roleName": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "roleContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
-                                "line": 37
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getRoleFromName",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
-                                    "line": 63
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getRoleFromName",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
+                              "line": 152
                             }
                           }
                         }
-                      }
-                    }
-                  },
-                  "/fromrights": {
-                    "handlers": {
-                      "POST": {
-                        "middlewares": [],
-                        "method": "POST",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getRoleFromRight",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
-                        "line": 72
                       }
                     }
                   }
@@ -1320,7 +1478,20 @@
                   "func": "newRole",
                   "comment": "",
                   "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
-                  "line": 94
+                  "line": 183
+                }
+              }
+            },
+            "/rights": {
+              "handlers": {
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getRoleFromRight",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/role_route.go",
+                  "line": 161
                 }
               }
             }
@@ -1329,8 +1500,46 @@
       },
       "/user": {
         "router": {
-          "middlewares": [],
+          "middlewares": [
+            {
+              "pkg": "",
+              "func": "github.com/goware/jwtauth.(*JwtAuth).Verifier-fm",
+              "comment": "",
+              "file": "github.com/titouanfreville/popcubeapi/api/avatar_route.go",
+              "line": 23,
+              "unresolvable": true
+            },
+            {
+              "pkg": "github.com/goware/jwtauth",
+              "func": "Authenticator",
+              "comment": "Authenticator is a default authentication middleware to enforce access following\nthe Verifier middleware. The Authenticator sends a 401 Unauthorized response for\nall unverified tokens and passes the good ones through. It's just fine until you\ndecide to write something similar and customize your client response.\n",
+              "file": "github.com/goware/jwtauth/jwtauth.go",
+              "line": 196
+            }
+          ],
           "routes": {
+            "/": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllUser",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                  "line": 233
+                },
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "newUser",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                  "line": 333
+                }
+              }
+            },
             "/:userID": {
               "router": {
                 "middlewares": [
@@ -1339,7 +1548,7 @@
                     "func": "userContext",
                     "comment": "",
                     "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                    "line": 68
+                    "line": 209
                   }
                 ],
                 "routes": {
@@ -1352,7 +1561,7 @@
                         "func": "deleteUser",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                        "line": 245
+                        "line": 386
                       }
                     }
                   },
@@ -1365,273 +1574,148 @@
                         "func": "updateUser",
                         "comment": "",
                         "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                        "line": 218
+                        "line": 359
                       }
                     }
                   }
                 }
               }
             },
-            "/get": {
+            "/all": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getAllUser",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                  "line": 233
+                }
+              }
+            },
+            "/date": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getOrderedByDate",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                  "line": 302
+                }
+              }
+            },
+            "/deleted": {
+              "handlers": {
+                "GET": {
+                  "middlewares": [],
+                  "method": "GET",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getDeletedUser",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                  "line": 245
+                }
+              }
+            },
+            "/email": {
               "router": {
                 "middlewares": [],
                 "routes": {
-                  "/": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllUser",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                        "line": 92
-                      }
-                    }
-                  },
-                  "/all": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getAllUser",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                        "line": 92
-                      }
-                    }
-                  },
-                  "/date": {
+                  "/:userEmail": {
                     "router": {
-                      "middlewares": [],
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "userContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                          "line": 209
+                        }
+                      ],
                       "routes": {
-                        "/:date": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "userContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                "line": 68
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getUserFromDate",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                    "line": 161
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getUserFromEmail",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                              "line": 293
                             }
                           }
                         }
                       }
                     }
-                  },
-                  "/deleted": {
-                    "handlers": {
-                      "GET": {
-                        "middlewares": [],
-                        "method": "GET",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getDeletedUser",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                        "line": 104
-                      }
-                    }
-                  },
-                  "/email": {
+                  }
+                }
+              }
+            },
+            "/firstname": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:firstName": {
                     "router": {
-                      "middlewares": [],
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "userContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                          "line": 209
+                        }
+                      ],
                       "routes": {
-                        "/:userEmail": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "userContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                "line": 68
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getUserFromEmail",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                    "line": 152
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getUserFromFirstName",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                              "line": 275
                             }
                           }
                         }
                       }
                     }
-                  },
-                  "/firstname": {
+                  }
+                }
+              }
+            },
+            "/lastname": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:lastName": {
                     "router": {
-                      "middlewares": [],
-                      "routes": {
-                        "/:firstName": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "userContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                "line": 68
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getUserFromFirstName",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                    "line": 134
-                                  }
-                                }
-                              }
-                            }
-                          }
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "userContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                          "line": 209
                         }
-                      }
-                    }
-                  },
-                  "/lastname": {
-                    "router": {
-                      "middlewares": [],
+                      ],
                       "routes": {
-                        "/:lastName": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "userContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                "line": 68
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getUserFromLastName",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                    "line": 143
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "/nickname": {
-                    "router": {
-                      "middlewares": [],
-                      "routes": {
-                        "/:nickName": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "userContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                "line": 68
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getUserFromNickName",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                    "line": 125
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "/role": {
-                    "handlers": {
-                      "POST": {
-                        "middlewares": [],
-                        "method": "POST",
-                        "pkg": "github.com/titouanfreville/popcubeapi/api",
-                        "func": "getUserFromRole",
-                        "comment": "",
-                        "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                        "line": 170
-                      }
-                    }
-                  },
-                  "/username": {
-                    "router": {
-                      "middlewares": [],
-                      "routes": {
-                        "/:userName": {
-                          "router": {
-                            "middlewares": [
-                              {
-                                "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                "func": "userContext",
-                                "comment": "",
-                                "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                "line": 68
-                              }
-                            ],
-                            "routes": {
-                              "/": {
-                                "handlers": {
-                                  "GET": {
-                                    "middlewares": [],
-                                    "method": "GET",
-                                    "pkg": "github.com/titouanfreville/popcubeapi/api",
-                                    "func": "getUserFromName",
-                                    "comment": "",
-                                    "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                                    "line": 116
-                                  }
-                                }
-                              }
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getUserFromLastName",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                              "line": 284
                             }
                           }
                         }
@@ -1650,7 +1734,90 @@
                   "func": "newUser",
                   "comment": "",
                   "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
-                  "line": 192
+                  "line": 333
+                }
+              }
+            },
+            "/nickname": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:nickName": {
+                    "router": {
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "userContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                          "line": 209
+                        }
+                      ],
+                      "routes": {
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getUserFromNickName",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                              "line": 266
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "/role": {
+              "handlers": {
+                "POST": {
+                  "middlewares": [],
+                  "method": "POST",
+                  "pkg": "github.com/titouanfreville/popcubeapi/api",
+                  "func": "getUserFromRole",
+                  "comment": "",
+                  "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                  "line": 311
+                }
+              }
+            },
+            "/username": {
+              "router": {
+                "middlewares": [],
+                "routes": {
+                  "/:userName": {
+                    "router": {
+                      "middlewares": [
+                        {
+                          "pkg": "github.com/titouanfreville/popcubeapi/api",
+                          "func": "userContext",
+                          "comment": "",
+                          "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                          "line": 209
+                        }
+                      ],
+                      "routes": {
+                        "/": {
+                          "handlers": {
+                            "GET": {
+                              "middlewares": [],
+                              "method": "GET",
+                              "pkg": "github.com/titouanfreville/popcubeapi/api",
+                              "func": "getUserFromName",
+                              "comment": "",
+                              "file": "github.com/titouanfreville/popcubeapi/api/user_route.go",
+                              "line": 257
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

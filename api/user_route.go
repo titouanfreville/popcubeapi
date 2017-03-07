@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/goware/jwtauth"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -24,6 +24,8 @@ const (
 
 func initUserRoute(router chi.Router) {
 	router.Route("/user", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(jwtauth.Authenticator)
 		// swagger:route GET /user Users getAllUser
 		//
 		// Get users
@@ -230,7 +232,7 @@ func userContext(next http.Handler) http.Handler {
 
 func getAllUser(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.User().GetAll(db)
@@ -242,7 +244,7 @@ func getAllUser(w http.ResponseWriter, r *http.Request) {
 
 func getDeletedUser(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.User().GetDeleted(db)
@@ -254,7 +256,7 @@ func getDeletedUser(w http.ResponseWriter, r *http.Request) {
 
 func getUserFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	name := r.Context().Value("userName").(string)
 	user := store.User().GetByUserName(name, db)
@@ -263,7 +265,7 @@ func getUserFromName(w http.ResponseWriter, r *http.Request) {
 
 func getUserFromNickName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	name := r.Context().Value(nickNameKey).(string)
 	user := store.User().GetByNickName(name, db)
@@ -272,7 +274,7 @@ func getUserFromNickName(w http.ResponseWriter, r *http.Request) {
 
 func getUserFromFirstName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	name := r.Context().Value(firstNameKey).(string)
 	user := store.User().GetByFirstName(name, db)
@@ -281,7 +283,7 @@ func getUserFromFirstName(w http.ResponseWriter, r *http.Request) {
 
 func getUserFromLastName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	name := r.Context().Value(lastNameKey).(string)
 	user := store.User().GetByLastName(name, db)
@@ -290,7 +292,7 @@ func getUserFromLastName(w http.ResponseWriter, r *http.Request) {
 
 func getUserFromEmail(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	email := r.Context().Value(userEmailKey).(string)
 	user := store.User().GetByEmail(email, db)
@@ -299,7 +301,7 @@ func getUserFromEmail(w http.ResponseWriter, r *http.Request) {
 
 func getOrderedByDate(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	date := r.Context().Value(userDateKey).(int)
 	user := store.User().GetOrderedByDate(date, db)
@@ -312,7 +314,7 @@ func getUserFromRole(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -334,7 +336,7 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -360,7 +362,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -384,7 +386,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(oldUserKey).(models.User)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	message := deleteMessageModel{
 		Object: user,
 	}

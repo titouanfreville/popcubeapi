@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/goware/jwtauth"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
-	renderPackage "github.com/unrolled/render"
 )
 
 const (
@@ -20,6 +20,8 @@ const (
 
 func initChannelRoute(router chi.Router) {
 	router.Route("/channel", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(jwtauth.Authenticator)
 		// swagger:route GET /channel Channels getAllChannel
 		//
 		// Get channels
@@ -167,7 +169,7 @@ func channelContext(next http.Handler) http.Handler {
 
 func getAllChannel(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Channel().GetAll(db)
@@ -179,7 +181,7 @@ func getAllChannel(w http.ResponseWriter, r *http.Request) {
 
 func getPublicChannel(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Channel().GetPublic(db)
@@ -191,7 +193,7 @@ func getPublicChannel(w http.ResponseWriter, r *http.Request) {
 
 func getPrivateChannel(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Channel().GetPrivate(db)
@@ -203,7 +205,7 @@ func getPrivateChannel(w http.ResponseWriter, r *http.Request) {
 
 func getChannelFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	name := r.Context().Value(channelNameKey).(string)
 	channel := store.Channel().GetByName(name, db)
@@ -212,7 +214,7 @@ func getChannelFromName(w http.ResponseWriter, r *http.Request) {
 
 func getChannelFromType(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	channelType := r.Context().Value(channelTypeKey).(string)
 	channel := store.Channel().GetByType(channelType, db)
@@ -225,7 +227,7 @@ func newChannel(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -251,7 +253,7 @@ func updateChannel(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -275,7 +277,7 @@ func updateChannel(w http.ResponseWriter, r *http.Request) {
 func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	channel := r.Context().Value(oldChannelKey).(models.Channel)
 	store := datastores.Store()
-	render := renderPackage.New()
+
 	message := deleteMessageModel{
 		Object: channel,
 	}

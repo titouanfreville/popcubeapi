@@ -42,5 +42,7 @@ RUN go get -v github.com/tools/godep && \
     godep get -v
 
 WORKDIR /$GOCOPYPATH
+
 EXPOSE 3000
+
 ENTRYPOINT waitforit database:3306 -t 0 -- echo "Db is ready" && go install && popcubeapi
