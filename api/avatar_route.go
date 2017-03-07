@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/goware/jwtauth"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -21,7 +20,7 @@ const (
 func initAvatarRoute(router chi.Router) {
 	router.Route("/avatar", func(r chi.Router) {
 		r.Use(tokenAuth.Verifier)
-		r.Use(jwtauth.Authenticator)
+		r.Use(Authenticator)
 		// swagger:route GET /avatar Avatars getAllAvatar
 		//
 		// Get avatars

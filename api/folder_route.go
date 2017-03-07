@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/goware/jwtauth"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -22,7 +21,7 @@ const (
 func initFolderRoute(router chi.Router) {
 	router.Route("/folder", func(r chi.Router) {
 		r.Use(tokenAuth.Verifier)
-		r.Use(jwtauth.Authenticator)
+		r.Use(Authenticator)
 		// swagger:route GET /folder Folders getAllFolder
 		//
 		// Get folders
