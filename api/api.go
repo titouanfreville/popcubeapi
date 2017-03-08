@@ -5,7 +5,9 @@ import (
 	"crypto/rand"
 	"encoding/base32"
 	"flag"
+	"log"
 	"net/http"
+	"os"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
@@ -206,6 +208,26 @@ func basicRoutes(router *chi.Mux) {
 	})
 }
 
+func initDevGetter(router chi.Router) {
+	env := os.Getenv("POPCUBE_API_ENV")
+	if env == "prod" || env == "test" || env == "beta" || env == "alpha" || env == "production" {
+		return
+	}
+	log.Print("<><><><><><><> Using DEV routes <><><><><><><> \n")
+	router.Route("/devgetters", func(r chi.Router) {
+		r.Get("/avatar", getAllAvatar)
+		r.Get("/channel", getAllChannel)
+		r.Get("/emoji", getAllEmoji)
+		r.Get("/folder", getAllFolder)
+		r.Get("/member", getAllMember)
+		r.Get("/message", getAllMessage)
+		r.Get("/organisation", getAllOrganisation)
+		r.Get("/parameter", getAllParameter)
+		r.Get("/role", getAllRole)
+		r.Get("/user", getAllUser)
+	})
+}
+
 // loginMiddleware login funcion providing user && jwt auth token
 func loginMiddleware(w http.ResponseWriter, r *http.Request) {
 	var data struct {
@@ -291,7 +313,7 @@ func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnecti
 	initParameterRoute(router)
 	initRoleRoute(router)
 	initUserRoute(router)
-
+	initDevGetter(router)
 	// Passing -routes to the program will generate docs for the above
 	// router definition. See the `routes.json` file in this folder for
 	// the output.

@@ -244,12 +244,15 @@ func userContext(next http.Handler) http.Handler {
 	})
 }
 
-func canManageUser(place string, token *jwt.Token) bool {
+func canManageUser(place string, self bool, currentUser string, token *jwt.Token) bool {
 	store := datastores.Store()
 	db := dbStore.db
 	userName := token.Claims.(jwt.MapClaims)["name"].(string)
 	user := store.User().GetByUserName(userName, db)
 	userRights := store.Role().GetByID(user.IDRole, db)
+	if self && currentUser == userName {
+		return true
+	}
 	if place == "organisation" || place == "global" {
 		haveGlobalManageRight, ok := token.Claims.(jwt.MapClaims)["canManageUser"].(bool)
 		log.Print(haveGlobalManageRight)
@@ -384,7 +387,9 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-	if !canManageUser("global", r.Context().Value(jwtTokenKey).(*jwt.Token)) {
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageUser("global", false, "", token) {
+
 		res := error401
 		res.Message = "You don't have the right to manage user."
 		render.JSON(w, error401.StatusCode, error401)
@@ -421,8 +426,8 @@ func inviteUser(w http.ResponseWriter, r *http.Request) {
 	organisation := store.Organisation().Get(db)
 	response := inviteOk{}
 	request := r.Body
-
-	if !canManageUser("global", r.Context().Value(jwtTokenKey).(*jwt.Token)) {
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageUser("global", false, "", token) {
 		res := error401
 		res.Message = "You don't have the right to manage user."
 		render.JSON(w, error401.StatusCode, error401)
@@ -461,8 +466,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	err := chiRender.Bind(request, &data)
 	user := r.Context().Value(oldUserKey).(models.User)
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
-	self := token.Claims.(jwt.MapClaims)["user"].(string) == user.Username
-	if !self && !canManageUser("global", token) {
+	if !canManageUser("global", true, user.Username, token) {
 		res := error401
 		res.Message = "You don't have the right to manage user."
 		render.JSON(w, error401.StatusCode, error401)
@@ -488,8 +492,7 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(oldUserKey).(models.User)
 	store := datastores.Store()
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
-	self := token.Claims.(jwt.MapClaims)["user"].(string) == user.Username
-	if !self && !canManageUser("global", token) {
+	if !canManageUser("global", true, user.Username, token) {
 		res := error401
 		res.Message = "You don't have the right to manage user."
 		render.JSON(w, error401.StatusCode, error401)
