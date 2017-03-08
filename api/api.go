@@ -5,7 +5,9 @@ import (
 	"crypto/rand"
 	"encoding/base32"
 	"flag"
+	"log"
 	"net/http"
+	"os"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
@@ -66,12 +68,36 @@ func initAuth() {
 	tokenAuth = New("HS256", hmacSampleSecret, hmacSampleSecret)
 }
 
-// createToken create JWT auth token for current login user
-func createToken(user models.User) (string, error) {
+// createUserToken create JWT auth token for current login user
+func createUserToken(user models.User, role models.Role) (string, error) {
 	claims := jwt.MapClaims{
-		"name":  user.Username,
-		"email": user.Email,
-		"role":  user.IDRole,
+		"name":       user.Username,
+		"email":      user.Email,
+		"role":       role.RoleName,
+		"archive":    role.CanArchive,
+		"invite":     role.CanInvite,
+		"manage":     role.CanManage,
+		"manageuser": role.CanManageUser,
+		"moderate":   role.CanModerate,
+		"private":    role.CanUsePrivate,
+		"type":       "userauth",
+	}
+	unsignedToken := *jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := unsignedToken.SignedString(hmacSampleSecret)
+
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+// createInviteToken create JWT auth token for current invitation
+func createInviteToken(inviteMail string, organisationName string) (string, error) {
+	claims := jwt.MapClaims{
+		"email":        inviteMail,
+		"organisation": organisationName,
+		"type":         "invitation",
 	}
 	unsignedToken := *jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := unsignedToken.SignedString(hmacSampleSecret)
@@ -102,6 +128,7 @@ func initMiddleware(router *chi.Mux) {
 
 // basicRoutes set basic routes for the API
 func basicRoutes(router *chi.Mux) {
+	router.Use(tokenAuth.Verifier)
 	// swagger:route GET / Test hello
 	//
 	// Hello World
@@ -149,18 +176,56 @@ func basicRoutes(router *chi.Mux) {
 	// 	  422: wrongEntity
 	// 	  503: databaseError
 	router.Post("/login", loginMiddleware)
-	// swagger:route POST /user Users newPublicUser
-	//
-	// New user
-	//
-	// This will create an user for organisation if organisation is Public OR Email match parametetered emails
-	//
-	// 	Responses:
-	//    201: userObjectSuccess
-	// 	  422: wrongEntity
-	// 	  503: databaseError
-	// 	  default: genericError
-	router.Post("/publicuser", newPublicUser)
+	router.Route("/publicuser", func(r chi.Router) {
+		// swagger:route POST /publicuser/new Users newPublicUser
+		//
+		// New user
+		//
+		// This will create an user for organisation if organisation is Public OR Email match parametetered emails
+		//
+		// 	Responses:
+		//    201: userObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Post("/new", newPublicUser)
+		r.Route("/newfrominvite", func(r chi.Router) {
+			r.Use(tokenAuth.Verifier)
+			r.Use(allowUserCreationFromToken)
+			// swagger:route POST /publicuser/newfrominvite Users newPublicUser
+			//
+			// New user
+			//
+			// This will create an user for organisation if user was invited
+			//
+			// 	Responses:
+			//    201: userObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
+			r.Post("/", newUser)
+		})
+	})
+}
+
+func initDevGetter(router chi.Router) {
+	env := os.Getenv("POPCUBE_API_ENV")
+	if env == "prod" || env == "test" || env == "beta" || env == "alpha" || env == "production" {
+		return
+	}
+	log.Print("<><><><><><><> Using DEV routes <><><><><><><> \n")
+	router.Route("/devgetters", func(r chi.Router) {
+		r.Get("/avatar", getAllAvatar)
+		r.Get("/channel", getAllChannel)
+		r.Get("/emoji", getAllEmoji)
+		r.Get("/folder", getAllFolder)
+		r.Get("/member", getAllMember)
+		r.Get("/message", getAllMessage)
+		r.Get("/organisation", getAllOrganisation)
+		r.Get("/parameter", getAllParameter)
+		r.Get("/role", getAllRole)
+		r.Get("/user", getAllUser)
+	})
 }
 
 // loginMiddleware login funcion providing user && jwt auth token
@@ -183,15 +248,18 @@ func loginMiddleware(w http.ResponseWriter, r *http.Request) {
 		user, err := store.User().Login(data.Login, data.Password, db)
 		if err == nil {
 			var terr error
+			// role can't be empty if user exist => foreign key constraint
+			role := datastores.Store().Role().GetByID(user.IDRole, dbStore.db)
 			response.User = user
-			response.Token, terr = createToken(user)
+			response.Token, terr = createUserToken(user, role)
 			if terr == nil {
 				render.JSON(w, 200, response)
 				return
 			}
-			render.JSON(w, err.StatusCode, err)
-			return
+			render.JSON(w, 422, "Could not generate token")
 		}
+		render.JSON(w, err.StatusCode, err)
+		return
 	}
 	render.JSON(w, error503.StatusCode, error503)
 
@@ -245,7 +313,7 @@ func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnecti
 	initParameterRoute(router)
 	initRoleRoute(router)
 	initUserRoute(router)
-
+	initDevGetter(router)
 	// Passing -routes to the program will generate docs for the above
 	// router definition. See the `routes.json` file in this folder for
 	// the output.

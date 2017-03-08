@@ -66,6 +66,13 @@ func (msi MemberStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Member {
 	return member
 }
 
+// GetChannelMember get specific user in specific channel
+func (msi MemberStoreImpl) GetChannelMember(user *models.User, channel *models.Channel, db *gorm.DB) models.Member {
+	member := models.Member{}
+	db.Table("members").Select("*").Joins("natural join users natural join channels").Where("users.idUser = ? and channels.idChannel = ?", user.IDUser, channel.IDChannel).Find(&member)
+	return member
+}
+
 // GetByUser get member from user
 func (msi MemberStoreImpl) GetByUser(user *models.User, db *gorm.DB) []models.Member {
 	members := []models.Member{}

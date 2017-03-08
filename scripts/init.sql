@@ -147,13 +147,6 @@ CREATE TABLE IF NOT EXISTS `popcube_test`.`members` (
 ENGINE = InnoDB
 COMMENT = 'Store information about member of organisation.';
 
-CREATE UNIQUE INDEX `User_UNIQUE` ON `popcube_test`.`members` (`idUser` ASC);
-
-CREATE UNIQUE INDEX `Role_UNIQUE` ON `popcube_test`.`members` (`idRole` ASC);
-
-CREATE UNIQUE INDEX `channel_UNIQUE` ON `popcube_test`.`members` (`idChannel` ASC);
-
-
 -- -----------------------------------------------------
 -- Table `popcube_test`.`messages`
 -- -----------------------------------------------------
