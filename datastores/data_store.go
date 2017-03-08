@@ -180,6 +180,7 @@ type MemberStore interface {
 	Save(member *models.Member, db *gorm.DB) *u.AppError
 	Update(member *models.Member, newMember *models.Member, db *gorm.DB) *u.AppError
 	GetByID(ID uint64, db *gorm.DB) models.Member
+	GetChannelMember(user *models.User, channel *models.Channel, db *gorm.DB) models.Member
 	GetByUser(user *models.User, db *gorm.DB) []models.Member
 	GetByChannel(channel *models.Channel, db *gorm.DB) []models.Member
 	GetByRole(role *models.Role, db *gorm.DB) []models.Member

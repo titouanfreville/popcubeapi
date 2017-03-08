@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"log"
+
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -241,34 +244,54 @@ func userContext(next http.Handler) http.Handler {
 	})
 }
 
+func canManageUser(place string, token *jwt.Token) bool {
+	store := datastores.Store()
+	db := dbStore.db
+	userName := token.Claims.(jwt.MapClaims)["name"].(string)
+	user := store.User().GetByUserName(userName, db)
+	userRights := store.Role().GetByID(user.IDRole, db)
+	if place == "organisation" || place == "global" {
+		haveGlobalManageRight, ok := token.Claims.(jwt.MapClaims)["canManageUser"].(bool)
+		log.Print(haveGlobalManageRight)
+		return (ok && haveGlobalManageRight) || userRights.CanManageUser
+	}
+	chanel := store.Channel().GetByName(place, db)
+	member := store.Member().GetChannelMember(&user, &chanel, db)
+	channelRights := store.Role().GetByID(member.IDRole, db)
+	return channelRights.CanManageUser
+}
+
 func getAllUser(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.User().GetAll(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.User().GetAll(db)
+	render.JSON(w, 200, result)
+
 }
 
 func getDeletedUser(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.User().GetDeleted(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.User().GetDeleted(db)
+	render.JSON(w, 200, result)
+
 }
 
 func getUserFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	name := r.Context().Value("userName").(string)
 	user := store.User().GetByUserName(name, db)
 	render.JSON(w, 200, user)
@@ -276,8 +299,11 @@ func getUserFromName(w http.ResponseWriter, r *http.Request) {
 
 func getUserFromNickName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	name := r.Context().Value(nickNameKey).(string)
 	user := store.User().GetByNickName(name, db)
 	render.JSON(w, 200, user)
@@ -285,8 +311,11 @@ func getUserFromNickName(w http.ResponseWriter, r *http.Request) {
 
 func getUserFromFirstName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	name := r.Context().Value(firstNameKey).(string)
 	user := store.User().GetByFirstName(name, db)
 	render.JSON(w, 200, user)
@@ -294,8 +323,11 @@ func getUserFromFirstName(w http.ResponseWriter, r *http.Request) {
 
 func getUserFromLastName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	name := r.Context().Value(lastNameKey).(string)
 	user := store.User().GetByLastName(name, db)
 	render.JSON(w, 200, user)
@@ -303,8 +335,11 @@ func getUserFromLastName(w http.ResponseWriter, r *http.Request) {
 
 func getUserFromEmail(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	email := r.Context().Value(userEmailKey).(string)
 	user := store.User().GetByEmail(email, db)
 	render.JSON(w, 200, user)
@@ -312,8 +347,11 @@ func getUserFromEmail(w http.ResponseWriter, r *http.Request) {
 
 func getOrderedByDate(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	date := r.Context().Value(userDateKey).(int)
 	user := store.User().GetOrderedByDate(date, db)
 	render.JSON(w, 200, user)
@@ -325,20 +363,19 @@ func getUserFromRole(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			role := store.User().GetByRole(data.Role, db)
-			render.JSON(w, 200, role)
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	role := store.User().GetByRole(data.Role, db)
+	render.JSON(w, 200, role)
 }
 
 func newUser(w http.ResponseWriter, r *http.Request) {
@@ -347,24 +384,30 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
+	if !canManageUser("global", r.Context().Value(jwtTokenKey).(*jwt.Token)) {
+		res := error401
+		res.Message = "You don't have the right to manage user."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.User().Save(data.User, db)
-			if err == nil {
-				render.JSON(w, 201, data.User)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.User().Save(data.User, db)
+	if err == nil {
+		render.JSON(w, 201, data.User)
+		return
+	}
+	render.JSON(w, apperr.StatusCode, apperr)
+
 }
 
 func inviteUser(w http.ResponseWriter, r *http.Request) {
@@ -378,24 +421,32 @@ func inviteUser(w http.ResponseWriter, r *http.Request) {
 	organisation := store.Organisation().Get(db)
 	response := inviteOk{}
 	request := r.Body
+
+	if !canManageUser("global", r.Context().Value(jwtTokenKey).(*jwt.Token)) {
+		res := error401
+		res.Message = "You don't have the right to manage user."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
+
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Email == "" {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			var terr error
-			response.Email = data.Email
-			response.Organisation = organisation.OrganisationName
-			response.Token, terr = createInviteToken(data.Email, organisation.OrganisationName)
-			if terr == nil {
-				render.JSON(w, 201, response)
-			} else {
-				render.JSON(w, 422, "Could not generate token")
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err == nil {
+		var terr error
+		response.Email = data.Email
+		response.Organisation = organisation.OrganisationName
+		response.Token, terr = createInviteToken(data.Email, organisation.OrganisationName)
+		if terr == nil {
+			render.JSON(w, 201, response)
+			return
+		}
+		render.JSON(w, 422, "Could not generate token")
+		return
+	}
+	render.JSON(w, error503.StatusCode, error503)
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
@@ -409,26 +460,41 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	user := r.Context().Value(oldUserKey).(models.User)
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	self := token.Claims.(jwt.MapClaims)["user"].(string) == user.Username
+	if !self && !canManageUser("global", token) {
+		res := error401
+		res.Message = "You don't have the right to manage user."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
+
 	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.User().Update(&user, data.User, db)
-			if err == nil {
-				render.JSON(w, 200, user)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err == nil {
+		err := store.User().Update(&user, data.User, db)
+		if err == nil {
+			render.JSON(w, 200, user)
+			return
+		}
+
+	}
+	render.JSON(w, error503.StatusCode, error503)
 }
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(oldUserKey).(models.User)
 	store := datastores.Store()
-
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	self := token.Claims.(jwt.MapClaims)["user"].(string) == user.Username
+	if !self && !canManageUser("global", token) {
+		res := error401
+		res.Message = "You don't have the right to manage user."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	message := deleteMessageModel{
 		Object: user,
 	}
@@ -439,12 +505,12 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 			message.Success = true
 			message.Message = "User well removed."
 			render.JSON(w, 200, message)
-		} else {
-			message.Success = false
-			message.Message = err.Message
-			render.JSON(w, err.StatusCode, message.Message)
+			return
 		}
-	} else {
-		render.JSON(w, 503, error503)
+		message.Success = false
+		message.Message = err.Message
+		render.JSON(w, err.StatusCode, message.Message)
+		return
 	}
+	render.JSON(w, 503, error503)
 }

@@ -77,16 +77,21 @@ func (usi UserStoreImpl) GetByUserName(userName string, db *gorm.DB) models.User
 }
 
 // Login Used to log user in
-func (usi UserStoreImpl) Login(userName string, pass string, db *gorm.DB) (models.User, *u.AppError) {
-	user := models.User{}
+func (usi UserStoreImpl) Login(login string, pass string, db *gorm.DB) (models.User, *u.AppError) {
+	user1 := models.User{}
+	user2 := models.User{}
 	empty := models.User{}
 	err := u.NewAPIError(404, "Wrong user name or password", "Can't proceed to login. Password or user name is not correct")
-	db.Where("userName = ?", userName).First(&user)
-	if (user == models.User{}) {
+	db.Where("userName = ?", login).First(&user1)
+	db.Where("email = ?", login).First(&user2)
+	if (user1 == models.User{} && user2 == models.User{}) {
 		return empty, err
 	}
-	if models.ComparePassword(user.Password, pass) {
-		return user, nil
+	if models.ComparePassword(user1.Password, pass) {
+		return user1, nil
+	}
+	if models.ComparePassword(user2.Password, pass) {
+		return user2, nil
 	}
 	return empty, err
 }
