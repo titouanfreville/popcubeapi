@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -148,38 +149,36 @@ func avatarContext(next http.Handler) http.Handler {
 func getAllAvatar(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.Avatar().GetAll(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.Avatar().GetAll(db)
+	render.JSON(w, 200, result)
 }
 
 func getAvatarFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		name := r.Context().Value(avatarNameKey).(string)
-		avatar := store.Avatar().GetByName(name, db)
-		render.JSON(w, 200, avatar)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	name := r.Context().Value(avatarNameKey).(string)
+	avatar := store.Avatar().GetByName(name, db)
+	render.JSON(w, 200, avatar)
 }
 
 func getAvatarFromLink(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		link := r.Context().Value(avatarLinkKey).(string)
-		avatar := store.Avatar().GetByLink(link, db)
-		render.JSON(w, 200, avatar)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	link := r.Context().Value(avatarLinkKey).(string)
+	avatar := store.Avatar().GetByLink(link, db)
+	render.JSON(w, 200, avatar)
 }
 
 func newAvatar(w http.ResponseWriter, r *http.Request) {
@@ -187,25 +186,31 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 		Avatar *models.Avatar
 		OmitID interface{} `json:"id,omitempty"`
 	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Avatar == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Avatar().Save(data.Avatar, db)
-			if err == nil {
-				render.JSON(w, 201, data.Avatar)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	rerr := store.Avatar().Save(data.Avatar, db)
+	if rerr != nil {
+		render.JSON(w, rerr.StatusCode, rerr)
+		return
+	}
+	render.JSON(w, 201, data.Avatar)
 }
 
 func updateAvatar(w http.ResponseWriter, r *http.Request) {
@@ -213,48 +218,60 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 		Avatar *models.Avatar
 		OmitID interface{} `json:"id,omitempty"`
 	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
 	if err != nil || data.Avatar == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Avatar().Update(&avatar, data.Avatar, db)
-			if err == nil {
-				render.JSON(w, 200, avatar)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	rerr := store.Avatar().Update(&avatar, data.Avatar, db)
+	if err != nil {
+		render.JSON(w, rerr.StatusCode, rerr)
+		return
+	}
+	render.JSON(w, 200, avatar)
 }
 
 func deleteAvatar(w http.ResponseWriter, r *http.Request) {
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
 	store := datastores.Store()
-
 	message := deleteMessageModel{
 		Object: avatar,
 	}
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		err := store.Avatar().Delete(&avatar, db)
-		if err == nil {
-			message.Success = true
-			message.Message = "Avatar well removed."
-			render.JSON(w, 200, message)
-		} else {
-			message.Success = false
-			message.Message = err.Message
-			render.JSON(w, err.StatusCode, message.Message)
-		}
-	} else {
-		render.JSON(w, 503, error503)
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	err := store.Avatar().Delete(&avatar, db)
+	if err != nil {
+		message.Success = false
+		message.Message = err.Message
+		render.JSON(w, err.StatusCode, message.Message)
+		return
+	}
+	message.Success = true
+	message.Message = "Avatar well removed."
+	render.JSON(w, 200, message)
 }

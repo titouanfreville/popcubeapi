@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"log"
-
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
@@ -254,14 +252,27 @@ func canManageUser(place string, self bool, currentUser string, token *jwt.Token
 		return true
 	}
 	if place == "organisation" || place == "global" {
-		haveGlobalManageRight, ok := token.Claims.(jwt.MapClaims)["canManageUser"].(bool)
-		log.Print(haveGlobalManageRight)
-		return (ok && haveGlobalManageRight) || userRights.CanManageUser
+		return userRights.CanManageUser
 	}
 	chanel := store.Channel().GetByName(place, db)
 	member := store.Member().GetChannelMember(&user, &chanel, db)
 	channelRights := store.Role().GetByID(member.IDRole, db)
 	return channelRights.CanManageUser
+}
+
+func canInviteUser(place string, token *jwt.Token) bool {
+	store := datastores.Store()
+	db := dbStore.db
+	userName := token.Claims.(jwt.MapClaims)["name"].(string)
+	user := store.User().GetByUserName(userName, db)
+	userRights := store.Role().GetByID(user.IDRole, db)
+	if place == "organisation" || place == "global" {
+		return userRights.CanInvite
+	}
+	chanel := store.Channel().GetByName(place, db)
+	member := store.Member().GetChannelMember(&user, &chanel, db)
+	channelRights := store.Role().GetByID(member.IDRole, db)
+	return channelRights.CanInvite
 }
 
 func getAllUser(w http.ResponseWriter, r *http.Request) {
@@ -389,7 +400,6 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser("global", false, "", token) {
-
 		res := error401
 		res.Message = "You don't have the right to manage user."
 		render.JSON(w, error401.StatusCode, error401)
@@ -427,7 +437,7 @@ func inviteUser(w http.ResponseWriter, r *http.Request) {
 	response := inviteOk{}
 	request := r.Body
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
-	if !canManageUser("global", false, "", token) {
+	if !canManageUser("global", false, "", token) || !canInviteUser("global", token) {
 		res := error401
 		res.Message = "You don't have the right to manage user."
 		render.JSON(w, error401.StatusCode, error401)

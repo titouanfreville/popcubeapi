@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -150,6 +151,30 @@ func initChannelRoute(router chi.Router) {
 	})
 }
 
+func canModerate(currentChannelID uint64, token *jwt.Token) bool {
+	store := datastores.Store()
+	db := dbStore.db
+	userName := token.Claims.(jwt.MapClaims)["name"].(string)
+	user := store.User().GetByUserName(userName, db)
+	userRights := store.Role().GetByID(user.IDRole, db)
+	chanel := store.Channel().GetByID(currentChannelID, db)
+	member := store.Member().GetChannelMember(&user, &chanel, db)
+	memberRights := store.Role().GetByID(member.IDRole, db)
+	return (memberRights != models.Role{} && memberRights.CanManageUser || memberRights == models.Role{} && userRights.CanManageUser)
+}
+
+func canArchive(currentChannelID uint64, token *jwt.Token) bool {
+	store := datastores.Store()
+	db := dbStore.db
+	userName := token.Claims.(jwt.MapClaims)["name"].(string)
+	user := store.User().GetByUserName(userName, db)
+	userRights := store.Role().GetByID(user.IDRole, db)
+	chanel := store.Channel().GetByID(currentChannelID, db)
+	member := store.Member().GetChannelMember(&user, &chanel, db)
+	memberRights := store.Role().GetByID(member.IDRole, db)
+	return (memberRights != models.Role{} && memberRights.CanArchive || memberRights == models.Role{} && userRights.CanArchive)
+}
+
 func channelContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		channelID, err := strconv.ParseUint(chi.URLParam(r, "channelID"), 10, 64)
@@ -168,44 +193,47 @@ func channelContext(next http.Handler) http.Handler {
 
 func getAllChannel(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.Channel().GetAll(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.Channel().GetAll(db)
+	render.JSON(w, 200, result)
+
 }
 
 func getPublicChannel(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.Channel().GetPublic(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.Channel().GetPublic(db)
+	render.JSON(w, 200, result)
+
 }
 
 func getPrivateChannel(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.Channel().GetPrivate(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.Channel().GetPrivate(db)
+	render.JSON(w, 200, result)
+
 }
 
 func getChannelFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	name := r.Context().Value(channelNameKey).(string)
 	channel := store.Channel().GetByName(name, db)
 	render.JSON(w, 200, channel)
@@ -213,8 +241,11 @@ func getChannelFromName(w http.ResponseWriter, r *http.Request) {
 
 func getChannelFromType(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	channelType := r.Context().Value(channelTypeKey).(string)
 	channel := store.Channel().GetByType(channelType, db)
 	render.JSON(w, 200, channel)
@@ -225,25 +256,31 @@ func newChannel(w http.ResponseWriter, r *http.Request) {
 		Channel *models.Channel
 		OmitID  interface{} `json:"id,omitempty"`
 	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageUser("global", false, "", token) {
+		res := error401
+		res.Message = "You don't have the right to manage user."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Channel == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Channel().Save(data.Channel, db)
-			if err == nil {
-				render.JSON(w, 201, data.Channel)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	rerr := store.Channel().Save(data.Channel, db)
+	if err != nil {
+		render.JSON(w, rerr.StatusCode, rerr)
+		return
+	}
+	render.JSON(w, 201, data.Channel)
 }
 
 func updateChannel(w http.ResponseWriter, r *http.Request) {
@@ -251,48 +288,60 @@ func updateChannel(w http.ResponseWriter, r *http.Request) {
 		Channel *models.Channel
 		OmitID  interface{} `json:"id,omitempty"`
 	}
+	channel := r.Context().Value(oldChannelKey).(models.Channel)
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageUser(channel.ChannelName, false, "", token) {
+		res := error401
+		res.Message = "You don't have the right to manage user."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
-	channel := r.Context().Value(oldChannelKey).(models.Channel)
 	if err != nil || data.Channel == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Channel().Update(&channel, data.Channel, db)
-			if err == nil {
-				render.JSON(w, 200, channel)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	rerr := store.Channel().Update(&channel, data.Channel, db)
+	if err == nil {
+		render.JSON(w, rerr.StatusCode, rerr)
+		return
+	}
+	render.JSON(w, 200, channel)
 }
 
 func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	channel := r.Context().Value(oldChannelKey).(models.Channel)
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageUser(channel.ChannelName, false, "", token) {
+		res := error401
+		res.Message = "You don't have the right to manage user."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	message := deleteMessageModel{
 		Object: channel,
 	}
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		err := store.Channel().Delete(&channel, db)
-		if err == nil {
-			message.Success = true
-			message.Message = "Channel well removed."
-			render.JSON(w, 200, message)
-		} else {
-			message.Success = false
-			message.Message = err.Message
-			render.JSON(w, err.StatusCode, message.Message)
-		}
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	err := store.Channel().Delete(&channel, db)
+	if err == nil {
+		message.Success = false
+		message.Message = err.Message
+		render.JSON(w, err.StatusCode, message.Message)
+		return
+	}
+	message.Success = true
+	message.Message = "Channel well removed."
+	render.JSON(w, 200, message)
 }

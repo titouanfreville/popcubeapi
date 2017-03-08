@@ -71,16 +71,9 @@ func initAuth() {
 // createUserToken create JWT auth token for current login user
 func createUserToken(user models.User, role models.Role) (string, error) {
 	claims := jwt.MapClaims{
-		"name":       user.Username,
-		"email":      user.Email,
-		"role":       role.RoleName,
-		"archive":    role.CanArchive,
-		"invite":     role.CanInvite,
-		"manage":     role.CanManage,
-		"manageuser": role.CanManageUser,
-		"moderate":   role.CanModerate,
-		"private":    role.CanUsePrivate,
-		"type":       "userauth",
+		"name":  user.Username,
+		"email": user.Email,
+		"type":  "userauth",
 	}
 	unsignedToken := *jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := unsignedToken.SignedString(hmacSampleSecret)
