@@ -15,7 +15,7 @@ import (
 
 // UserParameter object
 //
-// Global userParameters to apply within organisation. unique object in database
+// User parameter store all the parameters set an user can use.
 //
 // swagger:model
 type UserParameter struct {
