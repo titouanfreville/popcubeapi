@@ -16,6 +16,9 @@ function usage(){
     echo -e "\t--tag=$TAG"
     echo ""
 }
+function install_docs_require() {
+   ./scripts/slate_require.sh 
+}
 function build_images() {
   # First args is tags
   docker build --no-cache -t ${REPO}/popcubedocs:$1 -f docker/slateserver.Dockerfile .
@@ -112,6 +115,7 @@ fi
 if [ ${TAG+x} ];
 then
   echo "TAG is set to '$TAG'";
+  install_docs_require
   build_images "$TAG"
   push_images "$TAG"
 elif [ ${BRANCH+x} ];
@@ -120,6 +124,7 @@ then
   if [ ${BRANCH} = "master" ];
   then
     echo "branch develop : OK"
+    install_docs_require
     build_images "master"
     push_images "master"
     build_images "latest"
@@ -127,6 +132,7 @@ then
   elif [ ${BRANCH} = "develop" ];
   then
     echo "branch develop : OK"
+    install_docs_require
     build_images "dev"
     push_images "dev"
   else
