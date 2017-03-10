@@ -11,7 +11,6 @@ import (
 //
 // swagger:model
 type Member struct {
-	// IDMember uint64  `gorm:"primary_key;column:idMember;AUTO_INCREMENT" json:"-"`
 	User User `db:"-" json:"-"`
 	// required: true
 	IDUser  uint64  `gorm:"column:idUser; not null;" json:"id_user,omitempty"`

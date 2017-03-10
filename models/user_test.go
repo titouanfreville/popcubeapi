@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
 	u "github.com/titouanfreville/popcubeapi/utils"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -60,7 +61,6 @@ func TestUserModel(t *testing.T) {
 				So(user.LastUpdate, ShouldNotBeNil)
 				So(user.LastUpdate, ShouldBeGreaterThan, 0)
 				So(user.LastUpdate, ShouldEqual, user.LastPasswordUpdate)
-				So(user.Locale, ShouldNotBeBlank)
 				So(ComparePassword(user.Password, "test"), ShouldBeTrue)
 			})
 
@@ -90,7 +90,6 @@ func TestUserModel(t *testing.T) {
 				So(user.LastUpdate, ShouldNotBeNil)
 				So(user.LastUpdate, ShouldBeGreaterThan, 0)
 				So(user.LastUpdate, ShouldEqual, user.LastPasswordUpdate)
-				So(user.Locale, ShouldNotBeBlank)
 				So(ComparePassword(user.Password, "test"), ShouldBeTrue)
 			})
 
@@ -111,7 +110,7 @@ func TestUserModel(t *testing.T) {
 		Convey("Given a full user entry", func() {
 			user := User{
 				WebID:              "testID",
-				LastUpdate:          10,
+				LastUpdate:         10,
 				Deleted:            true,
 				Username:           "TesT",
 				Password:           "test",
@@ -123,7 +122,6 @@ func TestUserModel(t *testing.T) {
 				Role:               Owner,
 				LastPasswordUpdate: 20,
 				FailedAttempts:     1,
-				Locale:             "vi",
 				LastActivityAt:     5,
 			}
 
@@ -143,7 +141,6 @@ func TestUserModel(t *testing.T) {
 				So(user.LastPasswordUpdate, ShouldNotEqual, 20)
 				So(user.LastPasswordUpdate, ShouldEqual, user.LastUpdate)
 				So(user.FailedAttempts, ShouldEqual, 1)
-				So(user.Locale, ShouldEqual, "vi")
 				So(user.LastActivityAt, ShouldEqual, 5)
 			})
 

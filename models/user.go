@@ -79,12 +79,8 @@ type User struct {
 	// Number of attemps failed while loging in
 	//
 	// required: true
-	FailedAttempts int `gorm:"column:failedAttempts; not null;" json:"failed_attempts,omitempty"`
-	// User langage
-	//
-	// required: true
-	Locale string `gorm:"column:locale; not null;" json:"locale,omitempty"`
-	Role   Role   `gorm:"ForeignKey:IDRole;" db:"-" json:"-"`
+	FailedAttempts int  `gorm:"column:failedAttempts; not null;" json:"failed_attempts,omitempty"`
+	Role           Role `gorm:"ForeignKey:IDRole;" db:"-" json:"-"`
 	// Role key of user in the organisation
 	//
 	// required: true
@@ -155,10 +151,6 @@ func (user *User) PreSave() {
 
 	user.LastUpdate = GetMillis()
 	user.LastPasswordUpdate = user.LastUpdate
-
-	if user.Locale == "" {
-		user.Locale = DefaultLocale
-	}
 
 	if len(user.Password) > 0 {
 		user.Password = HashPassword(user.Password)
