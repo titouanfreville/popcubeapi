@@ -120,7 +120,7 @@ func initMessageRoute(router chi.Router) {
 			// 	  503: databaseError
 			// 	  default: genericError
 			r.Put("/update", updateMessage)
-			// swagger:route PUT /message/{messageID} Messages updateMessage
+			// swagger:route PUT /message/{messageID} Messages deleteMessage
 			//
 			// Update message
 			//

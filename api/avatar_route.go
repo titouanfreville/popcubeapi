@@ -114,7 +114,7 @@ func initAvatarRoute(router chi.Router) {
 			// 	  503: databaseError
 			// 	  default: genericError
 			r.Put("/update", updateAvatar)
-			// swagger:route PUT /avatar/{avatarID} Avatars updateAvatar
+			// swagger:route PUT /avatar/{avatarID} Avatars deleteAvatar
 			//
 			// Update avatar
 			//

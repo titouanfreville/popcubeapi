@@ -41,7 +41,14 @@ paths:
       summary: "Get avatars"
       description: "This will get all the avatars available in the organisation."
       operationId: "getAllAvatar"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "avatarSlice Array of avatars"
@@ -72,6 +79,13 @@ paths:
         schema:
           $ref: "#/definitions/Avatar"
         x-go-name: "Avatar"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "avatarObjectSuccess list of avatars"
@@ -98,7 +112,14 @@ paths:
       summary: "Get avatars"
       description: "This will get all the avatars available in the organisation."
       operationId: "getAllAvatar1"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "avatarSlice Array of avatars"
@@ -129,6 +150,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "AvatarLink"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"
@@ -157,6 +185,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "AvatarName"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"
@@ -186,6 +221,13 @@ paths:
         schema:
           $ref: "#/definitions/Avatar"
         x-go-name: "Avatar"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "avatarObjectSuccess list of avatars"
@@ -211,7 +253,7 @@ paths:
       - "Avatars"
       summary: "Update avatar"
       description: "This will return the new avatar object"
-      operationId: "updateAvatar"
+      operationId: "deleteAvatar"
       parameters:
       - name: "avatarID"
         in: "path"
@@ -220,13 +262,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "AvatarID"
-      - in: "body"
-        name: "avatar"
-        description: "Link of the avatar in server."
-        required: false
-        schema:
-          $ref: "#/definitions/Avatar"
-        x-go-name: "Avatar"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"
@@ -253,7 +295,14 @@ paths:
       summary: "Get channels"
       description: "This will get all the channels available in the organisation."
       operationId: "getAllChannel"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "channelSlice Array of channels"
@@ -284,6 +333,13 @@ paths:
         schema:
           $ref: "#/definitions/Channel"
         x-go-name: "Channel"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "messageObjectSuccess list of messages"
@@ -310,7 +366,14 @@ paths:
       summary: "Get channels"
       description: "This will get all the channels available in the organisation."
       operationId: "getAllChannel1"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "channelSlice Array of channels"
@@ -341,6 +404,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "ChannelName"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "channelObjectSuccess list of channels"
@@ -370,6 +440,13 @@ paths:
         schema:
           $ref: "#/definitions/Channel"
         x-go-name: "Channel"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "channelObjectSuccess list of channels"
@@ -396,7 +473,14 @@ paths:
       summary: "Get private channels"
       description: "This will get all the private channels available in the organisation."
       operationId: "getPrivateChannel"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "channelSlice Array of channels"
@@ -420,7 +504,14 @@ paths:
       summary: "Get public channels"
       description: "This will get all the public channels available in the organisation."
       operationId: "getPublicChannel"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "channelSlice Array of channels"
@@ -452,6 +543,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "ChannelType"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "channelSlice Array of channels"
@@ -490,6 +588,13 @@ paths:
         schema:
           $ref: "#/definitions/Channel"
         x-go-name: "Channel"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "channelObjectSuccess list of channels"
@@ -523,6 +628,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "ChannelID"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "deleteMessage"
@@ -544,7 +656,14 @@ paths:
       summary: "Get emojis"
       description: "This will get all the emojis available in the organisation."
       operationId: "getAllEmoji"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "emojiSlice Array of emojis"
@@ -575,6 +694,13 @@ paths:
         schema:
           $ref: "#/definitions/Emoji"
         x-go-name: "Emoji"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "emojiObjectSuccess list of emojis"
@@ -601,7 +727,14 @@ paths:
       summary: "Get emojis"
       description: "This will get all the emojis available in the organisation."
       operationId: "getAllEmoji1"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "emojiSlice Array of emojis"
@@ -632,6 +765,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "EmojiLink"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "emojiObjectSuccess list of emojis"
@@ -660,6 +800,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "EmojiName"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "emojiObjectSuccess list of emojis"
@@ -688,6 +835,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "EmojiShortcut"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "emojiObjectSuccess list of emojis"
@@ -724,6 +878,13 @@ paths:
         schema:
           $ref: "#/definitions/Emoji"
         x-go-name: "Emoji"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"
@@ -757,6 +918,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "EmojiID"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "deleteMessage"
@@ -778,7 +946,14 @@ paths:
       summary: "Get folders"
       description: "This will get all the folders available in the organisation."
       operationId: "getAllFolder"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "folderSlice Array of folders"
@@ -809,6 +984,13 @@ paths:
         schema:
           $ref: "#/definitions/Folder"
         x-go-name: "Folder"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "folderObjectSuccess list of folders"
@@ -835,7 +1017,14 @@ paths:
       summary: "Get folders"
       description: "This will get all the folders available in the organisation."
       operationId: "getAllFolder1"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "folderSlice Array of folders"
@@ -866,6 +1055,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "FolderLink"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "folderObjectSuccess list of folders"
@@ -895,6 +1091,13 @@ paths:
         schema:
           $ref: "#/definitions/Message"
         x-go-name: "Message"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "folderSlice Array of folders"
@@ -930,6 +1133,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "FolderName"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "folderObjectSuccess list of folders"
@@ -959,6 +1169,13 @@ paths:
         schema:
           $ref: "#/definitions/Folder"
         x-go-name: "Folder"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "folderObjectSuccess list of folders"
@@ -992,6 +1209,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "FolderType"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "folderObjectSuccess list of folders"
@@ -1028,6 +1252,13 @@ paths:
         schema:
           $ref: "#/definitions/Folder"
         x-go-name: "Folder"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"
@@ -1061,6 +1292,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "FolderID"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "deleteMessage"
@@ -1075,6 +1313,41 @@ paths:
           description: "genericError general error when unexpected errors occured"
           schema:
             $ref: "#/definitions/genericErrorModel"
+  /login:
+    post:
+      tags:
+      - "Login"
+      summary: "Try to log user in"
+      description: "Login user with provided USERNAME && Password"
+      operationId: "login"
+      parameters:
+      - in: "body"
+        name: "login"
+        description: "Login informations"
+        required: false
+        schema:
+          $ref: "#/definitions/loginParameterModel"
+        x-go-name: "Login"
+      responses:
+        200:
+          description: "inviteOk when invite correctly proceed, return the invite\
+            \ token information and the JWT token."
+          schema:
+            $ref: "#/definitions/User"
+        404:
+          description: "incorrectIds return error login message"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
   /member:
     get:
       tags:
@@ -1082,7 +1355,14 @@ paths:
       summary: "Get members"
       description: "This will get all the members available in the organisation."
       operationId: "getAllMember"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "memberSlice Array of members"
@@ -1113,6 +1393,13 @@ paths:
         schema:
           $ref: "#/definitions/Member"
         x-go-name: "Member"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "memberObjectSuccess list of members"
@@ -1139,7 +1426,14 @@ paths:
       summary: "Get members"
       description: "This will get all the members available in the organisation."
       operationId: "getAllMember1"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "memberSlice Array of members"
@@ -1171,6 +1465,13 @@ paths:
         schema:
           $ref: "#/definitions/Member"
         x-go-name: "Member"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "memberObjectSuccess list of members"
@@ -1196,15 +1497,15 @@ paths:
       - "Members"
       summary: "Update member"
       description: "This will return the new member object"
-      operationId: "updateMember"
+      operationId: "deleteMember"
       parameters:
-      - name: "memberID"
-        in: "path"
-        description: "Link of the member in server."
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
         required: true
-        type: "integer"
-        format: "int64"
-        x-go-name: "MemberID"
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "memberObjectSuccess list of members"
@@ -1231,7 +1532,14 @@ paths:
       summary: "Get messages"
       description: "This will get all the messages available in the organisation."
       operationId: "getAllMessage"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "messageSlice Array of messages"
@@ -1262,6 +1570,13 @@ paths:
         schema:
           $ref: "#/definitions/Message"
         x-go-name: "Message"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "messageObjectSuccess list of messages"
@@ -1288,7 +1603,14 @@ paths:
       summary: "Get messages"
       description: "This will get all the messages available in the organisation."
       operationId: "getAllMessage1"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "messageSlice Array of messages"
@@ -1321,6 +1643,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "MessageDate"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "messageObjectSuccess list of messages"
@@ -1350,6 +1679,13 @@ paths:
         schema:
           $ref: "#/definitions/Message"
         x-go-name: "Message"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "messageObjectSuccess list of messages"
@@ -1375,7 +1711,7 @@ paths:
       - "Messages"
       summary: "Update message"
       description: "This will return the new message object"
-      operationId: "updateMessage"
+      operationId: "deleteMessage"
       parameters:
       - name: "messageID"
         in: "path"
@@ -1384,13 +1720,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "MessageID"
-      - in: "body"
-        name: "message"
-        description: "Link of the message in server."
-        required: false
-        schema:
-          $ref: "#/definitions/Message"
-        x-go-name: "Message"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "messageObjectSuccess list of messages"
@@ -1417,7 +1753,14 @@ paths:
       summary: "Get organisations"
       description: "This will get all the organisations available in the organisation."
       operationId: "getAllOrganisation"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "organisationObjectSuccess list of organisations"
@@ -1447,6 +1790,13 @@ paths:
         schema:
           $ref: "#/definitions/Organisation"
         x-go-name: "Organisation"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "organisationObjectSuccess list of organisations"
@@ -1473,7 +1823,14 @@ paths:
       summary: "Get organisations"
       description: "This will get all the organisations available in the organisation."
       operationId: "getAllOrganisation1"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "organisationObjectSuccess list of organisations"
@@ -1504,6 +1861,13 @@ paths:
         schema:
           $ref: "#/definitions/Organisation"
         x-go-name: "Organisation"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "organisationObjectSuccess list of organisations"
@@ -1539,6 +1903,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "OrganisationID"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "organisationObjectSuccess list of organisations"
@@ -1577,7 +1948,14 @@ paths:
       summary: "Get parameters"
       description: "This will get all the parameters available in the organisation."
       operationId: "getAllParameter"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "parameterObjectSuccess list of parameters"
@@ -1606,6 +1984,13 @@ paths:
         schema:
           $ref: "#/definitions/Parameter"
         x-go-name: "Parameter"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "parameterObjectSuccess list of parameters"
@@ -1632,7 +2017,14 @@ paths:
       summary: "Get parameters"
       description: "This will get all the parameters available in the organisation."
       operationId: "getAllParameter1"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "parameterObjectSuccess list of parameters"
@@ -1662,6 +2054,13 @@ paths:
         schema:
           $ref: "#/definitions/Parameter"
         x-go-name: "Parameter"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "parameterObjectSuccess list of parameters"
@@ -1696,6 +2095,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "ParameterID"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"
@@ -1732,14 +2138,91 @@ paths:
           description: "genericError general error when unexpected errors occured"
           schema:
             $ref: "#/definitions/genericErrorModel"
+  /publicuser/new:
+    post:
+      tags:
+      - "Users"
+      summary: "New user"
+      description: "This will create an user for organisation if organisation is Public\
+        \ OR Email match parametetered emails"
+      operationId: "newPublicUser"
+      parameters: []
+      responses:
+        201:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /publicuser/newfrominvite:
+    post:
+      tags:
+      - "Users"
+      summary: "New user"
+      description: "This will create an user for organisation if user was invited"
+      operationId: "newInvitedUser"
+      parameters:
+      - in: "body"
+        name: "token"
+        description: "Invite token you got from user/invite call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: false
+        schema:
+          type: "string"
+        x-go-name: "Token"
+      responses:
+        201:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
   /role:
     get:
       tags:
       - "Roles"
       summary: "Get roles"
       description: "This will get all the roles available in the organisation."
-      operationId: "getAllRole"
-      parameters: []
+      operationId: "newRole"
+      parameters:
+      - in: "body"
+        name: "role"
+        description: "Role object"
+        required: false
+        schema:
+          $ref: "#/definitions/Role"
+        x-go-name: "Role"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "roleSlice Array of roles"
@@ -1763,7 +2246,14 @@ paths:
       summary: "Get roles"
       description: "This will get all the roles available in the organisation."
       operationId: "getAllRole1"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "roleSlice Array of roles"
@@ -1794,6 +2284,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "RoleName"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "roleObjectSuccess list of roles"
@@ -1823,6 +2320,13 @@ paths:
         schema:
           $ref: "#/definitions/Role"
         x-go-name: "Role"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "roleObjectSuccess list of roles"
@@ -1857,6 +2361,13 @@ paths:
         schema:
           $ref: "#/definitions/rightsParameterModel"
         x-go-name: "Rights"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "roleSlice Array of roles"
@@ -1900,6 +2411,13 @@ paths:
         schema:
           $ref: "#/definitions/Role"
         x-go-name: "Role"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "avatarObjectSuccess list of avatars"
@@ -1933,6 +2451,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "RoleID"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "deleteMessage"
@@ -1954,7 +2479,14 @@ paths:
       summary: "Get users"
       description: "This will get all the users available in the organisation."
       operationId: "getAllUser"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "userSlice Array of users"
@@ -1985,6 +2517,13 @@ paths:
         schema:
           $ref: "#/definitions/User"
         x-go-name: "User"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "userObjectSuccess list of users"
@@ -2011,7 +2550,14 @@ paths:
       summary: "Get deleted user"
       description: "This will get all the deleted users still present in database."
       operationId: "getDeletedUser"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "userSlice Array of users"
@@ -2035,7 +2581,14 @@ paths:
       summary: "Get user ordered by date"
       description: "This will get all the users ordered by date."
       operationId: "getOrderedByDate"
-      parameters: []
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "userSlice Array of users"
@@ -2066,11 +2619,52 @@ paths:
         required: true
         type: "string"
         x-go-name: "FirstName"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "userObjectSuccess list of users"
           schema:
             $ref: "#/definitions/User"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/invite:
+    post:
+      tags:
+      - "Users"
+      summary: "Invite user"
+      description: "This will create an invitation token for a user."
+      operationId: "inviteUser"
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
+      responses:
+        201:
+          description: "userObjectSuccess list of users"
+          schema:
+            $ref: "#/definitions/User"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
         503:
           description: "databaseError is an error object to tell what is happening\
             \ when we encounter issue with database"
@@ -2094,6 +2688,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "LastName"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "userObjectSuccess list of users"
@@ -2123,6 +2724,13 @@ paths:
         schema:
           $ref: "#/definitions/User"
         x-go-name: "User"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "userObjectSuccess list of users"
@@ -2156,6 +2764,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "NickName"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "userObjectSuccess list of users"
@@ -2185,6 +2800,13 @@ paths:
         schema:
           $ref: "#/definitions/Role"
         x-go-name: "Role"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "userSlice Array of users"
@@ -2220,6 +2842,13 @@ paths:
         required: true
         type: "string"
         x-go-name: "UserName"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "userObjectSuccess list of users"
@@ -2240,7 +2869,7 @@ paths:
       - "Users"
       summary: "Update user"
       description: "This will return the new user object"
-      operationId: "updateUser"
+      operationId: "deleteUser"
       parameters:
       - name: "userID"
         in: "path"
@@ -2249,13 +2878,13 @@ paths:
         type: "integer"
         format: "int64"
         x-go-name: "UserID"
-      - in: "body"
-        name: "user"
-        description: "Link of the user in server."
-        required: false
-        schema:
-          $ref: "#/definitions/User"
-        x-go-name: "User"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
       responses:
         200:
           description: "userObjectSuccess list of users"
@@ -2276,6 +2905,34 @@ paths:
           schema:
             $ref: "#/definitions/genericErrorModel"
 definitions:
+  AllowedWebMails:
+    type: "object"
+    required:
+    - "provider"
+    properties:
+      description:
+        type: "string"
+        description: "Rights that will automatically atributed to user created accound\
+          \ from the webmail"
+        x-go-name: "DefaultRights"
+      domain:
+        type: "string"
+        description: "Domain name of the allowedWebMails"
+        x-go-name: "Domain"
+      id:
+        type: "integer"
+        format: "uint64"
+        description: "id of the allowedWebMails"
+        minimum: 0.0
+        x-go-name: "IDAllowedWebMails"
+      provider:
+        type: "string"
+        description: "Mail provider"
+        x-go-name: "Provider"
+    title: "AllowedWebMails object"
+    description: "Describe web mails user that can join organisation without being\
+      \ invited. (ex: @popcube.xyz, @supinfo.com, etc.)"
+    x-go-package: "github.com/titouanfreville/popcubeapi/models"
   Avatar:
     type: "object"
     required:
@@ -2499,6 +3156,11 @@ definitions:
       name:
         type: "string"
         x-go-name: "OrganisationName"
+      public:
+        type: "boolean"
+        description: "State if organisation is free to join or not. Default is private\
+          \ (false)."
+        x-go-name: "Public"
     title: "Organisation object"
     description: "Describe organisation you are in. It is an unique object in the\
       \ database."
@@ -2538,6 +3200,28 @@ definitions:
     title: "Parameter object"
     description: "Global parameters to apply within organisation. unique object in\
       \ database"
+    x-go-package: "github.com/titouanfreville/popcubeapi/models"
+  Read:
+    type: "object"
+    required:
+    - "id_channel"
+    - "id_message"
+    - "id_user"
+    properties:
+      id_channel:
+        type: "integer"
+        format: "uint64"
+        x-go-name: "IDChannel"
+      id_message:
+        type: "integer"
+        format: "uint64"
+        x-go-name: "IDMessage"
+      id_user:
+        type: "integer"
+        format: "uint64"
+        x-go-name: "IDUser"
+    title: "Read object."
+    description: "Read state who read a given message in a given channel."
     x-go-package: "github.com/titouanfreville/popcubeapi/models"
   Role:
     type: "object"
@@ -2595,7 +3279,6 @@ definitions:
     - "failed_attempts"
     - "id_role"
     - "last_password_update"
-    - "locale"
     - "password"
     - "username"
     properties:
@@ -2653,10 +3336,6 @@ definitions:
         format: "int64"
         description: "Date of the last update from user"
         x-go-name: "LastUpdate"
-      locale:
-        type: "string"
-        description: "User langage"
-        x-go-name: "Locale"
       nickname:
         type: "string"
         description: "User nickname"
@@ -2678,6 +3357,44 @@ definitions:
     description: "An user is an account who have an access to a specific organisation.\
       \ Each user is unique inside a given organisation, but users are not shared\
       \ between\norganisations. Required apply only for creation of the object."
+    x-go-package: "github.com/titouanfreville/popcubeapi/models"
+  UserParameter:
+    type: "object"
+    required:
+    - "local"
+    - "sleep_end"
+    - "sleep_start"
+    - "time_zone"
+    properties:
+      id:
+        type: "integer"
+        format: "uint64"
+        description: "id of the user who parameter can be applied to"
+        x-go-name: "IDUser"
+      local:
+        type: "string"
+        description: "Default langage"
+        x-go-name: "Local"
+      parameter_name:
+        type: "string"
+        description: "required true"
+        x-go-name: "ParameterName"
+      sleep_end:
+        type: "integer"
+        format: "int64"
+        description: "Default end of non notification period"
+        x-go-name: "SleepEnd"
+      sleep_start:
+        type: "integer"
+        format: "int64"
+        description: "Default start of non notification period"
+        x-go-name: "SleepStart"
+      time_zone:
+        type: "string"
+        description: "Default time zone"
+        x-go-name: "TimeZone"
+    title: "UserParameter object"
+    description: "User parameter store all the parameters set an user can use."
     x-go-package: "github.com/titouanfreville/popcubeapi/models"
   avatarArraySuccess:
     type: "object"
@@ -2990,6 +3707,41 @@ definitions:
     title: "AppError Type used to structure error reporting for popcube chat project."
     x-go-name: "AppError"
     x-go-package: "github.com/titouanfreville/popcubeapi/utils"
+  incorrectIds:
+    type: "object"
+    properties:
+      Error:
+        description: "in:body"
+        $ref: "#/definitions/genericErrorModel"
+    description: "incorrectIds return error login message"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  inviteOk:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        description: "in:body"
+        x-go-name: "Email"
+      organisation:
+        type: "string"
+        description: "in:body"
+        x-go-name: "Organisation"
+      token:
+        type: "string"
+        description: "in:body"
+        x-go-name: "Token"
+    title: "inviteOk when invite correctly proceed, return the invite token information\
+      \ and the JWT token."
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  inviteToken:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+        description: "Invite token you got from user/invite call. Pass it as Authentication:\
+          \ bearer {{token}} in the header\nin:body"
+        x-go-name: "Token"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
   lastNameeParam:
     type: "object"
     properties:
@@ -2997,6 +3749,41 @@ definitions:
         type: "string"
         description: "Link of the user in server.\nin:path"
         x-go-name: "LastName"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  loginOk:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+        description: "in:body"
+        x-go-name: "Token"
+      user:
+        description: "in:body"
+        $ref: "#/definitions/User"
+    title: "loginOk when login correctly proceed, return the user and an auth token."
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  loginParam:
+    type: "object"
+    properties:
+      login:
+        description: "Login informations\nin:body"
+        $ref: "#/definitions/loginParameterModel"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  loginParameterModel:
+    type: "object"
+    required:
+    - "login"
+    - "password"
+    properties:
+      login:
+        type: "string"
+        description: "user name"
+        x-go-name: "Login"
+      password:
+        type: "string"
+        description: "user password hashed"
+        x-go-name: "Password"
+    description: "loginParameterModel is the object you have to pass to login"
     x-go-package: "github.com/titouanfreville/popcubeapi/api"
   memberArraySuccess:
     type: "object"
@@ -3251,6 +4038,17 @@ definitions:
         $ref: "#/definitions/User"
     description: "userObjectSuccess list of users"
     x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  userTokenParameter:
+    type: "object"
+    required:
+    - "token"
+    properties:
+      token:
+        type: "string"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        x-go-name: "Token"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
   wrongEntityError:
     type: "object"
     properties:
@@ -3312,6 +4110,15 @@ responses:
     description: "genericError general error when unexpected errors occured"
     schema:
       $ref: "#/definitions/genericErrorModel"
+  incorrectIds:
+    description: "incorrectIds return error login message"
+    schema:
+      $ref: "#/definitions/genericErrorModel"
+  loginOk:
+    description: "inviteOk when invite correctly proceed, return the invite token\
+      \ information and the JWT token."
+    schema:
+      $ref: "#/definitions/User"
   memberArraySuccess:
     description: "memberSlice Array of members"
     schema:

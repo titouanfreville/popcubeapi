@@ -323,11 +323,29 @@ type loginParameterModel struct {
 	Password string `json:"password"`
 }
 
-// swagger:parameters Login
+// swagger:parameters login
 type loginParam struct {
 	// Login informations
 	// in:body
 	Login loginParameterModel `json:"login"`
+}
+
+// <><><><><> <><><><><> <><><><><> <><><><><> //
+// <><><><><> TOKENS PARAMETERS <><><><><> //
+
+// swagger:parameters getAllAvatar getAllAvatar1 newAvatar newAvatar1 getAvatarFromLink getAvatarFromName updateAvatar deleteAvatar getAllChannel getAllChannel1 newChannel newChannel1 getPublicChannel getPrivateChannel getChannelFromType getChannelFromName updateChannel deleteChannel getAllEmoji getAllEmoji1 newEmoji1 newEmoji getEmojiFromLink getEmojiFromName getEmojiFromShortcut updateEmoji deleteEmoji getAllFolder getAllFolder1 newFolder newFolder1 getFolderFromMessage getFolderFromName getFolderFromLink getFolderFromType updateFolder deleteFolder getAllMember getAllMember1 newMember newMember1 getMemberFromChannel getMemberFromUser getMemberFromRole updateMember deleteMember getAllMessage getAllMessage1 newMessage newMessage1 getMessageFromChannel getMessageFromUser getMessageFromDate updateMessage deleteMessage getAllOrganisation getAllOrganisation1 newOrganisation newOrganisation1 updateOrganisation getAllParameter getAllParameter1 newParameter newParameter1 updateParameter getAllRole getAllRole1 newRole newRole1 getRoleFromRights getRoleFromName updateRole deleteRole getAllUser getAllUser1 newUser newUser1 inviteUser getDeletedUser getUserFromRole getOrderedByDate getUserFromName getUserFromNickName getUserFromFirstName getUserFromLastName updateUser deleteUser
+type userTokenParameter struct {
+	// User token you got from login call. Pass it as Authentication: bearer {{token}} in the header
+	// required: true
+	// in:header
+	Token string `json:"token"`
+}
+
+// swagger:parameters newInvitedUser
+type inviteToken struct {
+	// Invite token you got from user/invite call. Pass it as Authentication: bearer {{token}} in the header
+	// in:body
+	Token string `json:"token"`
 }
 
 // <><><><><> <><><><><> <><><><><> <><><><><> //
