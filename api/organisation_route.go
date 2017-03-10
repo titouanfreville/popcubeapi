@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -82,6 +83,15 @@ func initOrganisationRoute(router chi.Router) {
 	})
 }
 
+func canManageOrganisation(token *jwt.Token) bool {
+	store := datastores.Store()
+	db := dbStore.db
+	userName := token.Claims.(jwt.MapClaims)["name"].(string)
+	user := store.User().GetByUserName(userName, db)
+	userRights := store.Role().GetByID(user.IDRole, db)
+	return userRights.CanManage
+}
+
 func organisationContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := strconv.ParseUint(chi.URLParam(r, "organisationID"), 10, 64)
@@ -96,7 +106,6 @@ func organisationContext(next http.Handler) http.Handler {
 
 func getAllOrganisation(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Organisation().Get(db)
@@ -111,8 +120,14 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 		Organisation *models.Organisation
 		OmitID       interface{} `json:"id,omitempty"`
 	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -138,8 +153,14 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 		OmitID       interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	organisation := r.Context().Value(oldOrganisationKey).(models.Organisation)

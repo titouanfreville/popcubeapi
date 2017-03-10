@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -165,7 +166,6 @@ func emojiContext(next http.Handler) http.Handler {
 
 func getAllEmoji(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
 	if err := db.DB().Ping(); err == nil {
 		result := store.Emoji().GetAll(db)
@@ -207,8 +207,14 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 		Emoji  *models.Emoji
 		OmitID interface{} `json:"id,omitempty"`
 	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -233,8 +239,14 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 		Emoji  *models.Emoji
 		OmitID interface{} `json:"id,omitempty"`
 	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -256,9 +268,15 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteEmoji(w http.ResponseWriter, r *http.Request) {
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	emoji := r.Context().Value(oldEmojiKey).(models.Emoji)
 	store := datastores.Store()
-
 	message := deleteMessageModel{
 		Object: emoji,
 	}

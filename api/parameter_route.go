@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
@@ -112,8 +113,14 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 		Parameter *models.Parameter
 		OmitID    interface{} `json:"id,omitempty"`
 	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
@@ -138,8 +145,14 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 		Parameter *models.Parameter
 		OmitID    interface{} `json:"id,omitempty"`
 	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	if !canManageOrganisation(token) {
+		res := error401
+		res.Message = "You don't have the right to manage organisation."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)

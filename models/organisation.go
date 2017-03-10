@@ -34,8 +34,10 @@ type Organisation struct {
 	DockerStack int `gorm:"column:dockerStack;not null;unique" json:"docker_stack,omitempty"`
 	// required: true
 	OrganisationName string `gorm:"column:organisationName;not null;unique" json:"name,omitempty"`
-	Description      string `gorm:"column:description" json:"description,omitempty"`
-	Avatar           string `gorm:"column:avatar" json:"avatar,omitempty"`
+	// State if organisation is free to join or not. Default is private (false).
+	Public      bool   `gorm:"column:public; not null" json:"public"`
+	Description string `gorm:"column:description" json:"description,omitempty"`
+	Avatar      string `gorm:"column:avatar" json:"avatar,omitempty"`
 	// Domain name of the organisation
 	Domain string `gorm:"column:domain" json:"domain,omitempty"`
 }
