@@ -202,7 +202,7 @@ func initUserRoute(router chi.Router) {
 			// 	  503: databaseError
 			// 	  default: genericError
 			r.Put("/update", updateUser)
-			// swagger:route PUT /user/{userID} Users updateUser
+			// swagger:route PUT /user/{userID} Users deleteUser
 			//
 			// Update user
 			//

@@ -185,7 +185,7 @@ func basicRoutes(router *chi.Mux) {
 		r.Route("/newfrominvite", func(r chi.Router) {
 			r.Use(tokenAuth.Verifier)
 			r.Use(allowUserCreationFromToken)
-			// swagger:route POST /publicuser/newfrominvite Users newPublicUser
+			// swagger:route POST /publicuser/newfrominvite Users newInvitedUser
 			//
 			// New user
 			//

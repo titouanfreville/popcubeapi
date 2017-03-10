@@ -115,7 +115,7 @@ func initMemberRoute(router chi.Router) {
 			// 	  503: databaseError
 			// 	  default: genericError
 			r.Put("/update", updateMember)
-			// swagger:route PUT /member/{memberID} Members updateMember
+			// swagger:route PUT /member/{memberID} Members deleteMember
 			//
 			// Update member
 			//

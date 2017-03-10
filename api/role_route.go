@@ -31,7 +31,7 @@ func initRoleRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Get("/", getAllRole)
-		// swagger:route GET /role Roles getAllRole
+		// swagger:route GET /role Roles newRole
 		//
 		// Get roles
 		//
