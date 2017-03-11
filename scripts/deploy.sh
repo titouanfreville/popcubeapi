@@ -40,6 +40,8 @@ curl -X POST --header 'Content-Type: application/json' \
    \"Env\": [
      \"VIRTUAL_NETWORK=nginx-proxy\",
      \"VIRTUAL_HOST=docs-alpha.popcube.xyz\",
+     \"LETSENCRYPT_HOST=docs-alpha.popcube.xyz\",
+     \"LETSENCRYPT_EMAIL=contact@popcube.xyz\",
      \"VIRTUAL_PORT=4567\"
    ],
    \"Hostname\": \"popcube_alpha_docs\" }" \
@@ -65,7 +67,9 @@ curl -X POST --header 'Content-Type: application/json' \
    \"Image\": \"${REPO}/popcubeapi:$1\",
    \"Env\": [
      \"VIRTUAL_NETWORK=nginx-proxy\",
-     \"VIRTUAL_HOST=alpha-api.popcube.xyz\",
+     \"VIRTUAL_HOST=api-alpha.popcube.xyz\",
+     \"LETSENCRYPT_HOST=api-alpha.popcube.xyz\",
+     \"LETSENCRYPT_EMAIL=contact@popcube.xyz\",
      \"VIRTUAL_PORT=3000\"
    ],
     \"HostConfig\": {
@@ -111,6 +115,16 @@ if [ ${TAG+x} ] && [ ${BRANCH+x} ];
 then
   echo "TAG and BRANCH is not compatible :("
   exit 1
+fi
+if [ -z ${DEPLOY_TOKEN+x} ] || [ -z ${DEPLOY_URL+x} ];
+then
+  echo "#################################"
+  echo "############WARNING##############"
+  echo "#################################"
+  echo "    DEPLOY_TOKEN is not SET"
+  echo "               OR"
+  echo "    DEPLOY_URL is not SET"
+  echo "#################################"
 fi
 if [ ${TAG+x} ];
 then
