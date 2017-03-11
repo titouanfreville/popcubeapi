@@ -38,6 +38,16 @@ type inviteOk struct {
 	Token string `json:"token,omitempty"`
 }
 
+// initOk when init correctly proceed, return the organisation object and its owner.
+//
+// swagger:response loginOk
+type initOk struct {
+	// in:body
+	Organisation models.Organisation `json:"organisation,omitempty"`
+	// in:body
+	Owner models.User `json:"user,omitempty"`
+}
+
 // ---------------------------------------------------
 // Errors --------------------------------------------
 

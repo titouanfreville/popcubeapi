@@ -29,6 +29,7 @@ import (
 
 // StoreInterface interface the Stores and usefull DB functions
 type StoreInterface interface {
+	AllowedWebMails() AllowedWebMailsStore
 	Avatar() AvatarStore
 	Channel() ChannelStore
 	Emoji() EmojiStore
@@ -37,8 +38,10 @@ type StoreInterface interface {
 	Message() MessageStore
 	Organisation() OrganisationStore
 	Parameter() ParameterStore
-	User() UserStore
+	Read() ReadStore
 	Role() RoleStore
+	UserParameter() UserParameterStore
+	User() UserStore
 	InitConnection(user string, dbname string, password string, host string, port string) *gorm.DB
 	InitDatabase(user string, dbname string, password string, host string, port string)
 	CloseConnection(*gorm.DB)
@@ -124,6 +127,17 @@ func (store StoreImpl) InitDatabase(user string, dbname string, password string,
 // CloseConnection close database connection
 func (store StoreImpl) CloseConnection(db *gorm.DB) {
 	defer db.Close()
+}
+
+/*AllowedWebMailsStore interface the allowedWebMails communication */
+type AllowedWebMailsStore interface {
+	Save(allowedWebMails *models.AllowedWebMails, db *gorm.DB) *u.AppError
+	Update(allowedWebMails *models.AllowedWebMails, newAllowedWebMails *models.AllowedWebMails, db *gorm.DB) *u.AppError
+	GetByDomain(domain string, db *gorm.DB) models.AllowedWebMails
+	GetByProvider(provider string, db *gorm.DB) []models.AllowedWebMails
+	GetByID(ID uint64, db *gorm.DB) models.AllowedWebMails
+	GetAll(db *gorm.DB) []models.AllowedWebMails
+	Delete(allowedWebMails *models.AllowedWebMails, db *gorm.DB) *u.AppError
 }
 
 /*AvatarStore interface the avatar communication */
@@ -217,6 +231,19 @@ type ParameterStore interface {
 	Get(db *gorm.DB) models.Parameter
 }
 
+/*ReadStore interface communication with read table*/
+type ReadStore interface {
+	Save(read *models.Read, db *gorm.DB) *u.AppError
+	Update(read *models.Read, newRead *models.Read, db *gorm.DB) *u.AppError
+	GetByID(ID uint64, db *gorm.DB) models.Read
+	GetChannelRead(user *models.User, channel *models.Channel, db *gorm.DB) models.Read
+	GetByUser(user *models.User, db *gorm.DB) []models.Read
+	GetByChannel(channel *models.Channel, db *gorm.DB) []models.Read
+	GetByMessage(message *models.Message, db *gorm.DB) []models.Read
+	GetAll(db *gorm.DB) []models.Read
+	Delete(read *models.Read, db *gorm.DB) *u.AppError
+}
+
 /*RoleStore interface the role communication*/
 type RoleStore interface {
 	Save(role *models.Role, db *gorm.DB) *u.AppError
@@ -244,4 +271,15 @@ type UserStore interface {
 	GetAll(db *gorm.DB) []models.User
 	Delete(user *models.User, db *gorm.DB) *u.AppError
 	Login(userName string, pass string, db *gorm.DB) (models.User, *u.AppError)
+}
+
+/*UserParameterStore interface the userUserParameter communication*/
+type UserParameterStore interface {
+	Save(userUserParameter *models.UserParameter, db *gorm.DB) *u.AppError
+	Update(userUserParameter *models.UserParameter, newUserParameter *models.UserParameter, db *gorm.DB) *u.AppError
+	Delete(userParameter *models.UserParameter, db *gorm.DB) *u.AppError
+	GetAll(db *gorm.DB) []models.UserParameter
+	GetByUser(user *models.User, db *gorm.DB) []models.UserParameter
+	GetByName(parameterName string, db *gorm.DB) []models.UserParameter
+	GetByID(id uint64, db *gorm.DB) models.UserParameter
 }

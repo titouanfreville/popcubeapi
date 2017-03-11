@@ -23,7 +23,6 @@ func TestFolderModel(t *testing.T) {
 		Role:               Owner,
 		LastPasswordUpdate: 20,
 		FailedAttempts:     1,
-		Locale:             "vi",
 	}
 
 	channelTest := Channel{

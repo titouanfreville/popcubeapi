@@ -23,6 +23,7 @@ func TestEmojiStore(t *testing.T) {
 			Shortcut: ":troll-face:",
 			Link:     "emojis/trollface.svg",
 		}
+		db.Delete(&emoji)
 		Convey("Given a correct emoji.", func() {
 			appError := esi.Save(&emoji, db)
 			Convey("Trying to add it for the first time, should be accepted", func() {
@@ -54,6 +55,7 @@ func TestEmojiStore(t *testing.T) {
 			Link:     "emojis/trollface2.svg",
 		}
 
+		db.Delete(&emoji)
 		appError := esi.Save(&emoji, db)
 		So(appError, ShouldBeNil)
 		So(appError, ShouldNotResemble, dbError)

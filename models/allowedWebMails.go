@@ -21,13 +21,13 @@ type AllowedWebMails struct {
 	//
 	// min: 0
 	IDAllowedWebMails uint64 `gorm:"primary_key;column:idAllowedWebMails;AUTO_INCREMENT" json:"id,omitempty"`
-	// Mail provider
-	// required: true
-	Provider string `gorm:"column:provider;not null;" json:"provider,omitempty"`
 	// Domain name of the allowedWebMails
-	Domain string `gorm:"column:domain" json:"domain,omitempty"`
+	// required: true
+	Domain string `gorm:"column:domain; unique; not null;" json:"domain,omitempty"`
+	// Mail provider
+	Provider string `gorm:"column:provider" json:"provider,omitempty"`
 	// Rights that will automatically atributed to user created accound from the webmail
-	DefaultRights string `gorm:"column:description" json:"description,omitempty"`
+	DefaultRights string `gorm:"column:defaultRights" json:"defaultRights,omitempty"`
 }
 
 // IsValid check validity of object before saving in DB

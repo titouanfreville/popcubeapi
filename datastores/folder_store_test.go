@@ -22,7 +22,7 @@ func TestFolderStore(t *testing.T) {
 	msi := store.Message()
 
 	standartRole := Role{
-		RoleName:      "teststandartazd",
+		RoleName:      "teststandart",
 		CanUsePrivate: true,
 		CanModerate:   true,
 		CanArchive:    true,
@@ -30,6 +30,7 @@ func TestFolderStore(t *testing.T) {
 		CanManage:     false,
 		CanManageUser: false,
 	}
+	db.Delete(&standartRole)
 	rsi.Save(&standartRole, db)
 
 	userTest := User{
@@ -41,6 +42,7 @@ func TestFolderStore(t *testing.T) {
 		LastName:  "L",
 		IDRole:    standartRole.IDRole,
 	}
+	db.Delete(&userTest)
 	usi.Save(&userTest, db)
 
 	channelTest := Channel{
@@ -51,6 +53,7 @@ func TestFolderStore(t *testing.T) {
 		Subject:     "Sujet",
 		Avatar:      "jesuiscool.svg",
 	}
+	db.Delete(&channelTest)
 	csi.Save(&channelTest, db)
 
 	messageTest := Message{
@@ -58,6 +61,7 @@ func TestFolderStore(t *testing.T) {
 		IDUser:    userTest.IDUser,
 		IDChannel: channelTest.IDChannel,
 	}
+	db.Delete(&messageTest)
 	msi.Save(&messageTest, db)
 
 	Convey("Testing save function", t, func() {
@@ -106,7 +110,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "LL",
 	// 		FirstName:   "Luky",
 	// 		LastName:    "Luke",
-	// 		Locale:      "vn_VN",
 	// 		IDRole:      adminRole.IDRole,
 	// 	}
 
@@ -239,7 +242,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "LL",
 	// 		FirstName:   "Luky",
 	// 		LastName:    "Luke",
-	// 		Locale:      "en_EN",
 	// 		IDRole:      adminRole.IDRole,
 	// 	}
 	// 	folder1 := Folder{
@@ -249,7 +251,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "thebrothers",
 	// 		FirstName:   "Joe",
 	// 		LastName:    "Dalton",
-	// 		Locale:      "en_EN",
 	// 		IDRole:      standartRole.IDRole,
 	// 	}
 	// 	folder2 := Folder{
@@ -259,7 +260,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "Moris",
 	// 		FirstName:   "Moris",
 	// 		LastName:    "Gossiny",
-	// 		Locale:      "fr_FR",
 	// 		IDRole:      ownerRole.IDRole,
 	// 	}
 	// 	folder1New := Folder{
@@ -269,7 +269,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "thebrothers",
 	// 		FirstName:   "Joe, Jack, William, Avrell",
 	// 		LastName:    "Dalton",
-	// 		Locale:      "en_EN",
 	// 		IDRole:      guestRole.IDRole,
 	// 	}
 	// 	folder3 := Folder{
@@ -279,7 +278,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "JJ",
 	// 		FirstName:   "Jolly",
 	// 		LastName:    "Jumper",
-	// 		Locale:      "en_EN",
 	// 		IDRole:      standartRole.IDRole,
 	// 	}
 	// 	folder4 := Folder{
@@ -289,7 +287,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "Kid",
 	// 		FirstName:   "Billy",
 	// 		LastName:    "The Kid",
-	// 		Locale:      "en_EN",
 	// 		IDRole:      guestRole.IDRole,
 	// 	}
 
@@ -389,7 +386,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "LL",
 	// 		FirstName:   "Luky",
 	// 		LastName:    "Luke",
-	// 		Locale:      "en_EN",
 	// 		IDRole:      adminRole.IDRole,
 	// 	}
 	// 	folder1 := Folder{
@@ -399,7 +395,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "thebrothers",
 	// 		FirstName:   "Joe",
 	// 		LastName:    "Dalton",
-	// 		Locale:      "en_EN",
 	// 		IDRole:      standartRole.IDRole,
 	// 	}
 	// 	folder2 := Folder{
@@ -409,7 +404,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "Moris",
 	// 		FirstName:   "Moris",
 	// 		LastName:    "Gossiny",
-	// 		Locale:      "fr_FR",
 	// 		IDRole:      ownerRole.IDRole,
 	// 	}
 	// 	folder3 := Folder{
@@ -419,7 +413,6 @@ func TestFolderStore(t *testing.T) {
 	// 		NickName:    "JJ",
 	// 		FirstName:   "Jolly",
 	// 		LastName:    "Jumper",
-	// 		Locale:      "en_EN",
 	// 		IDRole:      standartRole.IDRole,
 	// 	}
 

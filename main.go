@@ -14,7 +14,7 @@ var (
 )
 
 func getConf(dbSettings *configs.DbConnection, serverSetting *configs.APIServerInfo) {
-	*dbSettings, *serverSetting = configs.InitConfig()
+	*dbSettings, *serverSetting, _ = configs.InitConfig()
 }
 
 func initAPI() {
