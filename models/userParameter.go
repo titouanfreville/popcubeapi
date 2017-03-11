@@ -22,7 +22,7 @@ type UserParameter struct {
 	// id of the user who parameter can be applied to
 	IDUser uint64 `gorm:"column:idUser; not null" json:"id,omitempty"`
 	// required true
-	ParameterName string `gorm:"column: parameterName" json:"parameter_name, omitempty"`
+	ParameterName string `gorm:"column:parameterName" json:"parameter_name, omitempty"`
 	// Default langage
 	//
 	// required: true

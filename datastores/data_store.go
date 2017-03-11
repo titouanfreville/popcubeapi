@@ -38,6 +38,7 @@ type StoreInterface interface {
 	Message() MessageStore
 	Organisation() OrganisationStore
 	Parameter() ParameterStore
+	UserParameter() UserParameterStore
 	User() UserStore
 	Role() RoleStore
 	InitConnection(user string, dbname string, password string, host string, port string) *gorm.DB
@@ -256,4 +257,15 @@ type UserStore interface {
 	GetAll(db *gorm.DB) []models.User
 	Delete(user *models.User, db *gorm.DB) *u.AppError
 	Login(userName string, pass string, db *gorm.DB) (models.User, *u.AppError)
+}
+
+/*UserParameterStore interface the userUserParameter communication*/
+type UserParameterStore interface {
+	Save(userUserParameter *models.UserParameter, db *gorm.DB) *u.AppError
+	Update(userUserParameter *models.UserParameter, newUserParameter *models.UserParameter, db *gorm.DB) *u.AppError
+	Delete(userParameter *models.UserParameter, db *gorm.DB) *u.AppError
+	GetAll(db *gorm.DB) []models.UserParameter
+	GetByUser(user *models.User, db *gorm.DB) []models.UserParameter
+	GetByName(parameterName string, db *gorm.DB) []models.UserParameter
+	GetByID(id uint64, db *gorm.DB) models.UserParameter
 }
