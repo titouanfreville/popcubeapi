@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
@@ -40,6 +41,7 @@ type key string
 // }
 
 var (
+	secret           string
 	hmacSampleSecret []byte
 	tokenAuth        *JwtAuth
 	userToken        *jwt.Token
@@ -63,9 +65,23 @@ func newRandomString(length int) string {
 	return b.String()
 }
 func initAuth() {
-	secret := newRandomString(100)
 	hmacSampleSecret = []byte(secret)
 	tokenAuth = New("HS256", hmacSampleSecret, hmacSampleSecret)
+	claims := jwt.MapClaims{
+		"organisation_name":   "PopCube",
+		"organisation_stack":  1,
+		"organisation_domain": "chat.popcube.xyz",
+		"public":              false,
+		"owner":               "TCMJJ",
+		"owner_mail":          "owned@popcube.xyz",
+		"owner_password":      "popcube",
+		"type":                "neworganisation",
+		"authorise":           "this token let you create new organisation and a new user in an iner DB",
+	}
+	unsignedToken := *jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, _ := unsignedToken.SignedString(hmacSampleSecret)
+	log.Print("Tolken new organisation && role : ")
+	log.Print(tokenString)
 }
 
 // createUserToken create JWT auth token for current login user
@@ -168,7 +184,19 @@ func basicRoutes(router *chi.Mux) {
 	// 		404: incorrectIds
 	// 	  422: wrongEntity
 	// 	  503: databaseError
+	// 	  default: genericError
 	router.Post("/login", loginMiddleware)
+	// swagger:route POST /initorganisation Init initOrganisation
+	//
+	// Try to log user in
+	//
+	// Login user with provided USERNAME && Password
+	//
+	// Responses:
+	// 		200: initOk
+	// 	  503: databaseError
+	// 	  default: genericError
+	router.Post("/initorganisation", initOrganisation)
 	router.Route("/publicuser", func(r chi.Router) {
 		// swagger:route POST /publicuser/new Users newPublicUser
 		//
@@ -258,16 +286,86 @@ func loginMiddleware(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func initOrganisation(w http.ResponseWriter, r *http.Request) {
+	// Verify token
+	ctx := r.Context()
+	if jwtErr, ok := ctx.Value(jwtErrorKey).(error); ok {
+		if jwtErr != nil {
+			render.JSON(w, 401, jwtErr)
+			return
+		}
+	}
+	jwtToken, ok := ctx.Value(jwtTokenKey).(*jwt.Token)
+	if !ok || jwtToken == nil || !jwtToken.Valid {
+		render.JSON(w, 401, "token is not valid or does not exist")
+		return
+	}
+	tokenType, ok := jwtToken.Claims.(jwt.MapClaims)["type"]
+	if !ok {
+		render.JSON(w, 401, "Token is not valid. Type is undifined")
+		return
+	}
+	if tokenType != "neworganisation" {
+		render.JSON(w, 401, "Token is not an init organisation one")
+		return
+	}
+	// Token passed. Initialising organisation
+	store := datastores.Store()
+	db := dbStore.db
+	organisation := models.Organisation{
+		OrganisationName: jwtToken.Claims.(jwt.MapClaims)["organisation_name"].(string),
+		DockerStack:      jwtToken.Claims.(jwt.MapClaims)["organisation_stack"].(int),
+		Domain:           jwtToken.Claims.(jwt.MapClaims)["organisation_domain"].(string),
+		Public:           jwtToken.Claims.(jwt.MapClaims)["public"].(bool),
+	}
+	user := models.User{
+		Username: jwtToken.Claims.(jwt.MapClaims)["owner"].(string),
+		Email:    jwtToken.Claims.(jwt.MapClaims)["owner_mail"].(string),
+		Password: jwtToken.Claims.(jwt.MapClaims)["owner_password"].(string),
+		// Owner role should always have ID 1 as it is the first one created into the DB.
+		IDRole: 1,
+	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	appErr := store.Organisation().Save(&organisation, db)
+	if appErr != nil {
+		render.JSON(w, appErr.StatusCode, appErr)
+		return
+	}
+	appErr = store.User().Save(&user, db)
+	if appErr != nil {
+		render.JSON(w, appErr.StatusCode, appErr)
+		return
+	}
+	res := initOk{
+		Organisation: organisation,
+		Owner:        user,
+	}
+	render.JSON(w, 201, res)
+}
+
 func newPublicUser(w http.ResponseWriter, r *http.Request) {
 	var data struct {
 		User   *models.User
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
+	organisation := store.Organisation().Get(db)
+	allowedWebMails := store.AllowedWebMails().GetAll(db)
+	isAuthorizedMail := false
+	for _, authorizedMail := range allowedWebMails {
+		filter := "*" + authorizedMail.Domain
+		ok, _ := regexp.MatchString(filter, data.User.Email)
+		isAuthorizedMail = isAuthorizedMail || ok
+	}
+	if !isAuthorizedMail && !organisation.Public {
+		render.JSON(w, 401, "You can't sign up if organisation is not public or your email domain was unauthorized.")
+	}
 	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
@@ -287,6 +385,7 @@ func newPublicUser(w http.ResponseWriter, r *http.Request) {
 // StartAPI initialise the api with provided host and port.
 func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnection) {
 	router := newRouter()
+	_, _, secret = configs.InitConfig()
 	// Init DB connection
 	user := DbConnectionInfo.User
 	db := DbConnectionInfo.Database
