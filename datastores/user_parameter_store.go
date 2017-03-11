@@ -78,7 +78,7 @@ func (psi UserParameterStoreImpl) GetAll(db *gorm.DB) []models.UserParameter {
 // GetByUser get userParameter from user
 func (psi UserParameterStoreImpl) GetByUser(user *models.User, db *gorm.DB) []models.UserParameter {
 	userParameters := []models.UserParameter{}
-	db.Table("userParameters").Select("*").Joins("natural join users").Where("users.idUser = ?", user.IDUser).Find(&userParameters)
+	db.Table("user_parameters").Select("*").Joins("natural join users").Where("users.idUser = ?", user.IDUser).Find(&userParameters)
 	return userParameters
 }
 

@@ -38,9 +38,10 @@ type StoreInterface interface {
 	Message() MessageStore
 	Organisation() OrganisationStore
 	Parameter() ParameterStore
+	Read() ReadStore
+	Role() RoleStore
 	UserParameter() UserParameterStore
 	User() UserStore
-	Role() RoleStore
 	InitConnection(user string, dbname string, password string, host string, port string) *gorm.DB
 	InitDatabase(user string, dbname string, password string, host string, port string)
 	CloseConnection(*gorm.DB)
@@ -228,6 +229,19 @@ type ParameterStore interface {
 	Save(parameter *models.Parameter, db *gorm.DB) *u.AppError
 	Update(parameter *models.Parameter, newParameter *models.Parameter, db *gorm.DB) *u.AppError
 	Get(db *gorm.DB) models.Parameter
+}
+
+/*ReadStore interface communication with read table*/
+type ReadStore interface {
+	Save(read *models.Read, db *gorm.DB) *u.AppError
+	Update(read *models.Read, newRead *models.Read, db *gorm.DB) *u.AppError
+	GetByID(ID uint64, db *gorm.DB) models.Read
+	GetChannelRead(user *models.User, channel *models.Channel, db *gorm.DB) models.Read
+	GetByUser(user *models.User, db *gorm.DB) []models.Read
+	GetByChannel(channel *models.Channel, db *gorm.DB) []models.Read
+	GetByMessage(message *models.Message, db *gorm.DB) []models.Read
+	GetAll(db *gorm.DB) []models.Read
+	Delete(read *models.Read, db *gorm.DB) *u.AppError
 }
 
 /*RoleStore interface the role communication*/
