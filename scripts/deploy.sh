@@ -53,7 +53,7 @@ curl -X POST --header 'Content-Type: application/json' \
       \"MYSQL_PASSWORD=test\",
       \"MYSQL_ROOT_PASSWORD=popcube_dev\",
       \"MYSQL_USER=test_user\",
-      \"MYSQL_DATABASE=popcube_test\"
+      \"MYSQL_DATABASE=popcube_dev\"
     ],
     \"Hostname\": \"popcube_alpha_database\" }" \
      http://${DEPLOY_URL}/deploy;

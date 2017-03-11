@@ -48,11 +48,11 @@ func (userParameter *UserParameter) IsValid() *u.AppError {
 	}
 
 	if len(userParameter.Local) > localMaxSize {
-		return u.NewLocAppError("UserParameter.IsValid", "too long local", nil, "The local :"+userParameter.Local+" can not be manage. Max size for local is 5")
+		return u.NewLocAppError("UserParameter.IsValid", "too long local", nil, "The local : "+userParameter.Local+" can not be manage. Max size for local is 5.")
 	}
 
 	if len(userParameter.TimeZone) > timeZoneMaxSize {
-		return u.NewLocAppError("UserParameter.IsValid", "too long timeZone", nil, "The TimeZone :"+userParameter.TimeZone+" can not be manage. Max size for local is 4")
+		return u.NewLocAppError("UserParameter.IsValid", "too long timeZone", nil, "The TimeZone : "+userParameter.TimeZone+" can not be manage. Max size for local is 4.")
 	}
 
 	if userParameter.SleepStart < 0 || userParameter.SleepStart > maxTime {

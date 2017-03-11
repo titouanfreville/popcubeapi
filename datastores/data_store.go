@@ -29,6 +29,7 @@ import (
 
 // StoreInterface interface the Stores and usefull DB functions
 type StoreInterface interface {
+	AllowedWebMails() AllowedWebMailsStore
 	Avatar() AvatarStore
 	Channel() ChannelStore
 	Emoji() EmojiStore
@@ -124,6 +125,17 @@ func (store StoreImpl) InitDatabase(user string, dbname string, password string,
 // CloseConnection close database connection
 func (store StoreImpl) CloseConnection(db *gorm.DB) {
 	defer db.Close()
+}
+
+/*AllowedWebMailsStore interface the allowedWebMails communication */
+type AllowedWebMailsStore interface {
+	Save(allowedWebMails *models.AllowedWebMails, db *gorm.DB) *u.AppError
+	Update(allowedWebMails *models.AllowedWebMails, newAllowedWebMails *models.AllowedWebMails, db *gorm.DB) *u.AppError
+	GetByDomain(domain string, db *gorm.DB) models.AllowedWebMails
+	GetByProvider(provider string, db *gorm.DB) []models.AllowedWebMails
+	GetByID(ID uint64, db *gorm.DB) models.AllowedWebMails
+	GetAll(db *gorm.DB) []models.AllowedWebMails
+	Delete(allowedWebMails *models.AllowedWebMails, db *gorm.DB) *u.AppError
 }
 
 /*AvatarStore interface the avatar communication */

@@ -109,7 +109,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "LL",
 			FirstName: "Luky",
 			LastName:  "Luke",
-			Locale:    "vn_VN",
 			IDRole:    adminRole.IDRole,
 		}
 
@@ -242,7 +241,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "LL",
 			FirstName: "Luky",
 			LastName:  "Luke",
-			Locale:    "en_EN",
 			IDRole:    adminRole.IDRole,
 		}
 		user1 := User{
@@ -252,7 +250,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "thebrothers",
 			FirstName: "Joe",
 			LastName:  "Dalton",
-			Locale:    "en_EN",
 			IDRole:    standartRole.IDRole,
 		}
 		user2 := User{
@@ -262,7 +259,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "Moris",
 			FirstName: "Moris",
 			LastName:  "Gossiny",
-			Locale:    "fr_FR",
 			IDRole:    ownerRole.IDRole,
 		}
 		user1New := User{
@@ -272,7 +268,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "thebrothers",
 			FirstName: "Joe, Jack, William, Avrell",
 			LastName:  "Dalton",
-			Locale:    "en_EN",
 			IDRole:    guestRole.IDRole,
 		}
 		user3 := User{
@@ -282,7 +277,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "JJ",
 			FirstName: "Jolly",
 			LastName:  "Jumper",
-			Locale:    "en_EN",
 			IDRole:    standartRole.IDRole,
 		}
 		user4 := User{
@@ -292,7 +286,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "Kid",
 			FirstName: "Billy",
 			LastName:  "The Kid",
-			Locale:    "en_EN",
 			IDRole:    guestRole.IDRole,
 		}
 
@@ -392,7 +385,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "LL",
 			FirstName: "Luky",
 			LastName:  "Luke",
-			Locale:    "en_EN",
 			IDRole:    adminRole.IDRole,
 		}
 		user1 := User{
@@ -402,7 +394,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "thebrothers",
 			FirstName: "Joe",
 			LastName:  "Dalton",
-			Locale:    "en_EN",
 			IDRole:    standartRole.IDRole,
 		}
 		user2 := User{
@@ -412,7 +403,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "Moris",
 			FirstName: "Moris",
 			LastName:  "Gossiny",
-			Locale:    "fr_FR",
 			IDRole:    ownerRole.IDRole,
 		}
 		user3 := User{
@@ -422,7 +412,6 @@ func TestUserStore(t *testing.T) {
 			NickName:  "JJ",
 			FirstName: "Jolly",
 			LastName:  "Jumper",
-			Locale:    "en_EN",
 			IDRole:    standartRole.IDRole,
 		}
 
