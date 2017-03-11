@@ -1313,6 +1313,28 @@ paths:
           description: "genericError general error when unexpected errors occured"
           schema:
             $ref: "#/definitions/genericErrorModel"
+  /initorganisation:
+    post:
+      tags:
+      - "Init"
+      summary: "Try to log user in"
+      description: "Login user with provided USERNAME && Password"
+      operationId: "initOrganisation"
+      parameters: []
+      responses:
+        200:
+          description: "initOk"
+          schema:
+            $ref: "#/definitions/initOk"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
   /login:
     post:
       tags:
@@ -1330,8 +1352,8 @@ paths:
         x-go-name: "Login"
       responses:
         200:
-          description: "inviteOk when invite correctly proceed, return the invite\
-            \ token information and the JWT token."
+          description: "initOk when init correctly proceed, return the organisation\
+            \ object and its owner."
           schema:
             $ref: "#/definitions/User"
         404:
@@ -1346,6 +1368,10 @@ paths:
         503:
           description: "databaseError is an error object to tell what is happening\
             \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
           schema:
             $ref: "#/definitions/genericErrorModel"
   /member:
@@ -2146,7 +2172,15 @@ paths:
       description: "This will create an user for organisation if organisation is Public\
         \ OR Email match parametetered emails"
       operationId: "newPublicUser"
-      parameters: []
+      parameters:
+      - in: "body"
+        name: "token"
+        description: "Init token you got when creating new organisation. Pass it as\
+          \ Authentication: bearer {{token}} in the header"
+        required: false
+        schema:
+          type: "string"
+        x-go-name: "Token"
       responses:
         201:
           description: "userObjectSuccess list of users"
@@ -2908,9 +2942,9 @@ definitions:
   AllowedWebMails:
     type: "object"
     required:
-    - "provider"
+    - "domain"
     properties:
-      description:
+      defaultRights:
         type: "string"
         description: "Rights that will automatically atributed to user created accound\
           \ from the webmail"
@@ -3715,6 +3749,27 @@ definitions:
         $ref: "#/definitions/genericErrorModel"
     description: "incorrectIds return error login message"
     x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  initOk:
+    type: "object"
+    properties:
+      organisation:
+        description: "in:body"
+        $ref: "#/definitions/Organisation"
+      user:
+        description: "in:body"
+        $ref: "#/definitions/User"
+    title: "initOk when init correctly proceed, return the organisation object and\
+      \ its owner."
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
+  initToken:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+        description: "Init token you got when creating new organisation. Pass it as\
+          \ Authentication: bearer {{token}} in the header\nin:body"
+        x-go-name: "Token"
+    x-go-package: "github.com/titouanfreville/popcubeapi/api"
   inviteOk:
     type: "object"
     properties:
@@ -4115,8 +4170,8 @@ responses:
     schema:
       $ref: "#/definitions/genericErrorModel"
   loginOk:
-    description: "inviteOk when invite correctly proceed, return the invite token\
-      \ information and the JWT token."
+    description: "initOk when init correctly proceed, return the organisation object\
+      \ and its owner."
     schema:
       $ref: "#/definitions/User"
   memberArraySuccess:

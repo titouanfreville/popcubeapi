@@ -348,4 +348,11 @@ type inviteToken struct {
 	Token string `json:"token"`
 }
 
+// swagger:parameters newPublicUser
+type initToken struct {
+	// Init token you got when creating new organisation. Pass it as Authentication: bearer {{token}} in the header
+	// in:body
+	Token string `json:"token"`
+}
+
 // <><><><><> <><><><><> <><><><><> <><><><><> //
