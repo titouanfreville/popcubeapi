@@ -204,15 +204,15 @@ func initUserRoute(router chi.Router) {
 			r.Put("/update", updateUser)
 			// swagger:route PUT /user/{userID} Users deleteUser
 			//
-			// Update user
+			// Delete user
 			//
-			// This will return the new user object
+			// This will return a delete specific mesage
 			//
 			// 	Responses:
-			//    200: userObjectSuccess
+			//    200: deleteMessage
 			// 	  422: wrongEntity
 			// 	  503: databaseError
-			// 	  default: genericError
+			// 	  default: deleteMessage
 			r.Delete("/delete", deleteUser)
 		})
 	})

@@ -182,10 +182,7 @@ func getAvatarFromLink(w http.ResponseWriter, r *http.Request) {
 }
 
 func newAvatar(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Avatar *models.Avatar
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Avatar *models.Avatar
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageOrganisation(token) {
 		res := error401
@@ -196,8 +193,8 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Avatar == nil {
+	err := chiRender.Bind(request, &Avatar)
+	if err != nil || Avatar == nil {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -205,19 +202,16 @@ func newAvatar(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	rerr := store.Avatar().Save(data.Avatar, db)
+	rerr := store.Avatar().Save(Avatar, db)
 	if rerr != nil {
 		render.JSON(w, rerr.StatusCode, rerr)
 		return
 	}
-	render.JSON(w, 201, data.Avatar)
+	render.JSON(w, 201, Avatar)
 }
 
 func updateAvatar(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Avatar *models.Avatar
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Avatar *models.Avatar
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageOrganisation(token) {
 		res := error401
@@ -228,9 +222,9 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
+	err := chiRender.Bind(request, &Avatar)
 	avatar := r.Context().Value(oldAvatarKey).(models.Avatar)
-	if err != nil || data.Avatar == nil {
+	if err != nil || &Avatar == nil {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -238,7 +232,7 @@ func updateAvatar(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	rerr := store.Avatar().Update(&avatar, data.Avatar, db)
+	rerr := store.Avatar().Update(&avatar, Avatar, db)
 	if err != nil {
 		render.JSON(w, rerr.StatusCode, rerr)
 		return

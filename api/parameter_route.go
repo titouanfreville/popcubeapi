@@ -98,14 +98,13 @@ func parameterContext(next http.Handler) http.Handler {
 
 func getAllParameter(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.Parameter().Get(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.Parameter().Get(db)
+	render.JSON(w, 200, result)
 }
 
 func newParameter(w http.ResponseWriter, r *http.Request) {
@@ -125,19 +124,19 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Parameter == nil {
-		render.JSON(w, 500, err)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Parameter().Save(data.Parameter, db)
-			if err == nil {
-				render.JSON(w, 200, data.Parameter)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		render.JSON(w, error422.StatusCode, error422)
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Parameter().Save(data.Parameter, db)
+	if err != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 200, data.Parameter)
 }
 
 func updateParameter(w http.ResponseWriter, r *http.Request) {
@@ -159,16 +158,16 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 	parameter := r.Context().Value(oldParameterKey).(models.Parameter)
 	if err != nil || data.Parameter == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Parameter().Update(&parameter, data.Parameter, db)
-			if err == nil {
-				render.JSON(w, 200, parameter)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Parameter().Update(&parameter, data.Parameter, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 200, parameter)
 }

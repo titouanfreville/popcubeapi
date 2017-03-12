@@ -90,8 +90,8 @@ func (psi UserParameterStoreImpl) GetByName(parameterName string, db *gorm.DB) [
 }
 
 // GetByID Used to get userParameter from DB
-func (psi UserParameterStoreImpl) GetByID(ID uint64, db *gorm.DB) models.UserParameter {
+func (psi UserParameterStoreImpl) GetByID(userID uint64, parameterName string, db *gorm.DB) models.UserParameter {
 	userParameter := models.UserParameter{}
-	db.Where("idUserParameter = ?", ID).First(&userParameter)
+	db.Where("idUser = ? AND parameterName= ?", userID, parameterName).First(&userParameter)
 	return userParameter
 }

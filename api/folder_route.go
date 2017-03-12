@@ -177,20 +177,22 @@ func folderContext(next http.Handler) http.Handler {
 
 func getAllFolder(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.Folder().GetAll(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.Folder().GetAll(db)
+	render.JSON(w, 200, result)
 }
 
 func getFolderFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	name := r.Context().Value(folderNameKey).(string)
 	folder := store.Folder().GetByName(name, db)
 	render.JSON(w, 200, folder)
@@ -198,8 +200,11 @@ func getFolderFromName(w http.ResponseWriter, r *http.Request) {
 
 func getFolderFromType(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	folderType := r.Context().Value(folderTypeKey).(string)
 	folder := store.Folder().GetByType(folderType, db)
 	render.JSON(w, 200, folder)
@@ -207,8 +212,11 @@ func getFolderFromType(w http.ResponseWriter, r *http.Request) {
 
 func getFolderFromLink(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	link := r.Context().Value(folderLinkKey).(string)
 	folder := store.Folder().GetByLink(link, db)
 	render.JSON(w, 200, folder)
@@ -220,20 +228,19 @@ func getFolderFromMessage(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			folders := store.Folder().GetByMessage(data.Message, db)
-			render.JSON(w, 200, folders)
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	folders := store.Folder().GetByMessage(data.Message, db)
+	render.JSON(w, 200, folders)
 }
 
 func newFolder(w http.ResponseWriter, r *http.Request) {
@@ -242,24 +249,21 @@ func newFolder(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Folder == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Folder().Save(data.Folder, db)
-			if err == nil {
-				render.JSON(w, 201, data.Folder)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Folder().Save(data.Folder, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+	}
+	render.JSON(w, 201, data.Folder)
 }
 
 func updateFolder(w http.ResponseWriter, r *http.Request) {
@@ -268,47 +272,43 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	folder := r.Context().Value(oldFolderKey).(models.Folder)
 	if err != nil || data.Folder == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Folder().Update(&folder, data.Folder, db)
-			if err == nil {
-				render.JSON(w, 200, folder)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Folder().Update(&folder, data.Folder, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+	}
+	render.JSON(w, 200, folder)
 }
 
 func deleteFolder(w http.ResponseWriter, r *http.Request) {
 	folder := r.Context().Value("folder").(models.Folder)
 	store := datastores.Store()
-
 	message := deleteMessageModel{
 		Object: folder,
 	}
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		err := store.Folder().Delete(&folder, db)
-		if err == nil {
-			message.Success = true
-			message.Message = "Folder well removed."
-			render.JSON(w, 200, message)
-		} else {
-			message.Success = false
-			message.Message = err.Message
-			render.JSON(w, err.StatusCode, message.Message)
-		}
-	} else {
-		render.JSON(w, 503, error503)
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	apperr := store.Folder().Delete(&folder, db)
+	if apperr != nil {
+		message.Success = false
+		message.Message = apperr.Message
+		render.JSON(w, apperr.StatusCode, message.Message)
+	}
+	message.Success = true
+	message.Message = "Folder well removed."
+	render.JSON(w, 200, message)
 }

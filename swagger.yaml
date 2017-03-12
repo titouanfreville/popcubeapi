@@ -73,12 +73,19 @@ paths:
       operationId: "newAvatar"
       parameters:
       - in: "body"
-        name: "avatar"
-        description: "Link of the avatar in server."
-        required: false
+        name: "name"
+        description: "Avatar name"
+        required: true
         schema:
-          $ref: "#/definitions/Avatar"
-        x-go-name: "Avatar"
+          type: "string"
+        x-go-name: "Name"
+      - in: "body"
+        name: "link"
+        description: "Path into server"
+        required: true
+        schema:
+          type: "string"
+        x-go-name: "Link"
       - name: "token"
         in: "header"
         description: "User token you got from login call. Pass it as Authentication:\
@@ -215,12 +222,19 @@ paths:
       operationId: "newAvatar1"
       parameters:
       - in: "body"
-        name: "avatar"
-        description: "Link of the avatar in server."
-        required: false
+        name: "name"
+        description: "Avatar name"
+        required: true
         schema:
-          $ref: "#/definitions/Avatar"
-        x-go-name: "Avatar"
+          type: "string"
+        x-go-name: "Name"
+      - in: "body"
+        name: "link"
+        description: "Path into server"
+        required: true
+        schema:
+          type: "string"
+        x-go-name: "Link"
       - name: "token"
         in: "header"
         description: "User token you got from login call. Pass it as Authentication:\
@@ -640,6 +654,80 @@ paths:
           description: "deleteMessage"
           schema:
             $ref: "#/definitions/deleteMessage"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /channel/{channelID}/user/{userID}:
+    put:
+      tags:
+      - "Members"
+      summary: "Update member"
+      description: "This will return the new member object"
+      operationId: "updateMember"
+      parameters:
+      - name: "memberID"
+        in: "path"
+        description: "Link of the member in server."
+        required: true
+        type: "integer"
+        format: "int64"
+        x-go-name: "MemberID"
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
+      responses:
+        200:
+          description: "memberObjectSuccess list of members"
+          schema:
+            $ref: "#/definitions/Member"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    delete:
+      tags:
+      - "Members"
+      summary: "Delete member"
+      description: "This will return the new member object"
+      operationId: "deleteMember"
+      parameters:
+      - name: "token"
+        in: "header"
+        description: "User token you got from login call. Pass it as Authentication:\
+          \ bearer {{token}} in the header"
+        required: true
+        type: "string"
+        x-go-name: "Token"
+      responses:
+        200:
+          description: "memberObjectSuccess list of members"
+          schema:
+            $ref: "#/definitions/Member"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
         503:
           description: "databaseError is an error object to tell what is happening\
             \ when we encounter issue with database"
@@ -1500,40 +1588,6 @@ paths:
         x-go-name: "Token"
       responses:
         201:
-          description: "memberObjectSuccess list of members"
-          schema:
-            $ref: "#/definitions/Member"
-        422:
-          description: "wrongEntityError is an error object to inform that the provided\
-            \ object was not correctly formated"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        503:
-          description: "databaseError is an error object to tell what is happening\
-            \ when we encounter issue with database"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-        default:
-          description: "genericError general error when unexpected errors occured"
-          schema:
-            $ref: "#/definitions/genericErrorModel"
-  /member/{memberID}:
-    put:
-      tags:
-      - "Members"
-      summary: "Update member"
-      description: "This will return the new member object"
-      operationId: "deleteMember"
-      parameters:
-      - name: "token"
-        in: "header"
-        description: "User token you got from login call. Pass it as Authentication:\
-          \ bearer {{token}} in the header"
-        required: true
-        type: "string"
-        x-go-name: "Token"
-      responses:
-        200:
           description: "memberObjectSuccess list of members"
           schema:
             $ref: "#/definitions/Member"
@@ -2901,8 +2955,8 @@ paths:
     put:
       tags:
       - "Users"
-      summary: "Update user"
-      description: "This will return the new user object"
+      summary: "Delete user"
+      description: "This will return a delete specific mesage"
       operationId: "deleteUser"
       parameters:
       - name: "userID"
@@ -2921,9 +2975,149 @@ paths:
         x-go-name: "Token"
       responses:
         200:
-          description: "userObjectSuccess list of users"
+          description: "deleteMessage"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/deleteMessage"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "deleteMessage"
+          schema:
+            $ref: "#/definitions/deleteMessage"
+  /user/{userName}/parameters:
+    get:
+      tags:
+      - "UserParameter"
+      summary: "Get user parameters"
+      description: "This will get all the user parameters available in the organisation."
+      operationId: "getAllUserParameter"
+      parameters: []
+      responses:
+        200:
+          $ref: "#/responses/userParameterArraySuccess"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    post:
+      tags:
+      - "UserParameter"
+      summary: "New userparameter"
+      description: "This will create an userparameter for organisation userparameters\
+        \ library."
+      operationId: "newUserParameter"
+      parameters: []
+      responses:
+        201:
+          $ref: "#/responses/userparameterObjectSuccess"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/{userName}/parameters/all:
+    get:
+      tags:
+      - "UserParameter"
+      summary: "Get userparameters"
+      description: "This will get all the userparameters available in the organisation."
+      operationId: "getAllUserParameter1"
+      parameters: []
+      responses:
+        200:
+          $ref: "#/responses/userparameterArraySuccess"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/{userName}/parameters/new:
+    post:
+      tags:
+      - "UserParameter"
+      summary: "New userparameter"
+      description: "This will create an userparameter for organisation userparameters\
+        \ library."
+      operationId: "newUserParameter1"
+      parameters: []
+      responses:
+        201:
+          $ref: "#/responses/userparameterObjectSuccess"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+  /user/{userName}/parameters/{parameterName}:
+    put:
+      tags:
+      - "UserParameter"
+      summary: "Update userparameter"
+      description: "This will return the new userparameter object"
+      operationId: "updateUserParameter"
+      parameters: []
+      responses:
+        200:
+          $ref: "#/responses/userparameterObjectSuccess"
+        422:
+          description: "wrongEntityError is an error object to inform that the provided\
+            \ object was not correctly formated"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        503:
+          description: "databaseError is an error object to tell what is happening\
+            \ when we encounter issue with database"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+        default:
+          description: "genericError general error when unexpected errors occured"
+          schema:
+            $ref: "#/definitions/genericErrorModel"
+    delete:
+      tags:
+      - "UserParameter"
+      summary: "Delete userparameter"
+      description: "This will return the new userparameter object"
+      operationId: "deleteUserParameter"
+      parameters: []
+      responses:
+        200:
+          $ref: "#/responses/userparameterObjectSuccess"
         422:
           description: "wrongEntityError is an error object to inform that the provided\
             \ object was not correctly formated"
@@ -3467,10 +3661,20 @@ definitions:
     x-go-package: "github.com/titouanfreville/popcubeapi/api"
   avatarObjectParam:
     type: "object"
+    required:
+    - "link"
+    - "name"
     properties:
-      avatar:
-        description: "Link of the avatar in server.\nin:body"
-        $ref: "#/definitions/Avatar"
+      link:
+        type: "string"
+        description: "Path into server"
+        x-go-name: "Link"
+      name:
+        type: "string"
+        description: "Avatar name"
+        x-go-name: "Name"
+    title: "avatarObjectParam object"
+    description: "Avatar object to provide to update or create avatar into the database."
     x-go-package: "github.com/titouanfreville/popcubeapi/api"
   avatarObjectSuccess:
     type: "object"

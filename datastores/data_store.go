@@ -193,7 +193,7 @@ type FolderStore interface {
 type MemberStore interface {
 	Save(member *models.Member, db *gorm.DB) *u.AppError
 	Update(member *models.Member, newMember *models.Member, db *gorm.DB) *u.AppError
-	GetByID(ID uint64, db *gorm.DB) models.Member
+	GetByID(channelID uint64, userID uint64, db *gorm.DB) models.Member
 	GetChannelMember(user *models.User, channel *models.Channel, db *gorm.DB) models.Member
 	GetByUser(user *models.User, db *gorm.DB) []models.Member
 	GetByChannel(channel *models.Channel, db *gorm.DB) []models.Member
@@ -281,5 +281,5 @@ type UserParameterStore interface {
 	GetAll(db *gorm.DB) []models.UserParameter
 	GetByUser(user *models.User, db *gorm.DB) []models.UserParameter
 	GetByName(parameterName string, db *gorm.DB) []models.UserParameter
-	GetByID(id uint64, db *gorm.DB) models.UserParameter
+	GetByID(userID uint64, parameterName string, db *gorm.DB) models.UserParameter
 }

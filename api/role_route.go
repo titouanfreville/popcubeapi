@@ -138,20 +138,23 @@ func roleContext(next http.Handler) http.Handler {
 
 func getAllRole(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.Role().GetAll(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.Role().GetAll(db)
+	render.JSON(w, 200, result)
+
 }
 
 func getRoleFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	name := r.Context().Value(roleNameKey).(string)
 	role := store.Role().GetByName(name, db)
 	render.JSON(w, 200, role)
@@ -163,8 +166,11 @@ func getRoleFromRight(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Role == nil {
@@ -185,24 +191,23 @@ func newRole(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Role().Save(data.Role, db)
-			if err == nil {
-				render.JSON(w, 201, data.Role)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Role().Save(data.Role, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 201, data.Role)
 }
 
 func updateRole(w http.ResponseWriter, r *http.Request) {
@@ -211,47 +216,45 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	role := r.Context().Value(oldRoleKey).(models.Role)
 	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Role().Update(&role, data.Role, db)
-			if err == nil {
-				render.JSON(w, 200, role)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Role().Update(&role, data.Role, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 200, role)
 }
 
 func deleteRole(w http.ResponseWriter, r *http.Request) {
 	role := r.Context().Value(oldRoleKey).(models.Role)
 	store := datastores.Store()
-
 	message := deleteMessageModel{
 		Object: role,
 	}
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		err := store.Role().Delete(&role, db)
-		if err == nil {
-			message.Success = true
-			message.Message = "Role well removed."
-			render.JSON(w, 200, message)
-		} else {
-			message.Success = false
-			message.Message = err.Message
-			render.JSON(w, err.StatusCode, message.Message)
-		}
-	} else {
-		render.JSON(w, 503, error503)
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	err := store.Role().Delete(&role, db)
+	if err != nil {
+		message.Success = false
+		message.Message = err.Message
+		render.JSON(w, err.StatusCode, message.Message)
+		return
+	}
+	message.Success = true
+	message.Message = "Role well removed."
+	render.JSON(w, 200, message)
 }
