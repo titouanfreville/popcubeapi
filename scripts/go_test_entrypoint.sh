@@ -74,16 +74,16 @@ check_file () {
 check_fixed_packages () {
   echo "Testing FIXED PACKAGES : "
   echo ">>> API "
-  go test -v -cover -covermode=count -coverprofile=/home/coverage/api.cover api
+  go test -v -cover -covermode=count -coverprofile=/home/coverage/api.cover github.com/titouanfreville/popcubeapi/api
   failures=$((failures+$?))
   echo ">>> DATA_STORES "
-  go test -v -cover -covermode=count -coverprofile=/home/coverage/datastores.cover datastores
+  go test -v -cover -covermode=count -coverprofile=/home/coverage/datastores.cover github.com/titouanfreville/popcubeapi/datastores
   failures=$((failures+$?))
   echo ">>> MODELS "
-  go test -v -cover -covermode=count -coverprofile=/home/coverage/models.cover models
+  go test -v -cover -covermode=count -coverprofile=/home/coverage/models.cover github.com/titouanfreville/popcubeapi/models
   failures=$((failures+$?))
   echo ">>> UTILS "
-  go test -v -cover -covermode=count -coverprofile=/home/coverage/utils.cover utils
+  go test -v -cover -covermode=count -coverprofile=/home/coverage/utils.cover github.com/titouanfreville/popcubeapi/utils
   failures=$((failures+$?))
   echo "Generating coverage html reports"
   go tool cover -html=/home/coverage/api.cover -o /home/docs/api_cover.html
@@ -99,16 +99,16 @@ check_fixed_packages () {
 check_fixed_packages_no_generation () {
   echo "Testing FIXED PACKAGES : "
   echo ">>> API "
-  go test -v api
+  go test -v github.com/titouanfreville/popcubeapi/api
   failures=$((failures+$?))
   echo ">>> DATA_STORES "
-  go test -v datastores
+  go test -v github.com/titouanfreville/popcubeapi/datastores
   failures=$((failures+$?))
   echo ">>> MODELS "
-  go test -v models
+  go test -v github.com/titouanfreville/popcubeapi/models
   failures=$((failures+$?))
   echo ">>> UTILS "
-  go test -v utils
+  go test -v github.com/titouanfreville/popcubeapi/utils
   failures=$((failures+$?))
 }
 
@@ -120,12 +120,12 @@ then
 else
   CMD="check_file ${1}"
 fi
-
+CMD="check_fixed_packages"
 if [ "$watching" -eq 0 ]
 then
 	watcher /go "$CMD"
 else
-  sleep 60s
+  #sleep 60s
 	check_fixed_packages_no_generation
   exit "$failures"
 fi

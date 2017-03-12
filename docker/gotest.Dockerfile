@@ -4,6 +4,8 @@ MAINTAINER FREVILLE Titouan titouanfreville@gmail.com
 ENV TERM xterm-256color
 ENV WATCHING 0
 ENV TERM xterm-256color
+ENV GOCOPYPATH /go/src/github.com/titouanfreville/popcubeapi
+ENV MYSQL_DATABASE popcube_test
 ENV GOCOPYPATH go/src/github.com/titouanfreville/popcubeapi
 ENV GOSU_VERSION 1.9
 
@@ -28,4 +30,4 @@ RUN set -x \
     && gosu nobody true \
     && apk del .gosu-deps
 
-ENTRYPOINT entrypoint /$GOCOPYPATH $WATCHING
+ENTRYPOINT waitforit database:3306 -t 0 -- echo "Db is ready" && entrypoint /$GOCOPYPATH $WATCHING

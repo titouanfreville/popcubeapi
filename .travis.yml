@@ -25,7 +25,7 @@ script:
   - docker login -u="$DOCKER_USER" -p="$DOCKER_PWD" $DOCKER_REGISTRY
   - docker build -t go_base -f docker/gobase.Dockerfile .;
   - docker build -t popcube-docs -f docker/docs.Dockerfile .;
-  - docker-compose -f docker-compose.test.yml up --build;
+  - docker-compose up  unit-gotest golint --build;
   - >-
     docker-compose --file=docker-compose.test.yml ps -q | xargs docker inspect -f '{{ .State.ExitCode }}' | while read code; do
     if [ "$code" != "0" ]; then

@@ -14,7 +14,7 @@ services:
       context: .
       dockerfile:  docker/gobase.Dockerfile
     env_file: .env
-    depends_on: 
+    depends_on:
       - database
     volumes:
       - "./api:/go/src/github.com/titouanfreville/popcubeapi/api"
@@ -54,11 +54,19 @@ services:
       - "./utils:/go/src/github.com/titouanfreville/popcubeapi/utils"
       - "./configs:/go/src/github.com/titouanfreville/popcubeapi/configs"
       - "./main.go:/go/src/github.com/titouanfreville/popcubeapi/main.go"
+  unit-gotest:
+    build:
+      context: .
+      dockerfile: docker/gotest.Dockerfile
+    depends_on:
+      - back
+      - database
+    env_file: .env
   database:
     image: mariadb:10.1
     env_file: .env
     hostname: database
-    ports: 
+    ports:
       - 3306:3306
     volumes :
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
