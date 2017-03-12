@@ -152,20 +152,22 @@ func messageContext(next http.Handler) http.Handler {
 
 func getAllMessage(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.Message().GetAll(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.Message().GetAll(db)
+	render.JSON(w, 200, result)
 }
 
 func getMessageFromDate(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	date := r.Context().Value(messageDateKey).(int)
 	message := store.Message().GetByDate(date, db)
 	render.JSON(w, 200, message)
@@ -177,20 +179,19 @@ func getMessageFromUser(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			role := store.Message().GetByCreator(data.User, db)
-			render.JSON(w, 200, role)
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	role := store.Message().GetByCreator(data.User, db)
+	render.JSON(w, 200, role)
 }
 
 func getMessageFromChannel(w http.ResponseWriter, r *http.Request) {
@@ -199,20 +200,19 @@ func getMessageFromChannel(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Channel == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			role := store.Message().GetByChannel(data.Channel, db)
-			render.JSON(w, 200, role)
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	role := store.Message().GetByChannel(data.Channel, db)
+	render.JSON(w, 200, role)
 }
 
 func newMessage(w http.ResponseWriter, r *http.Request) {
@@ -221,24 +221,23 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Message == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Message().Save(data.Message, db)
-			if err == nil {
-				render.JSON(w, 201, data.Message)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Message().Save(data.Message, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 201, data.Message)
 }
 
 func updateMessage(w http.ResponseWriter, r *http.Request) {
@@ -247,47 +246,45 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	message := r.Context().Value(oldMessageKey).(models.Message)
 	if err != nil || data.Message == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Message().Update(&message, data.Message, db)
-			if err == nil {
-				render.JSON(w, 200, message)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Message().Update(&message, data.Message, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 200, message)
 }
 
 func deleteMessageFunction(w http.ResponseWriter, r *http.Request) {
 	message := r.Context().Value(oldMessageKey).(models.Message)
 	store := datastores.Store()
-
 	dmessage := deleteMessageModel{
 		Object: message,
 	}
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		err := store.Message().Delete(&message, db)
-		if err == nil {
-			dmessage.Success = true
-			dmessage.Message = "Message well removed."
-			render.JSON(w, 200, message)
-		} else {
-			dmessage.Success = false
-			dmessage.Message = err.Message
-			render.JSON(w, err.StatusCode, dmessage.Message)
-		}
-	} else {
-		render.JSON(w, 503, error503)
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	apperr := store.Message().Delete(&message, db)
+	if apperr != nil {
+		dmessage.Success = false
+		dmessage.Message = apperr.Message
+		render.JSON(w, apperr.StatusCode, dmessage.Message)
+		return
+	}
+	dmessage.Success = true
+	dmessage.Message = "Message well removed."
+	render.JSON(w, 200, message)
 }

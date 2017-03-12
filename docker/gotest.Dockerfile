@@ -8,6 +8,7 @@ ENV GOCOPYPATH go/src/github.com/titouanfreville/popcubeapi
 ENV GOSU_VERSION 1.9
 
 COPY scripts/wait-for-it.sh /bin/waitforit
+COPY scripts/go_test_entrypoint.sh /bin/entrypoint
 
 WORKDIR /go/src
 
@@ -27,5 +28,4 @@ RUN set -x \
     && gosu nobody true \
     && apk del .gosu-deps
 
-# waitforit database:3306 -t 0 -- echo "Db is ready" && 
-ENTRYPOINT entrypoint /$GOCOPYPATH $WATCHING
+ENTRYPOINT  waitforit database:3306 -t 0 -- echo "Db is ready" && entrypoint /$GOCOPYPATH $WATCHING

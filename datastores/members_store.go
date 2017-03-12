@@ -60,9 +60,9 @@ func (msi MemberStoreImpl) GetAll(db *gorm.DB) []models.Member {
 }
 
 // GetByID Used to get member from DB
-func (msi MemberStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Member {
+func (msi MemberStoreImpl) GetByID(channelID uint64, userID uint64, db *gorm.DB) models.Member {
 	member := models.Member{}
-	db.Where("idMember = ?", ID).First(&member)
+	db.Where("idChannel = ? AND idUser = ?", channelID, userID).First(&member)
 	return member
 }
 

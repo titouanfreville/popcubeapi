@@ -26,10 +26,28 @@ type avatarIDParam struct {
 }
 
 // swagger:parameters newAvatar newAvatar1 updateAvatar
+// type avatarObjectParam struct {
+// 	//Link of the avatar in server.
+// 	// in:body
+// 	Avatar models.Avatar `json:""`
+// }
+
+// avatarObjectParam object
+//
+// Avatar object to provide to update or create avatar into the database.
+//
+// swagger:parameters newAvatar newAvatar1 updateAvatar
 type avatarObjectParam struct {
-	//Link of the avatar in server.
-	// in:body
-	Avatar models.Avatar `json:"avatar"`
+	// Avatar name
+	//
+	// required: true
+	// in: body
+	Name string `gorm:"column:name;not null;unique" json:"name,omitempty"`
+	// Path into server
+	//
+	// required: true
+	// in: body
+	Link string `gorm:"column:link;not null;unique" json:"link,omitempty"`
 }
 
 // <><><><><> <><><><><> <><><><><> <><><><><> //

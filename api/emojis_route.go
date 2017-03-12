@@ -177,8 +177,11 @@ func getAllEmoji(w http.ResponseWriter, r *http.Request) {
 
 func getEmojiFromName(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	name := r.Context().Value(emojiNameKey).(string)
 	emoji := store.Emoji().GetByName(name, db)
 	render.JSON(w, 200, emoji)
@@ -186,8 +189,11 @@ func getEmojiFromName(w http.ResponseWriter, r *http.Request) {
 
 func getEmojiFromShortcut(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	link := r.Context().Value(emojiShortcutKey).(string)
 	emoji := store.Emoji().GetByShortcut(link, db)
 	render.JSON(w, 200, emoji)
@@ -195,8 +201,11 @@ func getEmojiFromShortcut(w http.ResponseWriter, r *http.Request) {
 
 func getEmojiFromLink(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
 	link := r.Context().Value(emojiLinkKey).(string)
 	emoji := store.Emoji().GetByLink(link, db)
 	render.JSON(w, 200, emoji)
@@ -220,18 +229,19 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Emoji == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Emoji().Save(data.Emoji, db)
-			if err == nil {
-				render.JSON(w, 201, data.Emoji)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Emoji().Save(data.Emoji, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 201, data.Emoji)
 }
 
 func updateEmoji(w http.ResponseWriter, r *http.Request) {
@@ -253,18 +263,17 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 	emoji := r.Context().Value(oldEmojiKey).(models.Emoji)
 	if err != nil || data.Emoji == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Emoji().Update(&emoji, data.Emoji, db)
-			if err == nil {
-				render.JSON(w, 200, emoji)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	apperr := store.Emoji().Update(&emoji, data.Emoji, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 200, emoji)
 }
 
 func deleteEmoji(w http.ResponseWriter, r *http.Request) {
@@ -281,18 +290,18 @@ func deleteEmoji(w http.ResponseWriter, r *http.Request) {
 		Object: emoji,
 	}
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		err := store.Emoji().Delete(&emoji, db)
-		if err == nil {
-			message.Success = true
-			message.Message = "Emoji well removed."
-			render.JSON(w, 200, message)
-		} else {
-			message.Success = false
-			message.Message = err.Message
-			render.JSON(w, err.StatusCode, message.Message)
-		}
-	} else {
-		render.JSON(w, 503, error503)
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	apperr := store.Emoji().Delete(&emoji, db)
+	if apperr != nil {
+		message.Success = false
+		message.Message = apperr.Message
+		render.JSON(w, apperr.StatusCode, message.Message)
+		return
+	}
+	message.Success = true
+	message.Message = "Emoji well removed."
+	render.JSON(w, 200, message)
 }

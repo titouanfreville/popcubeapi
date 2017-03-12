@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"strconv"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
 	"github.com/titouanfreville/popcubeapi/datastores"
 	"github.com/titouanfreville/popcubeapi/models"
+	"github.com/titouanfreville/popcubeapi/utils"
 )
 
 const (
@@ -101,42 +103,45 @@ func initMemberRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/new", newMember)
-		r.Route("/:memberID", func(r chi.Router) {
-			r.Use(memberContext)
-			// swagger:route PUT /member/{memberID} Members updateMember
-			//
-			// Update member
-			//
-			// This will return the new member object
-			//
-			// 	Responses:
-			//    200: memberObjectSuccess
-			// 	  422: wrongEntity
-			// 	  503: databaseError
-			// 	  default: genericError
-			r.Put("/update", updateMember)
-			// swagger:route PUT /member/{memberID} Members deleteMember
-			//
-			// Update member
-			//
-			// This will return the new member object
-			//
-			// 	Responses:
-			//    200: memberObjectSuccess
-			// 	  422: wrongEntity
-			// 	  503: databaseError
-			// 	  default: genericError
-			r.Delete("/delete", deleteMember)
-		})
+	})
+	router.Route("/channel/{channelID}/user/{userID}", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(Authenticator)
+		r.Use(memberContext)
+		// swagger:route PUT /channel/{channelID}/user/{userID} Members updateMember
+		//
+		// Update member
+		//
+		// This will return the new member object
+		//
+		// 	Responses:
+		//    200: memberObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Put("/update", updateMember)
+		// swagger:route DELETE /channel/{channelID}/user/{userID} Members deleteMember
+		//
+		// Delete member
+		//
+		// This will return the new member object
+		//
+		// 	Responses:
+		//    200: memberObjectSuccess
+		// 	  422: wrongEntity
+		// 	  503: databaseError
+		// 	  default: genericError
+		r.Delete("/delete", deleteMember)
 	})
 }
 
 func memberContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		memberID, err := strconv.ParseUint(chi.URLParam(r, "memberID"), 10, 64)
+		channelID, err := strconv.ParseUint(chi.URLParam(r, "channelID"), 10, 64)
+		userID, err := strconv.ParseUint(chi.URLParam(r, "userID"), 10, 64)
 		oldMember := models.Member{}
 		if err == nil {
-			oldMember = datastores.Store().Member().GetByID(memberID, dbStore.db)
+			oldMember = datastores.Store().Member().GetByID(channelID, userID, dbStore.db)
 		}
 		ctx := context.WithValue(r.Context(), oldMemberKey, oldMember)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -145,14 +150,13 @@ func memberContext(next http.Handler) http.Handler {
 
 func getAllMember(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
-
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		result := store.Member().GetAll(db)
-		render.JSON(w, 200, result)
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	result := store.Member().GetAll(db)
+	render.JSON(w, 200, result)
 }
 
 func getMemberFromUser(w http.ResponseWriter, r *http.Request) {
@@ -161,20 +165,19 @@ func getMemberFromUser(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			role := store.Member().GetByUser(data.User, db)
-			render.JSON(w, 200, role)
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	role := store.Member().GetByUser(data.User, db)
+	render.JSON(w, 200, role)
 }
 
 func getMemberFromChannel(w http.ResponseWriter, r *http.Request) {
@@ -183,20 +186,19 @@ func getMemberFromChannel(w http.ResponseWriter, r *http.Request) {
 		OmitID  interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Channel == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			role := store.Member().GetByChannel(data.Channel, db)
-			render.JSON(w, 200, role)
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	role := store.Member().GetByChannel(data.Channel, db)
+	render.JSON(w, 200, role)
 }
 
 func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
@@ -205,20 +207,19 @@ func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Role == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			role := store.Member().GetByRole(data.Role, db)
-			render.JSON(w, 200, role)
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	role := store.Member().GetByRole(data.Role, db)
+	render.JSON(w, 200, role)
 }
 
 func newMember(w http.ResponseWriter, r *http.Request) {
@@ -227,24 +228,37 @@ func newMember(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil || data.Member == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Member().Save(data.Member, db)
-			if err == nil {
-				render.JSON(w, 201, data.Member)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	chanel := store.Channel().GetByID(data.Member.IDChannel, db)
+	if &chanel == nil {
+		message := "You are trying to invite member to chanel : " + chanel.ChannelName + " but channel doesn't exist."
+		apierr := utils.NewAPIError(404, "Channel don't exist", message)
+		render.JSON(w, apierr.StatusCode, apierr)
+		return
+	}
+	if !canManageUser(chanel.ChannelName, false, "", token) {
+		res := error401
+		res.Message = "You don't have the right to manage user from channel : " + chanel.ChannelName + "."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
+	apperr := store.Member().Save(data.Member, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 201, data.Member)
 }
 
 func updateMember(w http.ResponseWriter, r *http.Request) {
@@ -253,47 +267,84 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 		OmitID interface{} `json:"id,omitempty"`
 	}
 	store := datastores.Store()
-
 	db := dbStore.db
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	member := r.Context().Value(oldMemberKey).(models.Member)
 	if err != nil || data.Member == nil {
 		render.JSON(w, error422.StatusCode, error422)
-	} else {
-		if err := db.DB().Ping(); err == nil {
-			err := store.Member().Update(&member, data.Member, db)
-			if err == nil {
-				render.JSON(w, 200, member)
-			} else {
-				render.JSON(w, err.StatusCode, err)
-			}
-		} else {
-			render.JSON(w, error503.StatusCode, error503)
-		}
+		return
 	}
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
+	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	chanel := store.Channel().GetByID(member.IDChannel, db)
+	user := store.User().GetByID(member.IDUser, db)
+	rename := store.User().GetByID(data.Member.IDUser, db)
+	if &chanel == nil {
+		message := "You are trying to update member from chanel : " + chanel.ChannelName + " but this channel doesn't exist."
+		apierr := utils.NewAPIError(404, "Channel don't exist", message)
+		render.JSON(w, apierr.StatusCode, apierr)
+		return
+	}
+	if &user == nil {
+		message := "You are trying to update member : " + user.Username + "from channel :" + chanel.ChannelName + " but this user doesn't exist."
+		apierr := utils.NewAPIError(404, "Channel don't exist", message)
+		render.JSON(w, apierr.StatusCode, apierr)
+		return
+	}
+	if &rename == nil {
+		rename = models.User{Username: ""}
+	}
+	if !canManageUser(chanel.ChannelName, user.Username == rename.Username, user.Username, token) {
+		res := error401
+		res.Message = "You don't have the right to manage user from channel : " + chanel.ChannelName + "."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
+	apperr := store.Member().Update(&member, data.Member, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 200, member)
 }
 
 func deleteMember(w http.ResponseWriter, r *http.Request) {
 	member := r.Context().Value(oldMemberKey).(models.Member)
 	store := datastores.Store()
-
 	message := deleteMessageModel{
 		Object: member,
 	}
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		err := store.Member().Delete(&member, db)
-		if err == nil {
-			message.Success = true
-			message.Message = "Member well removed."
-			render.JSON(w, 200, message)
-		} else {
-			message.Success = false
-			message.Message = err.Message
-			render.JSON(w, err.StatusCode, message.Message)
-		}
-	} else {
+	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
+	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
+	chanel := store.Channel().GetByID(member.IDChannel, db)
+	if &chanel == nil {
+		message := "You are trying to remove member from chanel : " + chanel.ChannelName + " but channel doesn't exist."
+		apierr := utils.NewAPIError(404, "Channel doesn't exist", message)
+		render.JSON(w, apierr.StatusCode, apierr)
+		return
+	}
+	if !canManageUser(chanel.ChannelName, false, "", token) {
+		res := error401
+		res.Message = "You don't have the right to manage user from channel : " + chanel.ChannelName + "."
+		render.JSON(w, error401.StatusCode, error401)
+		return
+	}
+	apperr := store.Member().Delete(&member, db)
+	if apperr != nil {
+		message.Success = false
+		message.Message = apperr.Message
+		render.JSON(w, apperr.StatusCode, message.Message)
+		return
+	}
+	message.Success = true
+	message.Message = "Member well removed."
+	render.JSON(w, 200, message)
 }
