@@ -1,5 +1,12 @@
 version: "3"
 services:
+  back:
+    build:
+      context: .
+      dockerfile:  docker/gobase.Dockerfile
+    env_file: .env
+    depends_on:
+      - database
   unit-gotest:
     build:
       context: .
@@ -10,3 +17,9 @@ services:
       context: .
       dockerfile: docker/golint.Dockerfile
     env_file: .env
+  database:
+    image: mariadb:10.1
+    env_file: .env
+    hostname: database
+    ports:
+      - 3306:3306

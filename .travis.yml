@@ -25,7 +25,7 @@ script:
   - docker login -u="$DOCKER_USER" -p="$DOCKER_PWD" $DOCKER_REGISTRY
   - docker build -t go_base -f docker/gobase.Dockerfile .;
   - docker build -t popcube-docs -f docker/docs.Dockerfile .;
-  - docker-compose up --build unit-gotest golint;
+  - docker-compose -f docker-compose.test.yml up --build unit-gotest golint;
   - >-
     docker-compose --file=docker-compose.test.yml ps -q | xargs docker inspect -f '{{ .State.ExitCode }}' | while read code; do
     if [ "$code" != "0" ]; then
@@ -49,6 +49,6 @@ deploy:
     script: scripts/deploy.sh --tag=$TRAVIS_TAG --deploy=true
     on:
       tags: true
-      
+
 notifications:
   slack: societyco:T1mHeYKrOtopvRjIZ68MqOQo
