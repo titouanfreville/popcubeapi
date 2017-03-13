@@ -22,6 +22,8 @@ services:
       dockerfile: docker/golint.Dockerfile
     env_file: .env
   database:
-    image: mariadb:10.1
+    build:
+      context: .
+      dockerfile: docker/database.Dockerfile
     env_file: .env
     hostname: database
