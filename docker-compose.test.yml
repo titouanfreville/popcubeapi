@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile:  docker/gobase.Dockerfile
+    image: registry.le-corre.eu:5000/go:base
     env_file: .env
     depends_on:
       - database
