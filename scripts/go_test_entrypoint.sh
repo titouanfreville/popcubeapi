@@ -101,9 +101,9 @@ check_fixed_packages_no_generation () {
   echo ">>> API "
   go test -v github.com/titouanfreville/popcubeapi/api
   failures=$((failures+$?))
-  echo ">>> DATA_STORES "
-  go test -v github.com/titouanfreville/popcubeapi/datastores
-  failures=$((failures+$?))
+  # echo ">>> DATA_STORES "
+  # go test -v github.com/titouanfreville/popcubeapi/datastores
+  # failures=$((failures+$?))
   echo ">>> MODELS "
   go test -v github.com/titouanfreville/popcubeapi/models
   failures=$((failures+$?))
