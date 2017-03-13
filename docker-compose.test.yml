@@ -1,12 +1,29 @@
 version: "3"
 services:
+  back:
+    build:
+      context: .
+      dockerfile:  docker/gobase.Dockerfile
+    image: registry.le-corre.eu:5000/go:base
+    env_file: .env
+    depends_on:
+      - database
   unit-gotest:
     build:
       context: .
       dockerfile: docker/gotest.Dockerfile
     env_file: .env
+    depends_on:
+      - back
+      - database
   golint:
     build:
       context: .
       dockerfile: docker/golint.Dockerfile
     env_file: .env
+  database:
+    build:
+      context: .
+      dockerfile: docker/database.Dockerfile
+    env_file: .env
+    hostname: database
