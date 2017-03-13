@@ -17,7 +17,7 @@ function usage(){
     echo ""
 }
 function install_docs_require() {
-   ./scripts/slate_require.sh 
+   ./scripts/slate_require.sh
 }
 function build_images() {
   # First args is tags
@@ -33,7 +33,7 @@ function push_images() {
 }
 function deployement() {
 
-curl -X POST --header 'Content-Type: application/json' \
+OUTPUT=`curl -X POST --header 'Content-Type: application/json' \
  --header "X-AUTH-TOKEN: ${DEPLOY_TOKEN}" -d \
  "{
    \"Image\": \"${REPO}/popcubedocs:$1\",
@@ -45,9 +45,13 @@ curl -X POST --header 'Content-Type: application/json' \
      \"VIRTUAL_PORT=4567\"
    ],
    \"Hostname\": \"popcube_alpha_docs\" }" \
-    http://${DEPLOY_URL}/deploy;
+    http://${DEPLOY_URL}/deploy`
 
-curl -X POST --header 'Content-Type: application/json' \
+if [[ ${OUTPUT} == *"Failed"* ]]; then
+  echo "${OUTPUT}"
+  exit 1
+fi
+OUTPUT=`curl -X POST --header 'Content-Type: application/json' \
   --header "X-AUTH-TOKEN: ${DEPLOY_TOKEN}" -d \
   "{
     \"Image\": \"${REPO}/popcubedb:$1\",
@@ -58,10 +62,14 @@ curl -X POST --header 'Content-Type: application/json' \
       \"MYSQL_DATABASE=popcube_dev\"
     ],
     \"Hostname\": \"popcube_alpha_database\" }" \
-     http://${DEPLOY_URL}/deploy;
+     http://${DEPLOY_URL}/deploy`
 
+if [[ ${OUTPUT} == *"Failed"* ]]; then
+ echo "${OUTPUT}"
+ exit 1
+fi
 # API BACK
-curl -X POST --header 'Content-Type: application/json' \
+OUTPUT=`curl -X POST --header 'Content-Type: application/json' \
  --header "X-AUTH-TOKEN: ${DEPLOY_TOKEN}" -d \
  "{
    \"Image\": \"${REPO}/popcubeapi:$1\",
@@ -78,7 +86,11 @@ curl -X POST --header 'Content-Type: application/json' \
               ]
     },
    \"Hostname\": \"popcube_alpha_api\" }" \
-    http://${DEPLOY_URL}/deploy;
+    http://${DEPLOY_URL}/deploy`
+if [[ ${OUTPUT} == *"Failed"* ]]; then
+echo "${OUTPUT}"
+exit 1
+fi
 }
 if [ "$#" -eq 0 ]; then
     usage
