@@ -67,10 +67,7 @@ curl -X POST --header 'Content-Type: application/json' \
      \"VIRTUAL_NETWORK=nginx-proxy\",
      \"VIRTUAL_HOST=alpha-api.popcube.xyz\",
      \"VIRTUAL_PORT=3000\",
-      \"MYSQL_PASSWORD=test\",
-      \"MYSQL_ROOT_PASSWORD=popcube_dev\",
-      \"MYSQL_USER=test_user\",
-      \"MYSQL_DATABASE=popcube_dev\"
+     \"MYSQL_DATABASE=popcube_dev\"
    ],
     \"HostConfig\": {
       \"Links\": [
