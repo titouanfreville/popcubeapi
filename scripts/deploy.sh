@@ -17,7 +17,7 @@ function usage(){
     echo ""
 }
 function install_docs_require() {
-   ./scripts/slate_require.sh 
+   ./scripts/slate_require.sh
 }
 function build_images() {
   # First args is tags
@@ -33,19 +33,25 @@ function push_images() {
 }
 function deployement() {
 
-curl -X POST --header 'Content-Type: application/json' \
+OUTPUT=`curl -X POST --header 'Content-Type: application/json' \
  --header "X-AUTH-TOKEN: ${DEPLOY_TOKEN}" -d \
  "{
    \"Image\": \"${REPO}/popcubedocs:$1\",
    \"Env\": [
      \"VIRTUAL_NETWORK=nginx-proxy\",
      \"VIRTUAL_HOST=docs-alpha.popcube.xyz\",
+     \"LETSENCRYPT_HOST=docs-alpha.popcube.xyz\",
+     \"LETSENCRYPT_EMAIL=contact@popcube.xyz\",
      \"VIRTUAL_PORT=4567\"
    ],
    \"Hostname\": \"popcube_alpha_docs\" }" \
-    http://${DEPLOY_URL}/deploy;
+    http://${DEPLOY_URL}/deploy`
 
-curl -X POST --header 'Content-Type: application/json' \
+if [[ ${OUTPUT} == *"Failed"* ]]; then
+  echo "${OUTPUT}"
+  exit 1
+fi
+OUTPUT=`curl -X POST --header 'Content-Type: application/json' \
   --header "X-AUTH-TOKEN: ${DEPLOY_TOKEN}" -d \
   "{
     \"Image\": \"${REPO}/popcubedb:$1\",
@@ -56,18 +62,27 @@ curl -X POST --header 'Content-Type: application/json' \
       \"MYSQL_DATABASE=popcube_dev\"
     ],
     \"Hostname\": \"popcube_alpha_database\" }" \
-     http://${DEPLOY_URL}/deploy;
+     http://${DEPLOY_URL}/deploy`
 
+if [[ ${OUTPUT} == *"Failed"* ]]; then
+ echo "${OUTPUT}"
+ exit 1
+fi
 # API BACK
-curl -X POST --header 'Content-Type: application/json' \
+OUTPUT=`curl -X POST --header 'Content-Type: application/json' \
  --header "X-AUTH-TOKEN: ${DEPLOY_TOKEN}" -d \
  "{
    \"Image\": \"${REPO}/popcubeapi:$1\",
    \"Env\": [
      \"VIRTUAL_NETWORK=nginx-proxy\",
-     \"VIRTUAL_HOST=alpha-api.popcube.xyz\",
      \"VIRTUAL_PORT=3000\",
-     \"MYSQL_DATABASE=popcube_dev\"
+      \"MYSQL_PASSWORD=test\",
+      \"MYSQL_ROOT_PASSWORD=popcube_dev\",
+      \"MYSQL_USER=test_user\",
+      \"MYSQL_DATABASE=popcube_dev\",
+     \"VIRTUAL_HOST=api-alpha.popcube.xyz\",
+     \"LETSENCRYPT_HOST=api-alpha.popcube.xyz\",
+     \"LETSENCRYPT_EMAIL=contact@popcube.xyz\"
    ],
     \"HostConfig\": {
       \"Links\": [
@@ -75,7 +90,11 @@ curl -X POST --header 'Content-Type: application/json' \
               ]
     },
    \"Hostname\": \"popcube_alpha_api\" }" \
-    http://${DEPLOY_URL}/deploy;
+    http://${DEPLOY_URL}/deploy`
+if [[ ${OUTPUT} == *"Failed"* ]]; then
+echo "${OUTPUT}"
+exit 1
+fi
 }
 if [ "$#" -eq 0 ]; then
     usage
@@ -112,6 +131,16 @@ if [ ${TAG+x} ] && [ ${BRANCH+x} ];
 then
   echo "TAG and BRANCH is not compatible :("
   exit 1
+fi
+if [ -z ${DEPLOY_TOKEN+x} ] || [ -z ${DEPLOY_URL+x} ];
+then
+  echo "#################################"
+  echo "############WARNING##############"
+  echo "#################################"
+  echo "    DEPLOY_TOKEN is not SET"
+  echo "               OR"
+  echo "    DEPLOY_URL is not SET"
+  echo "#################################"
 fi
 if [ ${TAG+x} ];
 then
