@@ -124,22 +124,22 @@ func initUserRoute(router chi.Router) {
 				r.Get("/", getUserFromEmail)
 			})
 		})
-		r.Route("/username/", func(r chi.Router) {
-			r.Route("/:userName", func(r chi.Router) {
-				r.Use(userContext)
-				// swagger:route GET /user/username/{userName} Users getUserFromName
-				//
-				// Get user from username
-				//
-				// This will return the user object corresponding to provided username
-				//
-				// 	Responses:
-				//    200: userObjectSuccess
-				// 	  503: databaseError
-				// 	  default: genericError
-				r.Get("/", getUserFromName)
-			})
-		})
+		// r.Route("/username/", func(r chi.Router) {
+		// 	r.Route("/:userName", func(r chi.Router) {
+		// 		r.Use(userContext)
+		// 		// swagger:route GET /user/username/{userName} Users getUserFromName
+		// 		//
+		// 		// Get user from username
+		// 		//
+		// 		// This will return the user object corresponding to provided username
+		// 		//
+		// 		// 	Responses:
+		// 		//    200: userObjectSuccess
+		// 		// 	  503: databaseError
+		// 		// 	  default: genericError
+		// 		r.Get("/", getUserFromName)
+		// 	})
+		// })
 		r.Route("/nickname/", func(r chi.Router) {
 			r.Route("/:nickName", func(r chi.Router) {
 				r.Use(userContext)
@@ -190,6 +190,17 @@ func initUserRoute(router chi.Router) {
 		})
 		r.Route("/:userID", func(r chi.Router) {
 			r.Use(userContext)
+			// swagger:route GET /user/userName} Users getUserFromName
+			//
+			// Get user from username
+			//
+			// This will return the user object corresponding to provided username
+			//
+			// 	Responses:
+			//    200: userObjectSuccess
+			// 	  503: databaseError
+			// 	  default: genericError
+			r.Get("/", getUserFromName)
 			// swagger:route PUT /user/{userID} Users updateUser
 			//
 			// Update user
@@ -221,7 +232,11 @@ func initUserRoute(router chi.Router) {
 func userContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userID, err := strconv.ParseUint(chi.URLParam(r, "userID"), 10, 64)
+		userName := chi.URLParam(r, "userID")
 		name := chi.URLParam(r, "userName")
+		if name == "" {
+			name = userName
+		}
 		nickName := chi.URLParam(r, "nickName")
 		firstName := chi.URLParam(r, "firstName")
 		lastName := chi.URLParam(r, "lastName")
@@ -236,6 +251,8 @@ func userContext(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, userDateKey, date)
 		if err == nil {
 			oldUser = datastores.Store().User().GetByID(userID, dbStore.db)
+		} else {
+			oldUser = datastores.Store().User().GetByUserName(userName, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, oldUserKey, oldUser)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -306,7 +323,7 @@ func getUserFromName(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	name := r.Context().Value("userName").(string)
+	name := r.Context().Value(userNameKey).(string)
 	user := store.User().GetByUserName(name, db)
 	render.JSON(w, 200, user)
 }
@@ -481,20 +498,20 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error401.StatusCode, error401)
 		return
 	}
-
 	if err != nil || data.User == nil {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
-	if err := db.DB().Ping(); err == nil {
-		err := store.User().Update(&user, data.User, db)
-		if err == nil {
-			render.JSON(w, 200, user)
-			return
-		}
-
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
-	render.JSON(w, error503.StatusCode, error503)
+	apperr := store.User().Update(&user, data.User, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 200, user)
 }
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
@@ -511,18 +528,18 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 		Object: user,
 	}
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		err := store.User().Delete(&user, db)
-		if err == nil {
-			message.Success = true
-			message.Message = "User well removed."
-			render.JSON(w, 200, message)
-			return
-		}
-		message.Success = false
-		message.Message = err.Message
-		render.JSON(w, err.StatusCode, message.Message)
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	render.JSON(w, 503, error503)
+	apperr := store.User().Delete(&user, db)
+	if apperr != nil {
+		message.Success = false
+		message.Message = apperr.Message
+		render.JSON(w, apperr.StatusCode, message.Message)
+		return
+	}
+	message.Success = true
+	message.Message = "User well removed."
+	render.JSON(w, 200, message)
 }

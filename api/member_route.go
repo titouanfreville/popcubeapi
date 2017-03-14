@@ -104,7 +104,7 @@ func initMemberRoute(router chi.Router) {
 		// 	  default: genericError
 		r.Post("/new", newMember)
 	})
-	router.Route("/channel/{channelID}/user/{userID}", func(r chi.Router) {
+	router.Route("/channel/:channelID/user/:userID", func(r chi.Router) {
 		r.Use(tokenAuth.Verifier)
 		r.Use(Authenticator)
 		r.Use(memberContext)

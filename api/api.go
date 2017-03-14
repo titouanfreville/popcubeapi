@@ -406,6 +406,7 @@ func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnecti
 	initRoleRoute(router)
 	initUserRoute(router)
 	initDevGetter(router)
+	initUserParameterRoute(router)
 	// Passing -routes to the program will generate docs for the above
 	// router definition. See the `routes.json` file in this folder for
 	// the output.

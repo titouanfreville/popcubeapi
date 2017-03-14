@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"log"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
@@ -16,8 +18,9 @@ const (
 	userParameterUser   key = "userParameterUser"
 )
 
+// To be add into user routes.
 func initUserParameterRoute(router chi.Router) {
-	router.Route("/user/{userName}/parameters", func(r chi.Router) {
+	router.Route("/user/:userName/parameters", func(r chi.Router) {
 		r.Use(tokenAuth.Verifier)
 		r.Use(userParameterAuthenticator)
 		// swagger:route GET /user/{userName}/parameters UserParameter getAllUserParameter
@@ -66,7 +69,7 @@ func initUserParameterRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/new", newUserParameter)
-		r.Route("/{parameterName}", func(r chi.Router) {
+		r.Route("/:parameterName", func(r chi.Router) {
 			r.Use(tokenAuth.Verifier)
 			r.Use(userParameterAuthenticator)
 			r.Use(userparameterContext)
@@ -101,7 +104,6 @@ func initUserParameterRoute(router chi.Router) {
 func userParameterAuthenticator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-
 		if jwtErr, ok := ctx.Value(jwtErrorKey).(error); ok {
 			if jwtErr != nil {
 				render.JSON(w, 401, jwtErr)
@@ -157,11 +159,14 @@ func userparameterContext(next http.Handler) http.Handler {
 		store := datastores.Store()
 		db := dbStore.db
 		user := store.User().GetByUserName(userName, db)
-		if &user != nil {
+		if (user == models.User{}) {
 			oldUserParameter = store.UserParameter().GetByID(user.IDUser, parameterName, db)
 		}
 		ctx := context.WithValue(r.Context(), oldUserParameterKey, oldUserParameter)
 		ctx = context.WithValue(ctx, userParameterUser, user)
+		log.Print("New context : ----------------------- \n")
+		log.Print(ctx)
+		log.Print("\n------------------------------------- \n")
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
