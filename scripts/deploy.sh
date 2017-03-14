@@ -75,10 +75,14 @@ OUTPUT=`curl -X POST --header 'Content-Type: application/json' \
    \"Image\": \"${REPO}/popcubeapi:$1\",
    \"Env\": [
      \"VIRTUAL_NETWORK=nginx-proxy\",
+     \"VIRTUAL_PORT=3000\",
+      \"MYSQL_PASSWORD=test\",
+      \"MYSQL_ROOT_PASSWORD=popcube_dev\",
+      \"MYSQL_USER=test_user\",
+      \"MYSQL_DATABASE=popcube_dev\"
      \"VIRTUAL_HOST=api-alpha.popcube.xyz\",
      \"LETSENCRYPT_HOST=api-alpha.popcube.xyz\",
-     \"LETSENCRYPT_EMAIL=contact@popcube.xyz\",
-     \"VIRTUAL_PORT=3000\"
+     \"LETSENCRYPT_EMAIL=contact@popcube.xyz\"
    ],
     \"HostConfig\": {
       \"Links\": [
