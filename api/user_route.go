@@ -49,29 +49,6 @@ func initUserRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newUser)
-		// swagger:route GET /user/all Users getAllUser1
-		//
-		// Get users
-		//
-		// This will get all the users available in the organisation.
-		//
-		// 	Responses:
-		//    200: userArraySuccess
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Get("/all", getAllUser)
-		// swagger:route POST /user/new Users newUser1
-		//
-		// New user
-		//
-		// This will create an user for organisation users library.
-		//
-		// 	Responses:
-		//    201: userObjectSuccess
-		// 	  422: wrongEntity
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Post("/new", newUser)
 		// swagger:route POST /user/invite Users inviteUser
 		//
 		// Invite user
@@ -124,22 +101,6 @@ func initUserRoute(router chi.Router) {
 				r.Get("/", getUserFromEmail)
 			})
 		})
-		// r.Route("/username/", func(r chi.Router) {
-		// 	r.Route("/:userName", func(r chi.Router) {
-		// 		r.Use(userContext)
-		// 		// swagger:route GET /user/username/{userName} Users getUserFromName
-		// 		//
-		// 		// Get user from username
-		// 		//
-		// 		// This will return the user object corresponding to provided username
-		// 		//
-		// 		// 	Responses:
-		// 		//    200: userObjectSuccess
-		// 		// 	  503: databaseError
-		// 		// 	  default: genericError
-		// 		r.Get("/", getUserFromName)
-		// 	})
-		// })
 		r.Route("/nickname/", func(r chi.Router) {
 			r.Route("/:nickName", func(r chi.Router) {
 				r.Use(userContext)
@@ -212,7 +173,7 @@ func initUserRoute(router chi.Router) {
 			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: genericError
-			r.Put("/update", updateUser)
+			r.Put("/", updateUser)
 			// swagger:route PUT /user/{userID} Users deleteUser
 			//
 			// Delete user
@@ -224,7 +185,8 @@ func initUserRoute(router chi.Router) {
 			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: deleteMessage
-			r.Delete("/delete", deleteUser)
+			r.Delete("/", deleteUser)
+			initUserParameterRoute(r)
 		})
 	})
 }

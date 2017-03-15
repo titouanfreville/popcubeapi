@@ -26,19 +26,19 @@ type UserParameter struct {
 	// Default langage
 	//
 	// required: true
-	Local string `gorm:"column:local;not null; unique" json:"local,omitempty"`
+	Local string `gorm:"column:local" json:"local,omitempty"`
 	// Default time zone
 	//
 	// required: true
-	TimeZone string `gorm:"column:timeZone;not null; unique;" json:"time_zone,omitempty"`
+	TimeZone string `gorm:"column:timeZone" json:"time_zone,omitempty"`
 	// Default start of non notification period
 	//
 	// required: true
-	SleepStart int `gorm:"column:sleepStart;not null;unique" json:"sleep_start,omitempty"`
+	SleepStart int `gorm:"column:sleepStart" json:"sleep_start,omitempty"`
 	// Default end of non notification period
 	//
 	// required: true
-	SleepEnd int `gorm:"column:sleepEnd;not null;unique" json:"sleep_end,omitempty"`
+	SleepEnd int `gorm:"column:sleepEnd" json:"sleep_end,omitempty"`
 }
 
 // IsValid is used to check validity of UserParameter objects
