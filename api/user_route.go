@@ -49,29 +49,6 @@ func initUserRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newUser)
-		// swagger:route GET /user/all Users getAllUser1
-		//
-		// Get users
-		//
-		// This will get all the users available in the organisation.
-		//
-		// 	Responses:
-		//    200: userArraySuccess
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Get("/all", getAllUser)
-		// swagger:route POST /user/new Users newUser1
-		//
-		// New user
-		//
-		// This will create an user for organisation users library.
-		//
-		// 	Responses:
-		//    201: userObjectSuccess
-		// 	  422: wrongEntity
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Post("/new", newUser)
 		// swagger:route POST /user/invite Users inviteUser
 		//
 		// Invite user
@@ -124,22 +101,6 @@ func initUserRoute(router chi.Router) {
 				r.Get("/", getUserFromEmail)
 			})
 		})
-		r.Route("/username/", func(r chi.Router) {
-			r.Route("/:userName", func(r chi.Router) {
-				r.Use(userContext)
-				// swagger:route GET /user/username/{userName} Users getUserFromName
-				//
-				// Get user from username
-				//
-				// This will return the user object corresponding to provided username
-				//
-				// 	Responses:
-				//    200: userObjectSuccess
-				// 	  503: databaseError
-				// 	  default: genericError
-				r.Get("/", getUserFromName)
-			})
-		})
 		r.Route("/nickname/", func(r chi.Router) {
 			r.Route("/:nickName", func(r chi.Router) {
 				r.Use(userContext)
@@ -190,6 +151,17 @@ func initUserRoute(router chi.Router) {
 		})
 		r.Route("/:userID", func(r chi.Router) {
 			r.Use(userContext)
+			// swagger:route GET /user/userName} Users getUserFromName
+			//
+			// Get user from username
+			//
+			// This will return the user object corresponding to provided username
+			//
+			// 	Responses:
+			//    200: userObjectSuccess
+			// 	  503: databaseError
+			// 	  default: genericError
+			r.Get("/", getUserFromName)
 			// swagger:route PUT /user/{userID} Users updateUser
 			//
 			// Update user
@@ -201,7 +173,7 @@ func initUserRoute(router chi.Router) {
 			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: genericError
-			r.Put("/update", updateUser)
+			r.Put("/", updateUser)
 			// swagger:route PUT /user/{userID} Users deleteUser
 			//
 			// Delete user
@@ -213,7 +185,9 @@ func initUserRoute(router chi.Router) {
 			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: deleteMessage
-			r.Delete("/delete", deleteUser)
+			r.Delete("/", deleteUser)
+			initUserParameterRoute(r)
+			initMemberOverUser(r)
 		})
 	})
 }
@@ -221,7 +195,11 @@ func initUserRoute(router chi.Router) {
 func userContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userID, err := strconv.ParseUint(chi.URLParam(r, "userID"), 10, 64)
+		userName := chi.URLParam(r, "userID")
 		name := chi.URLParam(r, "userName")
+		if name == "" {
+			name = userName
+		}
 		nickName := chi.URLParam(r, "nickName")
 		firstName := chi.URLParam(r, "firstName")
 		lastName := chi.URLParam(r, "lastName")
@@ -236,6 +214,8 @@ func userContext(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, userDateKey, date)
 		if err == nil {
 			oldUser = datastores.Store().User().GetByID(userID, dbStore.db)
+		} else {
+			oldUser = datastores.Store().User().GetByUserName(userName, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, oldUserKey, oldUser)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -306,7 +286,7 @@ func getUserFromName(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	name := r.Context().Value("userName").(string)
+	name := r.Context().Value(userNameKey).(string)
 	user := store.User().GetByUserName(name, db)
 	render.JSON(w, 200, user)
 }
@@ -393,10 +373,7 @@ func getUserFromRole(w http.ResponseWriter, r *http.Request) {
 }
 
 func newUser(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		User   *models.User
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var User models.User
 	store := datastores.Store()
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser("global", false, "", token) {
@@ -407,8 +384,8 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 	}
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.User == nil {
+	err := chiRender.Bind(request, &User)
+	if err != nil || User == (models.User{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -416,9 +393,9 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.User().Save(data.User, db)
+	apperr := store.User().Save(&User, db)
 	if err == nil {
-		render.JSON(w, 201, data.User)
+		render.JSON(w, 201, User)
 		return
 	}
 	render.JSON(w, apperr.StatusCode, apperr)
@@ -465,14 +442,11 @@ func inviteUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		User   *models.User
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var User models.User
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
+	err := chiRender.Bind(request, &User)
 	user := r.Context().Value(oldUserKey).(models.User)
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser("global", true, user.Username, token) {
@@ -481,20 +455,20 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error401.StatusCode, error401)
 		return
 	}
-
-	if err != nil || data.User == nil {
+	if err != nil || (User == models.User{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
-	if err := db.DB().Ping(); err == nil {
-		err := store.User().Update(&user, data.User, db)
-		if err == nil {
-			render.JSON(w, 200, user)
-			return
-		}
-
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
+		return
 	}
-	render.JSON(w, error503.StatusCode, error503)
+	apperr := store.User().Update(&user, &User, db)
+	if apperr != nil {
+		render.JSON(w, apperr.StatusCode, apperr)
+		return
+	}
+	render.JSON(w, 200, user)
 }
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
@@ -511,18 +485,18 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 		Object: user,
 	}
 	db := dbStore.db
-	if err := db.DB().Ping(); err == nil {
-		err := store.User().Delete(&user, db)
-		if err == nil {
-			message.Success = true
-			message.Message = "User well removed."
-			render.JSON(w, 200, message)
-			return
-		}
-		message.Success = false
-		message.Message = err.Message
-		render.JSON(w, err.StatusCode, message.Message)
+	if err := db.DB().Ping(); err != nil {
+		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	render.JSON(w, 503, error503)
+	apperr := store.User().Delete(&user, db)
+	if apperr != nil {
+		message.Success = false
+		message.Message = apperr.Message
+		render.JSON(w, apperr.StatusCode, message.Message)
+		return
+	}
+	message.Success = true
+	message.Message = "User well removed."
+	render.JSON(w, 200, message)
 }

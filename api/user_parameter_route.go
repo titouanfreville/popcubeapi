@@ -13,11 +13,12 @@ import (
 
 const (
 	oldUserParameterKey key = "oldUserParameter"
-	userParameterUser   key = "userParameterUser"
 )
 
+// To be add into user routes.
 func initUserParameterRoute(router chi.Router) {
-	router.Route("/user/{userName}/parameters", func(r chi.Router) {
+	// User ID will be in the context from user_route
+	router.Route("/parameters", func(r chi.Router) {
 		r.Use(tokenAuth.Verifier)
 		r.Use(userParameterAuthenticator)
 		// swagger:route GET /user/{userName}/parameters UserParameter getAllUserParameter
@@ -43,30 +44,7 @@ func initUserParameterRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newUserParameter)
-		// swagger:route GET /user/{userName}/parameters/all UserParameter getAllUserParameter1
-		//
-		// Get userparameters
-		//
-		// This will get all the userparameters available in the organisation.
-		//
-		// 	Responses:
-		//    200: userparameterArraySuccess
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Get("/all", getAllUserParameter)
-		// swagger:route POST /user/{userName}/parameters/new UserParameter newUserParameter1
-		//
-		// New userparameter
-		//
-		// This will create an userparameter for organisation userparameters library.
-		//
-		// 	Responses:
-		//    201: userparameterObjectSuccess
-		// 	  422: wrongEntity
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Post("/new", newUserParameter)
-		r.Route("/{parameterName}", func(r chi.Router) {
+		r.Route("/:parameterName", func(r chi.Router) {
 			r.Use(tokenAuth.Verifier)
 			r.Use(userParameterAuthenticator)
 			r.Use(userparameterContext)
@@ -81,7 +59,7 @@ func initUserParameterRoute(router chi.Router) {
 			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: genericError
-			r.Put("/update", updateUserParameter)
+			r.Put("/", updateUserParameter)
 			// swagger:route DELETE /user/{userName}/parameters/{parameterName} UserParameter deleteUserParameter
 			//
 			// Delete userparameter
@@ -93,7 +71,7 @@ func initUserParameterRoute(router chi.Router) {
 			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: genericError
-			r.Delete("/delete", deleteUserParameter)
+			r.Delete("/", deleteUserParameter)
 		})
 	})
 }
@@ -101,32 +79,26 @@ func initUserParameterRoute(router chi.Router) {
 func userParameterAuthenticator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-
 		if jwtErr, ok := ctx.Value(jwtErrorKey).(error); ok {
 			if jwtErr != nil {
-				render.JSON(w, 401, jwtErr)
+				render.JSON(w, 401, "Token not found. You Are not allowed to proceed without token.")
 				return
 			}
 		}
-
 		jwtToken, ok := ctx.Value(jwtTokenKey).(*jwt.Token)
 		if !ok || jwtToken == nil || !jwtToken.Valid {
 			render.JSON(w, 401, "token is not valid or does not exist")
 			return
 		}
-
 		tokenType, ok := jwtToken.Claims.(jwt.MapClaims)["type"]
-
 		if !ok {
 			render.JSON(w, 401, "Token is not valid. Type is undifined")
 			return
 		}
-
 		if tokenType != "userauth" {
 			render.JSON(w, 401, "Token is not an user auth one")
 			return
 		}
-
 		tokenUser, ok := jwtToken.Claims.(jwt.MapClaims)["name"].(string)
 		tokenEmail, ok2 := jwtToken.Claims.(jwt.MapClaims)["email"].(string)
 		userFromMail := "-*-"
@@ -136,7 +108,7 @@ func userParameterAuthenticator(next http.Handler) http.Handler {
 		}
 		store := datastores.Store()
 		db := dbStore.db
-		userName := chi.URLParam(r, "userName")
+		userName := ctx.Value(oldUserKey).(models.User).Username
 		if ok2 {
 			userFromMail = store.User().GetByEmail(tokenEmail, db).Username
 		}
@@ -151,17 +123,16 @@ func userParameterAuthenticator(next http.Handler) http.Handler {
 
 func userparameterContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userName := chi.URLParam(r, "userName")
+		ctx := r.Context()
 		parameterName := chi.URLParam(r, "parameterName")
 		oldUserParameter := models.UserParameter{}
 		store := datastores.Store()
 		db := dbStore.db
-		user := store.User().GetByUserName(userName, db)
-		if &user != nil {
+		user := ctx.Value(oldUserKey).(models.User)
+		if (user != models.User{}) {
 			oldUserParameter = store.UserParameter().GetByID(user.IDUser, parameterName, db)
 		}
-		ctx := context.WithValue(r.Context(), oldUserParameterKey, oldUserParameter)
-		ctx = context.WithValue(ctx, userParameterUser, user)
+		ctx = context.WithValue(ctx, oldUserParameterKey, oldUserParameter)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -173,21 +144,18 @@ func getAllUserParameter(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	user := r.Context().Value(userParameterUser).(models.User)
+	user := r.Context().Value(oldUserKey).(models.User)
 	result := store.UserParameter().GetByUser(&user, db)
 	render.JSON(w, 200, result)
 }
 
 func newUserParameter(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		UserParameter *models.UserParameter
-		OmitID        interface{} `json:"id,omitempty"`
-	}
+	var UserParameter models.UserParameter
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.UserParameter == nil {
+	err := chiRender.Bind(request, &UserParameter)
+	if err != nil || (UserParameter == models.UserParameter{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -195,25 +163,23 @@ func newUserParameter(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.UserParameter().Save(data.UserParameter, db)
+	UserParameter.IDUser = r.Context().Value(oldUserKey).(models.User).IDUser
+	apperr := store.UserParameter().Save(&UserParameter, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return
 	}
-	render.JSON(w, 201, data.UserParameter)
+	render.JSON(w, 201, UserParameter)
 }
 
 func updateUserParameter(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		UserParameter *models.UserParameter
-		OmitID        interface{} `json:"id,omitempty"`
-	}
+	var UserParameter models.UserParameter
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
+	err := chiRender.Bind(request, &UserParameter)
 	userparameter := r.Context().Value(oldUserParameterKey).(models.UserParameter)
-	if err != nil || data.UserParameter == nil {
+	if err != nil || (UserParameter == models.UserParameter{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -221,7 +187,7 @@ func updateUserParameter(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.UserParameter().Update(&userparameter, data.UserParameter, db)
+	apperr := store.UserParameter().Update(&userparameter, &UserParameter, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return

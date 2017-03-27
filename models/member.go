@@ -16,9 +16,11 @@ type Member struct {
 	IDUser  uint64  `gorm:"column:idUser; not null;" json:"id_user,omitempty"`
 	Channel Channel `db:"-" json:"-"`
 	// required: true
-	IDChannel uint64 `gorm:"column:idChannel; not null;" json:"id_channel,omitempty"`
-	Role      Role   `db:"-" json:"-"`
-	IDRole    uint64 `gorm:"column:idRole; not null;" json:"id_role,omitempty"`
+	IDChannel  uint64 `gorm:"column:idChannel; not null;" json:"id_channel,omitempty"`
+	Role       Role   `db:"-" json:"-"`
+	IDRole     uint64 `gorm:"column:idRole; not null;" json:"id_role,omitempty"`
+	TimedOut   bool   `gorm:"column:timedOut; not null;" json:"timed_out, omitempty"`
+	TimeOutEnd int64  `gorm:"column:timeOutEnd" json:"timeout_end, omitempty"`
 }
 
 // IsValid check validity of member object
