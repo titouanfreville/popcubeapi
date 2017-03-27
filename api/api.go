@@ -262,6 +262,7 @@ func loginMiddleware(w http.ResponseWriter, r *http.Request) {
 	request := r.Body
 	err := chiRender.Bind(request, &data)
 	if err != nil {
+		log.Print("422 Here - loginMiddleware")
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -291,7 +292,7 @@ func initOrganisation(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if jwtErr, ok := ctx.Value(jwtErrorKey).(error); ok {
 		if jwtErr != nil {
-			render.JSON(w, 401, jwtErr)
+			render.JSON(w, 401, "Token not found. You Are not allowed to proceed without token.")
 			return
 		}
 	}
@@ -367,6 +368,7 @@ func newPublicUser(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, 401, "You can't sign up if organisation is not public or your email domain was unauthorized.")
 	}
 	if err != nil || data.User == nil {
+		log.Print("422 here. New Public User")
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {

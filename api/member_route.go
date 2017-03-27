@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -17,22 +18,22 @@ const (
 	oldMemberKey key = "oldMember"
 )
 
-func initMemberRoute(router chi.Router) {
-	router.Route("/member", func(r chi.Router) {
+func initMemberOverChannel(channelRoutes chi.Router) {
+	channelRoutes.Route("/member", func(r chi.Router) {
 		r.Use(tokenAuth.Verifier)
 		r.Use(Authenticator)
-		// swagger:route GET /member Members getAllMember
+		// swagger:route POST channel Members getMemberFromChannel
 		//
-		// Get members
+		// Get member into channel
 		//
-		// This will get all the members available in the organisation.
+		// This will return all users in provided channel
 		//
 		// 	Responses:
-		//    200: memberArraySuccess
+		//    200: memberObjectSuccess
 		// 	  503: databaseError
 		// 	  default: genericError
-		r.Get("/", getAllMember)
-		// swagger:route POST /member Members newMember
+		r.Get("/", getMemberFromChannel)
+		// swagger:route POST channel/{channelID}/member Members newMember
 		//
 		// New member
 		//
@@ -44,17 +45,72 @@ func initMemberRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newMember)
-		// swagger:route GET /member/all Members getAllMember1
-		//
-		// Get members
-		//
-		// This will get all the members available in the organisation.
-		//
-		// 	Responses:
-		//    200: memberArraySuccess
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Get("/all", getAllMember)
+	})
+	// swagger:route POST channel/{channelID}/role/{roleID} Members getMemberFromRole
+	//
+	// Get member having channel specifics roles
+	//
+	// This will return all members having a Specific role for a channel
+	//
+	// 	Responses:
+	//    200: memberObjectSuccess
+	// 	  503: databaseError
+	// 	  default: genericError
+	channelRoutes.Route("/role", func(r chi.Router) {
+		r.Route("/:roleID", func(r chi.Router) {
+			r.Use(memberContext)
+			r.Get("/", getMemberFromRole)
+		})
+	})
+	channelRoutes.Route("/user", func(r chi.Router) {
+		r.Route("/:userID", func(r chi.Router) {
+			r.Use(tokenAuth.Verifier)
+			r.Use(Authenticator)
+			r.Use(memberContext)
+			// swagger:route GET channel/{channelID}/user/{userID} Members getMemberFromUser
+			//
+			// Get channel user is member of
+			//
+			// This will return all channel provided user is in
+			//
+			// 	Responses:
+			//    200: memberObjectSuccess
+			// 	  503: databaseError
+			// 	  default: genericError
+			r.Get("/", getMemberFromUser)
+			// swagger:route PUT /channel/{channelID}/user/{userID} Members updateMember
+			//
+			// Update member
+			//
+			// This will return the new member object
+			//
+			// 	Responses:
+			//    200: memberObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
+			r.Put("/", updateMember)
+			// swagger:route DELETE /channel/{channelID}/user/{userID} Members deleteMember
+			//
+			// Delete member
+			//
+			// This will return the new member object
+			//
+			// 	Responses:
+			//    200: memberObjectSuccess
+			// 	  422: wrongEntity
+			// 	  503: databaseError
+			// 	  default: genericError
+			r.Delete("/", deleteMember)
+		})
+	})
+}
+
+func initMemberOverUser(userRoutes chi.Router) {
+	userRoutes.Route("/channels/:channelID", func(r chi.Router) {
+		r.Use(tokenAuth.Verifier)
+		r.Use(Authenticator)
+		r.Use(memberContext)
 		// swagger:route POST /channel Members getMemberFromChannel
 		//
 		// Get member into channel
@@ -66,19 +122,7 @@ func initMemberRoute(router chi.Router) {
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
-		r.Post("/channel", getMemberFromChannel)
-		// swagger:route POST /user Members getMemberFromUser
-		//
-		// Get channel user is member of
-		//
-		// This will return all channel provided user is in
-		//
-		// 	Responses:
-		//    200: memberObjectSuccess
-		// 	  422: wrongEntity
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Post("/user", getMemberFromUser)
+		r.Get("/", getMemberFromChannel)
 		// swagger:route POST /user Members getMemberFromRole
 		//
 		// Get member having channel specifics roles
@@ -90,25 +134,8 @@ func initMemberRoute(router chi.Router) {
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
-		r.Post("/role", getMemberFromRole)
-		// swagger:route POST /member/new Members newMember1
-		//
-		// New member
-		//
-		// This will create an member for organisation members library.
-		//
-		// 	Responses:
-		//    201: memberObjectSuccess
-		// 	  422: wrongEntity
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Post("/new", newMember)
-	})
-	router.Route("/channel/:channelID/user/:userID", func(r chi.Router) {
-		r.Use(tokenAuth.Verifier)
-		r.Use(Authenticator)
-		r.Use(memberContext)
-		// swagger:route PUT /channel/{channelID}/user/{userID} Members updateMember
+		userRoutes.Post("/role/:roleID", getMemberFromRole)
+		// swagger:route PUT user/{userID}/channel/{channelID} Members updateMember
 		//
 		// Update member
 		//
@@ -119,8 +146,8 @@ func initMemberRoute(router chi.Router) {
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
-		r.Put("/update", updateMember)
-		// swagger:route DELETE /channel/{channelID}/user/{userID} Members deleteMember
+		r.Put("/", updateMember)
+		// swagger:route DELETE user/{userID}/channel/{channelID} Members deleteMember
 		//
 		// Delete member
 		//
@@ -131,19 +158,54 @@ func initMemberRoute(router chi.Router) {
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
-		r.Delete("/delete", deleteMember)
+		r.Delete("/", deleteMember)
 	})
 }
 
 func memberContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		channelID, err := strconv.ParseUint(chi.URLParam(r, "channelID"), 10, 64)
-		userID, err := strconv.ParseUint(chi.URLParam(r, "userID"), 10, 64)
-		oldMember := models.Member{}
-		if err == nil {
-			oldMember = datastores.Store().Member().GetByID(channelID, userID, dbStore.db)
+		ctx := r.Context()
+		var ok bool
+		var channel models.Channel
+		var user models.User
+		var userFromParam models.User
+		channel, ok = ctx.Value(oldChannelKey).(models.Channel)
+		if !ok {
+			channel = models.Channel{}
 		}
-		ctx := context.WithValue(r.Context(), oldMemberKey, oldMember)
+		user, ok = ctx.Value(oldUserKey).(models.User)
+		if !ok {
+			user = models.User{}
+			userID, err := strconv.ParseUint(chi.URLParam(r, "userID"), 10, 64)
+			if err == nil {
+				userFromParam = datastores.Store().User().GetByID(userID, dbStore.db)
+			} else {
+				userID := chi.URLParam(r, "userID")
+				userFromParam = datastores.Store().User().GetByUserName(userID, dbStore.db)
+			}
+		}
+		oldMember := models.Member{}
+		if user != (models.User{}) {
+			channelID, err := strconv.ParseUint(chi.URLParam(r, "channelID"), 10, 64)
+			if err != nil {
+				channeName := chi.URLParam(r, "channelID")
+				channel = datastores.Store().Channel().GetByName(channeName, dbStore.db)
+				channelID = channel.IDChannel
+			}
+			oldMember = datastores.Store().Member().GetByID(channelID, user.IDUser, dbStore.db)
+		} else if channel != (models.Channel{}) {
+			userID, err := strconv.ParseUint(chi.URLParam(r, "userID"), 10, 64)
+			if err != nil {
+				userName := chi.URLParam(r, "userID")
+				user = datastores.Store().User().GetByUserName(userName, dbStore.db)
+				userID = user.IDUser
+			}
+			oldMember = datastores.Store().Member().GetByID(channel.IDChannel, userID, dbStore.db)
+		}
+		ctx = context.WithValue(ctx, oldMemberKey, oldMember)
+		ctx = context.WithValue(ctx, oldChannelKey, channel)
+		log.Print("Context user:", userFromParam)
+		ctx = context.WithValue(ctx, oldUserKey, userFromParam)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -160,45 +222,27 @@ func getAllMember(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMemberFromUser(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		User   *models.User
-		OmitID interface{} `json:"id,omitempty"`
-	}
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.User == nil {
-		render.JSON(w, error422.StatusCode, error422)
-		return
-	}
+	user := r.Context().Value(oldUserKey).(models.User)
 	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	role := store.Member().GetByUser(data.User, db)
-	render.JSON(w, 200, role)
+	member := store.Member().GetByUser(&user, db)
+	render.JSON(w, 200, member)
 }
 
 func getMemberFromChannel(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Channel *models.Channel
-		OmitID  interface{} `json:"id,omitempty"`
-	}
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Channel == nil {
-		render.JSON(w, error422.StatusCode, error422)
-		return
-	}
+	channel := r.Context().Value(oldChannelKey).(models.Channel)
 	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	role := store.Member().GetByChannel(data.Channel, db)
-	render.JSON(w, 200, role)
+	member := store.Member().GetByChannel(&channel, db)
+	render.JSON(w, 200, member)
 }
 
 func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
@@ -218,8 +262,8 @@ func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	role := store.Member().GetByRole(data.Role, db)
-	render.JSON(w, 200, role)
+	member := store.Member().GetByRole(data.Role, db)
+	render.JSON(w, 200, member)
 }
 
 func newMember(w http.ResponseWriter, r *http.Request) {

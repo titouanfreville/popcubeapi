@@ -116,10 +116,7 @@ func getAllOrganisation(w http.ResponseWriter, r *http.Request) {
 }
 
 func newOrganisation(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Organisation *models.Organisation
-		OmitID       interface{} `json:"id,omitempty"`
-	}
+	var Organisation models.Organisation
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageOrganisation(token) {
 		res := error401
@@ -130,8 +127,8 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Organisation == nil {
+	err := chiRender.Bind(request, &Organisation)
+	if err != nil || Organisation == (models.Organisation{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -139,19 +136,16 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Organisation().Save(data.Organisation, db)
+	apperr := store.Organisation().Save(&Organisation, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return
 	}
-	render.JSON(w, 201, data.Organisation)
+	render.JSON(w, 201, Organisation)
 }
 
 func updateOrganisation(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Organisation *models.Organisation
-		OmitID       interface{} `json:"id,omitempty"`
-	}
+	var Organisation models.Organisation
 	store := datastores.Store()
 	db := dbStore.db
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
@@ -162,16 +156,16 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	request := r.Body
-	err := chiRender.Bind(request, &data)
+	err := chiRender.Bind(request, &Organisation)
 	organisation := r.Context().Value(oldOrganisationKey).(models.Organisation)
-	if err != nil || data.Organisation == nil {
+	if err != nil || Organisation == (models.Organisation{}) {
 		render.JSON(w, error422.StatusCode, error422)
 	}
 	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Organisation().Update(&organisation, data.Organisation, db)
+	apperr := store.Organisation().Update(&organisation, &Organisation, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return

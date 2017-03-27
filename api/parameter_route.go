@@ -108,10 +108,7 @@ func getAllParameter(w http.ResponseWriter, r *http.Request) {
 }
 
 func newParameter(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Parameter *models.Parameter
-		OmitID    interface{} `json:"id,omitempty"`
-	}
+	var Parameter models.Parameter
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageOrganisation(token) {
 		res := error401
@@ -122,8 +119,8 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Parameter == nil {
+	err := chiRender.Bind(request, &Parameter)
+	if err != nil || Parameter == (models.Parameter{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -131,19 +128,16 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Parameter().Save(data.Parameter, db)
+	apperr := store.Parameter().Save(&Parameter, db)
 	if err != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return
 	}
-	render.JSON(w, 200, data.Parameter)
+	render.JSON(w, 200, Parameter)
 }
 
 func updateParameter(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Parameter *models.Parameter
-		OmitID    interface{} `json:"id,omitempty"`
-	}
+	var Parameter models.Parameter
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageOrganisation(token) {
 		res := error401
@@ -154,9 +148,9 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
+	err := chiRender.Bind(request, &Parameter)
 	parameter := r.Context().Value(oldParameterKey).(models.Parameter)
-	if err != nil || data.Parameter == nil {
+	if err != nil || Parameter == (models.Parameter{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -164,7 +158,7 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Parameter().Update(&parameter, data.Parameter, db)
+	apperr := store.Parameter().Update(&parameter, &Parameter, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return

@@ -174,15 +174,12 @@ func getMessageFromDate(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMessageFromUser(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		User   *models.User
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var User models.User
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.User == nil {
+	err := chiRender.Bind(request, &User)
+	if err != nil || User == (models.User{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -190,20 +187,17 @@ func getMessageFromUser(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	role := store.Message().GetByCreator(data.User, db)
+	role := store.Message().GetByCreator(&User, db)
 	render.JSON(w, 200, role)
 }
 
 func getMessageFromChannel(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Channel *models.Channel
-		OmitID  interface{} `json:"id,omitempty"`
-	}
+	var Channel models.Channel
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Channel == nil {
+	err := chiRender.Bind(request, &Channel)
+	if err != nil || Channel == (models.Channel{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -211,20 +205,17 @@ func getMessageFromChannel(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	role := store.Message().GetByChannel(data.Channel, db)
+	role := store.Message().GetByChannel(&Channel, db)
 	render.JSON(w, 200, role)
 }
 
 func newMessage(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Message *models.Message
-		OmitID  interface{} `json:"id,omitempty"`
-	}
+	var Message models.Message
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Message == nil {
+	err := chiRender.Bind(request, &Message)
+	if err != nil || Message == (models.Message{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -232,25 +223,22 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Message().Save(data.Message, db)
+	apperr := store.Message().Save(&Message, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return
 	}
-	render.JSON(w, 201, data.Message)
+	render.JSON(w, 201, Message)
 }
 
 func updateMessage(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Message *models.Message
-		OmitID  interface{} `json:"id,omitempty"`
-	}
+	var Message models.Message
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
+	err := chiRender.Bind(request, &Message)
 	message := r.Context().Value(oldMessageKey).(models.Message)
-	if err != nil || data.Message == nil {
+	if err != nil || Message == (models.Message{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -258,7 +246,7 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Message().Update(&message, data.Message, db)
+	apperr := store.Message().Update(&message, &Message, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return

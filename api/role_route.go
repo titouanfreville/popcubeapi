@@ -186,15 +186,12 @@ func getRoleFromRight(w http.ResponseWriter, r *http.Request) {
 }
 
 func newRole(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Role   *models.Role
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Role models.Role
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Role == nil {
+	err := chiRender.Bind(request, &Role)
+	if err != nil || Role == (models.Role{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -202,25 +199,22 @@ func newRole(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Role().Save(data.Role, db)
+	apperr := store.Role().Save(&Role, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return
 	}
-	render.JSON(w, 201, data.Role)
+	render.JSON(w, 201, Role)
 }
 
 func updateRole(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Role   *models.Role
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Role models.Role
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
+	err := chiRender.Bind(request, &Role)
 	role := r.Context().Value(oldRoleKey).(models.Role)
-	if err != nil || data.Role == nil {
+	if err != nil || Role == (models.Role{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -228,7 +222,7 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Role().Update(&role, data.Role, db)
+	apperr := store.Role().Update(&role, &Role, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return

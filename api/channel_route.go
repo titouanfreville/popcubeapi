@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"log"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pressly/chi"
 	chiRender "github.com/pressly/chi/render"
@@ -45,29 +47,6 @@ func initChannelRoute(router chi.Router) {
 		// 	  503: databaseError
 		// 	  default: genericError
 		r.Post("/", newChannel)
-		// swagger:route GET /channel/all Channels getAllChannel1
-		//
-		// Get channels
-		//
-		// This will get all the channels available in the organisation.
-		//
-		// 	Responses:
-		//    200: channelArraySuccess
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Get("/all", getAllChannel)
-		// swagger:route POST /channel/new Channels newChannel1
-		//
-		// New channel
-		//
-		// This will create an channel for organisation channels library.
-		//
-		// 	Responses:
-		//    201: channelObjectSuccess
-		// 	  422: wrongEntity
-		// 	  503: databaseError
-		// 	  default: genericError
-		r.Post("/new", newChannel)
 		// swagger:route GET /channel/public Channels getPublicChannel
 		//
 		// Get public channels
@@ -106,24 +85,19 @@ func initChannelRoute(router chi.Router) {
 				r.Get("/", getChannelFromType)
 			})
 		})
-		r.Route("/name/", func(r chi.Router) {
-			r.Route("/:channelName", func(r chi.Router) {
-				r.Use(channelContext)
-				// swagger:route GET /channel/name/{channelName} Channels getChannelFromName
-				//
-				// Get nammed channel
-				//
-				// This will get the channels having provided name in the organisation.
-				//
-				// 	Responses:
-				//    200: channelObjectSuccess
-				// 	  503: databaseError
-				// 	  default: genericError
-				r.Get("/", getChannelFromName)
-			})
-		})
 		r.Route("/:channelID", func(r chi.Router) {
 			r.Use(channelContext)
+			// swagger:route GET /channel/{channelID} Channels getChannelFromID
+			//
+			// Get nammed channel  - Currently in conflict with channel/{channelID}/member/{}
+			//
+			// This will get the channels having provided name in the organisation.
+			//
+			// 	Responses:
+			//    200: channelObjectSuccess
+			// 	  503: databaseError
+			// 	  default: genericError
+			r.Get("/", getChannelFromID)
 			// swagger:route PUT /channel/{channelID} Channels updateChannel
 			//
 			// Update channel
@@ -135,7 +109,7 @@ func initChannelRoute(router chi.Router) {
 			// 	  422: wrongEntity
 			// 	  503: databaseError
 			// 	  default: genericError
-			r.Put("/update", updateChannel)
+			r.Put("/", updateChannel)
 			// swagger:route DELETE /channel/{channelID} Channels deleteChannel
 			//
 			// Delete channel
@@ -146,7 +120,8 @@ func initChannelRoute(router chi.Router) {
 			//    200: deleteMessage
 			// 	  503: databaseError
 			// 	  default: genericError
-			r.Delete("/delete", deleteChannel)
+			r.Delete("/", deleteChannel)
+			initMemberOverChannel(r)
 		})
 	})
 }
@@ -178,13 +153,15 @@ func canArchive(currentChannelID uint64, token *jwt.Token) bool {
 func channelContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		channelID, err := strconv.ParseUint(chi.URLParam(r, "channelID"), 10, 64)
-		name := chi.URLParam(r, "channelName")
+		name := chi.URLParam(r, "channelID")
 		channelType := chi.URLParam(r, "channelType")
 		oldChannel := models.Channel{}
 		ctx := context.WithValue(r.Context(), channelNameKey, name)
 		ctx = context.WithValue(ctx, channelTypeKey, channelType)
 		if err == nil {
 			oldChannel = datastores.Store().Channel().GetByID(channelID, dbStore.db)
+		} else {
+			oldChannel = datastores.Store().Channel().GetByName(name, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, oldChannelKey, oldChannel)
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -227,15 +204,13 @@ func getPrivateChannel(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getChannelFromName(w http.ResponseWriter, r *http.Request) {
-	store := datastores.Store()
+func getChannelFromID(w http.ResponseWriter, r *http.Request) {
 	db := dbStore.db
 	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	name := r.Context().Value(channelNameKey).(string)
-	channel := store.Channel().GetByName(name, db)
+	channel := r.Context().Value(oldChannelKey).(models.Channel)
 	render.JSON(w, 200, channel)
 }
 
@@ -252,10 +227,7 @@ func getChannelFromType(w http.ResponseWriter, r *http.Request) {
 }
 
 func newChannel(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Channel *models.Channel
-		OmitID  interface{} `json:"id,omitempty"`
-	}
+	var Channel models.Channel
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser("global", false, "", token) {
 		res := error401
@@ -266,8 +238,9 @@ func newChannel(w http.ResponseWriter, r *http.Request) {
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Channel == nil {
+	err := chiRender.Bind(request, &Channel)
+	if err != nil || Channel == (models.Channel{}) {
+		log.Print("422 here - new channel")
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -275,32 +248,30 @@ func newChannel(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	rerr := store.Channel().Save(data.Channel, db)
+	rerr := store.Channel().Save(&Channel, db)
 	if err != nil {
 		render.JSON(w, rerr.StatusCode, rerr)
 		return
 	}
-	render.JSON(w, 201, data.Channel)
+	render.JSON(w, 201, Channel)
 }
 
 func updateChannel(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Channel *models.Channel
-		OmitID  interface{} `json:"id,omitempty"`
-	}
+	var Channel models.Channel
 	channel := r.Context().Value(oldChannelKey).(models.Channel)
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser(channel.ChannelName, false, "", token) {
 		res := error401
-		res.Message = "You don't have the right to manage user."
+		res.Message = "You don't have the right to manage channels."
 		render.JSON(w, error401.StatusCode, error401)
 		return
 	}
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Channel == nil {
+	err := chiRender.Bind(request, &Channel)
+	if err != nil || Channel == (models.Channel{}) {
+		log.Print("422 here - Update channel")
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -308,7 +279,7 @@ func updateChannel(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	rerr := store.Channel().Update(&channel, data.Channel, db)
+	rerr := store.Channel().Update(&channel, &Channel, db)
 	if err == nil {
 		render.JSON(w, rerr.StatusCode, rerr)
 		return
@@ -321,7 +292,7 @@ func deleteChannel(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser(channel.ChannelName, false, "", token) {
 		res := error401
-		res.Message = "You don't have the right to manage user."
+		res.Message = "You don't have the right to manage channels."
 		render.JSON(w, error401.StatusCode, error401)
 		return
 	}

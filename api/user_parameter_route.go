@@ -81,7 +81,7 @@ func userParameterAuthenticator(next http.Handler) http.Handler {
 		ctx := r.Context()
 		if jwtErr, ok := ctx.Value(jwtErrorKey).(error); ok {
 			if jwtErr != nil {
-				render.JSON(w, 401, jwtErr)
+				render.JSON(w, 401, "Token not found. You Are not allowed to proceed without token.")
 				return
 			}
 		}

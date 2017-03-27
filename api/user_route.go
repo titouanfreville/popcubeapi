@@ -187,6 +187,7 @@ func initUserRoute(router chi.Router) {
 			// 	  default: deleteMessage
 			r.Delete("/", deleteUser)
 			initUserParameterRoute(r)
+			initMemberOverUser(r)
 		})
 	})
 }
@@ -372,10 +373,7 @@ func getUserFromRole(w http.ResponseWriter, r *http.Request) {
 }
 
 func newUser(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		User   *models.User
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var User models.User
 	store := datastores.Store()
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser("global", false, "", token) {
@@ -386,8 +384,8 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 	}
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.User == nil {
+	err := chiRender.Bind(request, &User)
+	if err != nil || User == (models.User{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -395,9 +393,9 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.User().Save(data.User, db)
+	apperr := store.User().Save(&User, db)
 	if err == nil {
-		render.JSON(w, 201, data.User)
+		render.JSON(w, 201, User)
 		return
 	}
 	render.JSON(w, apperr.StatusCode, apperr)
@@ -444,14 +442,11 @@ func inviteUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		User   *models.User
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var User models.User
 	store := datastores.Store()
 	db := dbStore.db
 	request := r.Body
-	err := chiRender.Bind(request, &data)
+	err := chiRender.Bind(request, &User)
 	user := r.Context().Value(oldUserKey).(models.User)
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser("global", true, user.Username, token) {
@@ -460,7 +455,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error401.StatusCode, error401)
 		return
 	}
-	if err != nil || data.User == nil {
+	if err != nil || (User == models.User{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -468,7 +463,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.User().Update(&user, data.User, db)
+	apperr := store.User().Update(&user, &User, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return
