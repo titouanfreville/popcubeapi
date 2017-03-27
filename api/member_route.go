@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -204,7 +203,6 @@ func memberContext(next http.Handler) http.Handler {
 		}
 		ctx = context.WithValue(ctx, oldMemberKey, oldMember)
 		ctx = context.WithValue(ctx, oldChannelKey, channel)
-		log.Print("Context user:", userFromParam)
 		ctx = context.WithValue(ctx, oldUserKey, userFromParam)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
