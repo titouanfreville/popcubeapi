@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"encoding/base32"
 	"flag"
@@ -41,6 +42,7 @@ type key string
 // }
 
 var (
+	apiVersionKey    key = "version"
 	secret           string
 	hmacSampleSecret []byte
 	tokenAuth        *JwtAuth
@@ -133,6 +135,33 @@ func initMiddleware(router *chi.Mux) {
 	router.Use(middleware.Timeout(5 * 1000))
 	router.Use(middleware.Heartbeat("/heartbeat"))
 	router.Use(middleware.CloseNotify)
+}
+
+// initVersionRouting manage Version routing through go serveur
+func initVersionRouting(router *chi.Mux) {
+	router.Route("/alpha", func(router chi.Router) {
+		router.Use(apiVersionContext("alpha"))
+		initAvatarRoute(router)
+		initChannelRoute(router)
+		initEmojiRoute(router)
+		initFolderRoute(router)
+		initMessageRoute(router)
+		initOrganisationRoute(router)
+		initParameterRoute(router)
+		initRoleRoute(router)
+		initUserRoute(router)
+		initDevGetter(router)
+	})
+}
+
+// apiVersionContext Set Current ctx api version
+func apiVersionContext(version string) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r = r.WithContext(context.WithValue(r.Context(), apiVersionKey, version))
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 // basicRoutes set basic routes for the API
@@ -403,18 +432,7 @@ func StartAPI(hostname string, port string, DbConnectionInfo *configs.DbConnecti
 	dbStore.db = datastores.Store().InitConnection(user, db, pass, host, dbport)
 	initAuth()
 	initMiddleware(router)
-	basicRoutes(router)
-	initAvatarRoute(router)
-	initChannelRoute(router)
-	initEmojiRoute(router)
-	initFolderRoute(router)
-	initMessageRoute(router)
-	initOrganisationRoute(router)
-	initParameterRoute(router)
-	initRoleRoute(router)
-	initUserRoute(router)
-	initDevGetter(router)
-	// initUserParameterRoute(router)
+	initVersionRouting(router)
 	// Passing -routes to the program will generate docs for the above
 	// router definition. See the `routes.json` file in this folder for
 	// the output.
