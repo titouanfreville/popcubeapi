@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	oldMemberKey key = "oldMember"
+	oldMemberKey  key = "oldMember"
+	searchRoleKey key = "searchRole"
 )
 
 func initMemberOverChannel(channelRoutes chi.Router) {
@@ -168,6 +169,7 @@ func memberContext(next http.Handler) http.Handler {
 		var channel models.Channel
 		var user models.User
 		var userFromParam models.User
+		var role models.Role
 		channel, ok = ctx.Value(oldChannelKey).(models.Channel)
 		if !ok {
 			channel = models.EmptyChannel
@@ -201,9 +203,17 @@ func memberContext(next http.Handler) http.Handler {
 			}
 			oldMember = datastores.Store().Member().GetByID(channel.IDChannel, userID, dbStore.db)
 		}
+		roleId, err := strconv.ParseUint(chi.URLParam(r, "roleID"), 10, 64)
+		if err != nil {
+			roleName := chi.URLParam(r, "roleID")
+			role = datastores.Store().Role().GetByName(roleName, dbStore.db)
+		} else {
+			role = datastores.Store().Role().GetByID(roleId, dbStore.db)
+		}
 		ctx = context.WithValue(ctx, oldMemberKey, oldMember)
 		ctx = context.WithValue(ctx, oldChannelKey, channel)
 		ctx = context.WithValue(ctx, oldUserKey, userFromParam)
+		ctx = context.WithValue(ctx, searchRoleKey, role)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -244,20 +254,10 @@ func getMemberFromChannel(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
-	var Role models.Role
 	store := datastores.Store()
 	db := dbStore.db
-	
-	err := chiRender.Bind(r, &Role)
-	if err != nil || Role == models.EmptyRole {
-		render.JSON(w, error422.StatusCode, error422)
-		return
-	}
-	if err := db.DB().Ping(); err != nil {
-		render.JSON(w, error503.StatusCode, error503)
-		return
-	}
-	member := store.Member().GetByRole(&Role, db)
+	role := r.Context().Value(searchRoleKey).(models.Role)
+	member := store.Member().GetByRole(&role, db)
 	render.JSON(w, 200, member)
 }
 
@@ -265,7 +265,7 @@ func newMember(w http.ResponseWriter, r *http.Request) {
 	var Member models.Member
 	store := datastores.Store()
 	db := dbStore.db
-	
+
 	err := chiRender.Bind(r, &Member)
 	if err != nil || Member == models.EmptyMember {
 		render.JSON(w, error422.StatusCode, error422)
@@ -301,7 +301,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 	var Member models.Member
 	store := datastores.Store()
 	db := dbStore.db
-	
+
 	err := chiRender.Bind(r, &Member)
 	member := r.Context().Value(oldMemberKey).(models.Member)
 	if err != nil || Member == models.EmptyMember {
