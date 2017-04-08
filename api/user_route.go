@@ -205,7 +205,7 @@ func userContext(next http.Handler) http.Handler {
 		lastName := chi.URLParam(r, "lastName")
 		email := chi.URLParam(r, "email")
 		date, _ := strconv.ParseInt(chi.URLParam(r, "date"), 10, 64)
-		oldUser := models.User{}
+		oldUser := models.EmptyUser
 		ctx := context.WithValue(r.Context(), userNameKey, name)
 		ctx = context.WithValue(ctx, nickNameKey, nickName)
 		ctx = context.WithValue(ctx, firstNameKey, firstName)
@@ -352,15 +352,12 @@ func getOrderedByDate(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserFromRole(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Role   *models.Role
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Role models.Role
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Role == nil {
+
+	err := chiRender.Bind(r, &Role)
+	if err != nil || Role == models.EmptyRole {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -368,7 +365,7 @@ func getUserFromRole(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	role := store.User().GetByRole(data.Role, db)
+	role := store.User().GetByRole(&Role, db)
 	render.JSON(w, 200, role)
 }
 
@@ -383,8 +380,8 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &User)
+
+	err := chiRender.Bind(r, &User)
 	if err != nil || User == (models.User{}) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
@@ -402,17 +399,24 @@ func newUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// inviteUser request
+type inviteUserRequest struct {
+	Email   string      `json:"email"`
+	Message string      `json:"message"`
+	OmitID  interface{} `json:"id,omitempty"`
+}
+
+func (iU inviteUserRequest) Bind(r *http.Request) error {
+	return nil
+}
+
 func inviteUser(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Email   string      `json:"email"`
-		Message string      `json:"message"`
-		OmitID  interface{} `json:"id,omitempty"`
-	}
+	var iUR inviteUserRequest
 	store := datastores.Store()
 	db := dbStore.db
 	organisation := store.Organisation().Get(db)
 	response := inviteOk{}
-	request := r.Body
+
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser("global", false, "", token) || !canInviteUser("global", token) {
 		res := error401
@@ -421,16 +425,16 @@ func inviteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Email == "" {
+	err := chiRender.Bind(r, &iUR)
+	if err != nil || iUR.Email == "" {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
 	if err := db.DB().Ping(); err == nil {
 		var terr error
-		response.Email = data.Email
+		response.Email = iUR.Email
 		response.Organisation = organisation.OrganisationName
-		response.Token, terr = createInviteToken(data.Email, organisation.OrganisationName)
+		response.Token, terr = createInviteToken(iUR.Email, organisation.OrganisationName)
 		if terr == nil {
 			render.JSON(w, 201, response)
 			return
@@ -445,8 +449,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	var User models.User
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &User)
+	err := chiRender.Bind(r, &User)
 	user := r.Context().Value(oldUserKey).(models.User)
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageUser("global", true, user.Username, token) {

@@ -61,14 +61,14 @@ func (msi MemberStoreImpl) GetAll(db *gorm.DB) []models.Member {
 
 // GetByID Used to get member from DB
 func (msi MemberStoreImpl) GetByID(channelID uint64, userID uint64, db *gorm.DB) models.Member {
-	member := models.Member{}
+	member := models.EmptyMember
 	db.Where("idChannel = ? AND idUser = ?", channelID, userID).First(&member)
 	return member
 }
 
 // GetChannelMember get specific user in specific channel
 func (msi MemberStoreImpl) GetChannelMember(user *models.User, channel *models.Channel, db *gorm.DB) models.Member {
-	member := models.Member{}
+	member := models.EmptyMember
 	db.Table("members").Select("*").Joins("natural join users natural join channels").Where("users.idUser = ? and channels.idChannel = ?", user.IDUser, channel.IDChannel).Find(&member)
 	return member
 }
@@ -76,6 +76,7 @@ func (msi MemberStoreImpl) GetChannelMember(user *models.User, channel *models.C
 // GetByUser get member from user
 func (msi MemberStoreImpl) GetByUser(user *models.User, db *gorm.DB) []models.Member {
 	members := []models.Member{}
+	// natural join is not working here. No clues....
 	db.Table("members").Select("*").Joins("inner join users on members.idUser=users.idUser").Where("users.idUser = ?", user.IDUser).Find(&members)
 	return members
 }

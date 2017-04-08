@@ -163,7 +163,7 @@ func folderContext(next http.Handler) http.Handler {
 		name := chi.URLParam(r, "folderName")
 		folderType := chi.URLParam(r, "folderType")
 		folderLink := chi.URLParam(r, "folderLink")
-		oldFolder := models.Folder{}
+		oldFolder := models.EmptyFolder
 		ctx := context.WithValue(r.Context(), folderNameKey, name)
 		ctx = context.WithValue(r.Context(), folderTypeKey, folderType)
 		ctx = context.WithValue(ctx, folderLinkKey, folderLink)
@@ -223,14 +223,11 @@ func getFolderFromLink(w http.ResponseWriter, r *http.Request) {
 }
 
 func getFolderFromMessage(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Message *models.Message
-		OmitID  interface{} `json:"id,omitempty"`
-	}
+	var Message models.Message
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
+	
+	err := chiRender.Bind(r, &Message)
 	if err != nil {
 		render.JSON(w, error422.StatusCode, error422)
 		return
@@ -239,44 +236,37 @@ func getFolderFromMessage(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	folders := store.Folder().GetByMessage(data.Message, db)
+	folders := store.Folder().GetByMessage(&Message, db)
 	render.JSON(w, 200, folders)
 }
 
 func newFolder(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Folder *models.Folder
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Folder models.Folder
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Folder == nil {
+	err := chiRender.Bind(r, &Folder)
+	if err != nil || Folder == (models.EmptyFolder) {
 		render.JSON(w, error422.StatusCode, error422)
 	}
 	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Folder().Save(data.Folder, db)
+	apperr := store.Folder().Save(&Folder, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 	}
-	render.JSON(w, 201, data.Folder)
+	render.JSON(w, 201, Folder)
 }
 
 func updateFolder(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Folder *models.Folder
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Folder models.Folder
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
+	
+	err := chiRender.Bind(r, &Folder)
 	folder := r.Context().Value(oldFolderKey).(models.Folder)
-	if err != nil || data.Folder == nil {
+	if err != nil || Folder == models.EmptyFolder {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -284,7 +274,7 @@ func updateFolder(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Folder().Update(&folder, data.Folder, db)
+	apperr := store.Folder().Update(&folder, &Folder, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 	}

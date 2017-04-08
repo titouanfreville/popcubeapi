@@ -1,10 +1,11 @@
 package models
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"strconv"
 	"strings"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
@@ -42,7 +43,7 @@ func TestParameterModel(t *testing.T) {
 			So(parameter.IsValid(), ShouldNotResemble, u.NewLocAppError("Parameter.IsValid", "model.parameter.is_valid.description.app_error", nil, "id="+strconv.FormatUint(parameter.IDParameter, 10)))
 		})
 		Convey("Given an incorrect parameter. Parameter should be refused", func() {
-			empty := Parameter{}
+			empty := EmptyParameter
 			parameter := Parameter{
 				Local:      "en_EN",
 				TimeZone:   "UTC+2",
@@ -81,7 +82,7 @@ func TestParameterModel(t *testing.T) {
 	})
 
 	Convey("Testing PreSave function", t, func() {
-		parameter := Parameter{}
+		parameter := EmptyParameter
 		Convey("If parameter is empty, should fill some fields - webID, ParameterName, LastUpdate, Avatar and type, and parameter should be valid", func() {
 			parameter.PreSave()
 			So(parameter.IsValid(), ShouldBeNil)

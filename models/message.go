@@ -3,8 +3,14 @@ package models
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 
 	u "github.com/titouanfreville/popcubeapi/utils"
+)
+
+var (
+	// EmptyMessage empty var for message
+	EmptyMessage = Message{}
 )
 
 // Message object
@@ -35,15 +41,20 @@ type Message struct {
 	IDChannel uint64 `gorm:"column:idChannel; not null;" json:"id_channel,omitempty"`
 }
 
+// Bind method used in API
+func (message *Message) Bind(r *http.Request) error {
+	return nil
+}
+
 // IsValid function is used to check that the provided message correspond to the message model. It has to be use before tring to store it in the db.
 func (message *Message) IsValid() *u.AppError {
 	if message.Date == 0 {
 		return u.NewLocAppError("Message.IsValid", "model.message.date.app_error", nil, "")
 	}
-	// if message.Creator == (User{}) {
+	// if message.Creator == (EmptyUser) {
 	// 	return u.NewLocAppError("Message.IsValid", "model.message.creator.app_error", nil, "")
 	// }
-	// if message.Channel == (Channel{}) {
+	// if message.Channel == (EmptyChannel) {
 	// 	return u.NewLocAppError("Message.IsValid", "model.message.channel.app_error", nil, "")
 	// }
 

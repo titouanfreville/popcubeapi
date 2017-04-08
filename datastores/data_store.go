@@ -99,7 +99,7 @@ func (store StoreImpl) InitDatabase(user string, dbname string, password string,
 	db := store.InitConnection(user, dbname, password, host, port)
 	db.Debug().DB().Ping()
 	// Create correct tables
-	// db.AutoMigrate(&models.Avatar{}, &models.Channel{}, &models.Emoji{}, &models.Folder{},
+	// db.AutoMigrate(&models.EmptyAvatar, &models.Channel{}, &models.Emoji{}, &models.Folder{},
 	// 	models.Member{}, &models.Message{}, &models.Organisation{}, &models.Parameter{},
 	// 	&models.Role{}, &models.User{})
 

@@ -64,27 +64,27 @@ func (usi UserStoreImpl) GetAll(db *gorm.DB) []models.User {
 
 // GetByID Used to get user from DB
 func (usi UserStoreImpl) GetByID(ID uint64, db *gorm.DB) models.User {
-	user := models.User{}
+	user := models.EmptyUser
 	db.Where("idUser = ?", ID).First(&user)
 	return user
 }
 
 // GetByUserName Used to get user from DB
 func (usi UserStoreImpl) GetByUserName(userName string, db *gorm.DB) models.User {
-	user := models.User{}
+	user := models.EmptyUser
 	db.Where("userName = ?", userName).First(&user)
 	return user
 }
 
 // Login Used to log user in
 func (usi UserStoreImpl) Login(login string, pass string, db *gorm.DB) (models.User, *u.AppError) {
-	user1 := models.User{}
-	user2 := models.User{}
-	empty := models.User{}
+	user1 := models.EmptyUser
+	user2 := models.EmptyUser
+	empty := models.EmptyUser
 	err := u.NewAPIError(404, "Wrong user name or password", "Can't proceed to login. Password or user name is not correct")
 	db.Where("userName = ?", login).First(&user1)
 	db.Where("email = ?", login).First(&user2)
-	if (user1 == models.User{} && user2 == models.User{}) {
+	if user1 == models.EmptyUser && user2 == models.EmptyUser {
 		return empty, err
 	}
 	if models.ComparePassword(user1.Password, pass) {
@@ -98,7 +98,7 @@ func (usi UserStoreImpl) Login(login string, pass string, db *gorm.DB) (models.U
 
 // GetByEmail Used to get user from DB by email
 func (usi UserStoreImpl) GetByEmail(userEmail string, db *gorm.DB) models.User {
-	user := models.User{}
+	user := models.EmptyUser
 	db.Where("email = ?", userEmail).First(&user)
 	return user
 }
@@ -119,7 +119,7 @@ func (usi UserStoreImpl) GetDeleted(db *gorm.DB) []models.User {
 
 // GetByNickName get user from nick name
 func (usi UserStoreImpl) GetByNickName(nickName string, db *gorm.DB) models.User {
-	user := models.User{}
+	user := models.EmptyUser
 	db.Where("nickName = ?", nickName).First(&user)
 	return user
 }

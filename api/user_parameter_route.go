@@ -125,11 +125,11 @@ func userparameterContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		parameterName := chi.URLParam(r, "parameterName")
-		oldUserParameter := models.UserParameter{}
+		oldUserParameter := models.EmptyUserParameter
 		store := datastores.Store()
 		db := dbStore.db
 		user := ctx.Value(oldUserKey).(models.User)
-		if (user != models.User{}) {
+		if user != models.EmptyUser {
 			oldUserParameter = store.UserParameter().GetByID(user.IDUser, parameterName, db)
 		}
 		ctx = context.WithValue(ctx, oldUserParameterKey, oldUserParameter)
@@ -153,9 +153,8 @@ func newUserParameter(w http.ResponseWriter, r *http.Request) {
 	var UserParameter models.UserParameter
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &UserParameter)
-	if err != nil || (UserParameter == models.UserParameter{}) {
+	err := chiRender.Bind(r, &UserParameter)
+	if err != nil || (UserParameter == models.EmptyUserParameter) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -176,10 +175,10 @@ func updateUserParameter(w http.ResponseWriter, r *http.Request) {
 	var UserParameter models.UserParameter
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &UserParameter)
+
+	err := chiRender.Bind(r, &UserParameter)
 	userparameter := r.Context().Value(oldUserParameterKey).(models.UserParameter)
-	if err != nil || (UserParameter == models.UserParameter{}) {
+	if err != nil || (UserParameter == models.EmptyUserParameter) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}

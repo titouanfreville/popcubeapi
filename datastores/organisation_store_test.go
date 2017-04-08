@@ -44,7 +44,7 @@ func TestOrganisationStore(t *testing.T) {
 			})
 		})
 		Convey("Given an incorrect organisation.", func() {
-			empty := Organisation{}
+			empty := EmptyOrganisation
 			organisation.OrganisationName = ""
 			Convey("Empty organisation or no Organisation Name organisation should return No name error", func() {
 				appError := osi.Save(&organisation, db)
@@ -166,7 +166,7 @@ func TestOrganisationStore(t *testing.T) {
 			So(appError, ShouldNotResemble, dbError)
 		})
 		// Convey("Providing an incorrect user as new should result in errors", func() {
-		// 	empty := Organisation{}
+		// 	empty := EmptyOrganisation
 		// 	newOrganisation.OrganisationName = ""
 		// 	Convey("Empty organisation or no Organisation Name organisation should return No name error", func() {
 		// 		appError := osi.Update(&organisation, &newOrganisation, db)
@@ -252,7 +252,7 @@ func TestOrganisationStore(t *testing.T) {
 
 		// })
 		Convey("Providing an incorrect user as old should result in errors", func() {
-			empty := Organisation{}
+			empty := EmptyOrganisation
 			organisation.OrganisationName = ""
 			Convey("Empty organisation or no Organisation Name organisation should return No name error", func() {
 				appError := osi.Update(&organisation, &newOrganisation, db)
@@ -349,7 +349,7 @@ func TestOrganisationStore(t *testing.T) {
 			Domain:           "zeus.popcube",
 		}
 		Convey("Trying to get organisation from empty DB should return empty", func() {
-			So(osi.Get(db), ShouldResemble, Organisation{})
+			So(osi.Get(db), ShouldResemble, EmptyOrganisation)
 		})
 		appError := osi.Save(&organisation, db)
 		So(appError, ShouldBeNil)

@@ -50,8 +50,8 @@ func TestMessageModel(t *testing.T) {
 				testMessage := MessageFromJSON(strings.NewReader(json))
 				So(testMessage.Date, ShouldEqual, message.Date)
 				So(testMessage.Content, ShouldEqual, message.Content)
-				So(testMessage.Creator, ShouldResemble, User{})
-				So(testMessage.Channel, ShouldResemble, Channel{})
+				So(testMessage.Creator, ShouldResemble, EmptyUser)
+				So(testMessage.Channel, ShouldResemble, EmptyChannel)
 			})
 		})
 
@@ -78,7 +78,7 @@ func TestMessageModel(t *testing.T) {
 
 	Convey("Testing pre Save function", t, func() {
 		Convey("Given any message, it should update date with current date", func() {
-			m1 := Message{}
+			m1 := EmptyMessage
 			m2 := Message{Date: 10}
 			m3 := Message{Date: 20, Content: "Test presave"}
 			m4 := Message{Content: "Test presave"}
@@ -115,7 +115,7 @@ func TestMessageModel(t *testing.T) {
 			So(message.IsValid(), ShouldNotResemble, u.NewLocAppError("Message.IsValid", "model.message.channel.app_error", nil, ""))
 		})
 		Convey("Given an incorrect message. Message should be refused", func() {
-			empty := Message{}
+			empty := EmptyMessage
 			message := Message{
 				Content: "Message test",
 				Creator: userTest,
@@ -134,7 +134,7 @@ func TestMessageModel(t *testing.T) {
 			})
 
 			message.Date = GetMillis()
-			// message.Creator = User{}
+			// message.Creator = EmptyUser
 
 			// Convey("Empty creator messages must return creator error", func() {
 			// 	So(message.IsValid(), ShouldNotBeNil)
@@ -144,7 +144,7 @@ func TestMessageModel(t *testing.T) {
 			// })
 
 			// message.Creator = userTest
-			// message.Channel = Channel{}
+			// message.Channel = EmptyChannel
 
 			// Convey("Empty channel message must return channel error", func() {
 			// 	So(message.IsValid(), ShouldNotBeNil)

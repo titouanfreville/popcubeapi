@@ -135,7 +135,7 @@ func canModerate(currentChannelID uint64, token *jwt.Token) bool {
 	chanel := store.Channel().GetByID(currentChannelID, db)
 	member := store.Member().GetChannelMember(&user, &chanel, db)
 	memberRights := store.Role().GetByID(member.IDRole, db)
-	return (memberRights != models.Role{} && memberRights.CanManageUser || memberRights == models.Role{} && userRights.CanManageUser)
+	return (memberRights != models.EmptyRole && memberRights.CanManageUser || memberRights == models.EmptyRole && userRights.CanManageUser)
 }
 
 func canArchive(currentChannelID uint64, token *jwt.Token) bool {
@@ -147,7 +147,7 @@ func canArchive(currentChannelID uint64, token *jwt.Token) bool {
 	chanel := store.Channel().GetByID(currentChannelID, db)
 	member := store.Member().GetChannelMember(&user, &chanel, db)
 	memberRights := store.Role().GetByID(member.IDRole, db)
-	return (memberRights != models.Role{} && memberRights.CanArchive || memberRights == models.Role{} && userRights.CanArchive)
+	return (memberRights != models.EmptyRole && memberRights.CanArchive || memberRights == models.EmptyRole && userRights.CanArchive)
 }
 
 func channelContext(next http.Handler) http.Handler {
@@ -155,7 +155,7 @@ func channelContext(next http.Handler) http.Handler {
 		channelID, err := strconv.ParseUint(chi.URLParam(r, "channelID"), 10, 64)
 		name := chi.URLParam(r, "channelID")
 		channelType := chi.URLParam(r, "channelType")
-		oldChannel := models.Channel{}
+		oldChannel := models.EmptyChannel
 		ctx := context.WithValue(r.Context(), channelNameKey, name)
 		ctx = context.WithValue(ctx, channelTypeKey, channelType)
 		if err == nil {
@@ -237,9 +237,8 @@ func newChannel(w http.ResponseWriter, r *http.Request) {
 	}
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Channel)
-	if err != nil || Channel == (models.Channel{}) {
+	err := chiRender.Bind(r, &Channel)
+	if err != nil || Channel == (models.EmptyChannel) {
 		log.Print("422 here - new channel")
 		render.JSON(w, error422.StatusCode, error422)
 		return
@@ -268,9 +267,8 @@ func updateChannel(w http.ResponseWriter, r *http.Request) {
 	}
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Channel)
-	if err != nil || Channel == (models.Channel{}) {
+	err := chiRender.Bind(r, &Channel)
+	if err != nil || Channel == (models.EmptyChannel) {
 		log.Print("422 here - Update channel")
 		render.JSON(w, error422.StatusCode, error422)
 		return

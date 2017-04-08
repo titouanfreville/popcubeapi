@@ -10,17 +10,13 @@
 		},
 		{
 			"ImportPath": "github.com/go-sql-driver/mysql",
-			"Comment": "v1.3-2-g2e00b5c",
-			"Rev": "2e00b5cd70399450106cec6431c2e2ce3cae5034"
-		},
-		{
-			"ImportPath": "github.com/goware/jwtauth",
-			"Rev": "d5f87ca5c3b52eaf56cc8c70c545d8aadd7cbb0a"
+			"Comment": "v1.3-6-g9dee4ca",
+			"Rev": "9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3"
 		},
 		{
 			"ImportPath": "github.com/jinzhu/gorm",
-			"Comment": "v1.0-126-g5050a58",
-			"Rev": "5050a58b457286dbda1844991866a86a434636ab"
+			"Comment": "v1.0-138-g45ccb13",
+			"Rev": "45ccb134373e7d9fa76d5987a6fed6cd5a5adfd4"
 		},
 		{
 			"ImportPath": "github.com/jinzhu/inflection",
@@ -28,23 +24,23 @@
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
-			"Comment": "v1.7.0-2-g2c24b78",
-			"Rev": "2c24b78755bd85f2b97c45f6f1bf906660b59d56"
+			"Comment": "v1.8.0-3-gf373441",
+			"Rev": "f373441d6d54a32891b2d8b1dbf99bc518f3d60d"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n/bundle",
-			"Comment": "v1.7.0-2-g2c24b78",
-			"Rev": "2c24b78755bd85f2b97c45f6f1bf906660b59d56"
+			"Comment": "v1.8.0-3-gf373441",
+			"Rev": "f373441d6d54a32891b2d8b1dbf99bc518f3d60d"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n/language",
-			"Comment": "v1.7.0-2-g2c24b78",
-			"Rev": "2c24b78755bd85f2b97c45f6f1bf906660b59d56"
+			"Comment": "v1.8.0-3-gf373441",
+			"Rev": "f373441d6d54a32891b2d8b1dbf99bc518f3d60d"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n/translation",
-			"Comment": "v1.7.0-2-g2c24b78",
-			"Rev": "2c24b78755bd85f2b97c45f6f1bf906660b59d56"
+			"Comment": "v1.8.0-3-gf373441",
+			"Rev": "f373441d6d54a32891b2d8b1dbf99bc518f3d60d"
 		},
 		{
 			"ImportPath": "github.com/pborman/uuid",
@@ -52,24 +48,29 @@
 			"Rev": "1b00554d822231195d1babd97ff4a781231955c9"
 		},
 		{
-			"ImportPath": "github.com/pressly/chi",
-			"Comment": "v2.0.0-13-g7765b09",
-			"Rev": "7765b0916fdc6791938554e9d53d39cae059ac8c"
+			"ImportPath": "github.com/pelletier/go-buffruneio",
+			"Comment": "v0.2.0",
+			"Rev": "c37440a7cf42ac63b919c752ca73a85067e05992"
 		},
 		{
-			"ImportPath": "github.com/pressly/chi/docgen",
-			"Comment": "v2.0.0-13-g7765b09",
-			"Rev": "7765b0916fdc6791938554e9d53d39cae059ac8c"
+			"ImportPath": "github.com/pelletier/go-toml",
+			"Comment": "v0.5.0-7-gfe206ef",
+			"Rev": "fe206efb84b2bc8e8cfafe6b4c1826622be969e3"
+		},
+		{
+			"ImportPath": "github.com/pressly/chi",
+			"Comment": "v2.1.0-1-g157587f",
+			"Rev": "157587f33c258f3590967dfc7be2e75c0aa1cdf3"
 		},
 		{
 			"ImportPath": "github.com/pressly/chi/middleware",
-			"Comment": "v2.0.0-13-g7765b09",
-			"Rev": "7765b0916fdc6791938554e9d53d39cae059ac8c"
+			"Comment": "v2.1.0-1-g157587f",
+			"Rev": "157587f33c258f3590967dfc7be2e75c0aa1cdf3"
 		},
 		{
 			"ImportPath": "github.com/pressly/chi/render",
-			"Comment": "v2.0.0-13-g7765b09",
-			"Rev": "7765b0916fdc6791938554e9d53d39cae059ac8c"
+			"Comment": "v2.1.0-1-g157587f",
+			"Rev": "157587f33c258f3590967dfc7be2e75c0aa1cdf3"
 		},
 		{
 			"ImportPath": "github.com/unrolled/render",
@@ -77,15 +78,15 @@
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/bcrypt",
-			"Rev": "453249f01cfeb54c3d549ddb75ff152ca243f9d8"
+			"Rev": "55a552f0823e0d3d54931488a2993ebd2fd0258c"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
-			"Rev": "453249f01cfeb54c3d549ddb75ff152ca243f9d8"
+			"Rev": "55a552f0823e0d3d54931488a2993ebd2fd0258c"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
-			"Rev": "a3f3340b5840cee44f372bddb5880fcbc419b46a"
+			"Rev": "cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b"
 		}
 	]
 }

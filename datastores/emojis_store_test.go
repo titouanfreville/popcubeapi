@@ -198,60 +198,60 @@ func TestEmojiStore(t *testing.T) {
 
 		Convey("We have to be able to find an emoji from is name", func() {
 			emoji := esi.GetByName(emoji0.Name, db)
-			So(emoji, ShouldNotResemble, Emoji{})
+			So(emoji, ShouldNotResemble, EmptyEmoji)
 			So(emoji, ShouldResemble, emoji0)
 			emoji = esi.GetByName(emoji2.Name, db)
-			So(emoji, ShouldNotResemble, Emoji{})
+			So(emoji, ShouldNotResemble, EmptyEmoji)
 			So(emoji, ShouldResemble, emoji2)
 			emoji = esi.GetByName(emoji3.Name, db)
-			So(emoji, ShouldNotResemble, Emoji{})
+			So(emoji, ShouldNotResemble, EmptyEmoji)
 			So(emoji, ShouldResemble, emoji3)
 			Convey("Should also work from updated value", func() {
 				emoji = esi.GetByName(emoji1.Name, db)
-				So(emoji, ShouldNotResemble, Emoji{})
+				So(emoji, ShouldNotResemble, EmptyEmoji)
 				So(emoji, ShouldResemble, emoji1)
 			})
 		})
 
 		Convey("We have to be able to find an emoji from is link", func() {
 			emoji := esi.GetByLink(emoji0.Link, db)
-			So(emoji, ShouldNotResemble, Emoji{})
+			So(emoji, ShouldNotResemble, EmptyEmoji)
 			So(emoji, ShouldResemble, emoji0)
 			emoji = esi.GetByLink(emoji2.Link, db)
-			So(emoji, ShouldNotResemble, Emoji{})
+			So(emoji, ShouldNotResemble, EmptyEmoji)
 			So(emoji, ShouldResemble, emoji2)
 			emoji = esi.GetByLink(emoji3.Link, db)
-			So(emoji, ShouldNotResemble, Emoji{})
+			So(emoji, ShouldNotResemble, EmptyEmoji)
 			So(emoji, ShouldResemble, emoji3)
 			Convey("Should also work from updated value", func() {
 				emoji = esi.GetByLink(emoji1.Link, db)
-				So(emoji, ShouldNotResemble, Emoji{})
+				So(emoji, ShouldNotResemble, EmptyEmoji)
 				So(emoji, ShouldResemble, emoji1)
 			})
 		})
 
 		Convey("We have to be able to find an emoji from its shortcut", func() {
 			emoji := esi.GetByShortcut(emoji0.Shortcut, db)
-			So(emoji, ShouldNotResemble, Emoji{})
+			So(emoji, ShouldNotResemble, EmptyEmoji)
 			So(emoji, ShouldResemble, emoji0)
 			emoji = esi.GetByShortcut(emoji2.Shortcut, db)
-			So(emoji, ShouldNotResemble, Emoji{})
+			So(emoji, ShouldNotResemble, EmptyEmoji)
 			So(emoji, ShouldResemble, emoji2)
 			emoji = esi.GetByShortcut(emoji3.Shortcut, db)
-			So(emoji, ShouldNotResemble, Emoji{})
+			So(emoji, ShouldNotResemble, EmptyEmoji)
 			So(emoji, ShouldResemble, emoji3)
 			Convey("Should also work from updated value", func() {
 				emoji = esi.GetByShortcut(emoji1.Shortcut, db)
-				So(emoji, ShouldNotResemble, Emoji{})
+				So(emoji, ShouldNotResemble, EmptyEmoji)
 				So(emoji, ShouldResemble, emoji1)
 			})
 		})
 
 		Convey("Searching for non existent emoji should return empty", func() {
 			emoji := esi.GetByLink("The Mask", db)
-			So(emoji, ShouldResemble, Emoji{})
+			So(emoji, ShouldResemble, EmptyEmoji)
 			emoji = esi.GetByName("Fantôme", db)
-			So(emoji, ShouldResemble, Emoji{})
+			So(emoji, ShouldResemble, EmptyEmoji)
 		})
 
 		db.Delete(&emoji0)
@@ -303,7 +303,7 @@ func TestEmojiStore(t *testing.T) {
 			appError := esi.Delete(&emoji2, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dberror)
-			So(esi.GetByName("God", db), ShouldResemble, Emoji{})
+			So(esi.GetByName("God", db), ShouldResemble, EmptyEmoji)
 		})
 
 		Convey("Trying to delete from non conform emoji should return specific emoji error and should not delete emojis.", func() {

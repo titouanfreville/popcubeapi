@@ -69,7 +69,7 @@ func TestFolderModel(t *testing.T) {
 				Type:    "Video",
 				Message: messageTest,
 			}
-			empty := Folder{}
+			empty := EmptyFolder
 			folder.Name = ""
 
 			Convey("empty Name or folder should return name error", func() {
@@ -108,7 +108,7 @@ func TestFolderModel(t *testing.T) {
 			})
 
 			folder.Type = "xml"
-			folder.Message = Message{}
+			folder.Message = EmptyMessage
 
 			// Convey("Empty message should result in message", func() {
 			// 	So(folder.IsValid(), ShouldNotBeNil)

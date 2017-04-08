@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 	"strings"
 	"unicode/utf8"
 
@@ -20,6 +21,8 @@ const (
 var (
 	// ChannelAvailableTypes Used to have knowsledge on type a channel can take
 	ChannelAvailableTypes = []string{"direct", "text", "audio", "video"}
+	// EmptyChannel var for empty channel
+	EmptyChannel = Channel{}
 )
 
 // Channel object.
@@ -54,6 +57,11 @@ type Channel struct {
 	Subject string `gorm:"column:subject" json:"subject,omitempty"`
 	// Photo :O
 	Avatar string `gorm:"column:avatar" json:"avatar,omitempty"`
+}
+
+// Bind method used in API
+func (channel *Channel) Bind(r *http.Request) error {
+	return nil
 }
 
 // ToJSON Take a channel and convert it into json

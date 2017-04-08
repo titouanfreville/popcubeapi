@@ -317,51 +317,51 @@ func TestUserStore(t *testing.T) {
 
 		Convey("We have to be able to find a user from is name", func() {
 			user := usi.GetByUserName(user0.Username, db)
-			So(user, ShouldNotResemble, User{})
+			So(user, ShouldNotResemble, EmptyUser)
 			So(user, ShouldResemble, user0)
 			user = usi.GetByUserName(user2.Username, db)
-			So(user, ShouldNotResemble, User{})
+			So(user, ShouldNotResemble, EmptyUser)
 			So(user, ShouldResemble, user2)
 			user = usi.GetByUserName(user3.Username, db)
-			So(user, ShouldNotResemble, User{})
+			So(user, ShouldNotResemble, EmptyUser)
 			So(user, ShouldResemble, user3)
 			user = usi.GetByUserName(user4.Username, db)
-			So(user, ShouldNotResemble, User{})
+			So(user, ShouldNotResemble, EmptyUser)
 			So(user, ShouldResemble, user4)
 			Convey("Should also work from updated value", func() {
 				user = usi.GetByUserName(user1New.Username, db)
-				So(user, ShouldNotResemble, User{})
+				So(user, ShouldNotResemble, EmptyUser)
 				So(user, ShouldResemble, user1)
 			})
 		})
 
 		Convey("We have to be able to find a user from his email", func() {
 			user := usi.GetByEmail(user0.Email, db)
-			So(user, ShouldNotResemble, User{})
+			So(user, ShouldNotResemble, EmptyUser)
 			So(user, ShouldResemble, user0)
 			user = usi.GetByEmail(user2.Email, db)
-			So(user, ShouldNotResemble, User{})
+			So(user, ShouldNotResemble, EmptyUser)
 			So(user, ShouldResemble, user2)
 			user = usi.GetByEmail(user3.Email, db)
 			So(user, ShouldResemble, user3)
 			user = usi.GetByEmail(user4.Email, db)
-			So(user, ShouldNotResemble, User{})
+			So(user, ShouldNotResemble, EmptyUser)
 			So(user, ShouldResemble, user4)
 		})
 
 		Convey("We have to be able to find an user from his Role", func() {
 			users := usi.GetByRole(&adminRole, db)
-			So(users, ShouldNotResemble, User{})
+			So(users, ShouldNotResemble, EmptyUser)
 			So(users, ShouldResemble, admins)
 			users = usi.GetByRole(&guestRole, db)
-			So(users, ShouldNotResemble, User{})
+			So(users, ShouldNotResemble, EmptyUser)
 			So(users, ShouldResemble, guests)
 
 		})
 
 		Convey("Searching for non existent user should return empty", func() {
 			user := usi.GetByUserName("fantome", db)
-			So(user, ShouldResemble, User{})
+			So(user, ShouldResemble, EmptyUser)
 		})
 
 		db.Delete(&user0)
@@ -433,7 +433,7 @@ func TestUserStore(t *testing.T) {
 			appError := usi.Delete(&user2, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dberror)
-			So(usi.GetByUserName("moris", db), ShouldResemble, User{})
+			So(usi.GetByUserName("moris", db), ShouldResemble, EmptyUser)
 		})
 
 		// Convey("Trying to delete from non conform user should return specific user error and should not delete users.", func() {

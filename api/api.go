@@ -249,18 +249,28 @@ func initDevGetter(router chi.Router) {
 	})
 }
 
+// loginRequestObject
+type loginRequest struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
+func (lR *loginRequest) Bind(r *http.Request) error {
+	return nil
+}
+
 // loginMiddleware login funcion providing user && jwt auth token
 func loginMiddleware(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Login    string      `json:"login"`
-		Password string      `json:"password"`
-		OmitID   interface{} `json:"id,omitempty"`
-	}
+	// var data struct {
+	// 	Login    string      `json:"login"`
+	// 	Password string      `json:"password"`
+	// 	OmitID   interface{} `json:"id,omitempty"`
+	// }
 	store := datastores.Store()
 	response := loginOk{}
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
+	data := &loginRequest{}
+	err := chiRender.Bind(r, data)
 	if err != nil {
 		log.Print("422 Here - loginMiddleware")
 		render.JSON(w, error422.StatusCode, error422)
@@ -348,33 +358,29 @@ func initOrganisation(w http.ResponseWriter, r *http.Request) {
 }
 
 func newPublicUser(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		User   *models.User
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var User models.User
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
+	err := chiRender.Bind(r, &User)
 	organisation := store.Organisation().Get(db)
 	allowedWebMails := store.AllowedWebMails().GetAll(db)
 	isAuthorizedMail := false
 	for _, authorizedMail := range allowedWebMails {
 		filter := "*" + authorizedMail.Domain
-		ok, _ := regexp.MatchString(filter, data.User.Email)
+		ok, _ := regexp.MatchString(filter, User.Email)
 		isAuthorizedMail = isAuthorizedMail || ok
 	}
 	if !isAuthorizedMail && !organisation.Public {
 		render.JSON(w, 401, "You can't sign up if organisation is not public or your email domain was unauthorized.")
 	}
-	if err != nil || data.User == nil {
+	if err != nil || User == (models.EmptyUser) {
 		log.Print("422 here. New Public User")
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
-			err := store.User().Save(data.User, db)
+			err := store.User().Save(&User, db)
 			if err == nil {
-				render.JSON(w, 201, data.User)
+				render.JSON(w, 201, User)
 			} else {
 				render.JSON(w, err.StatusCode, err)
 			}

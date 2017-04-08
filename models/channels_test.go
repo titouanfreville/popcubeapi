@@ -1,9 +1,11 @@
 package models
 
+
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"strings"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
@@ -25,7 +27,7 @@ func TestChannelModel(t *testing.T) {
 			channel := Channel{
 				WebID:       NewID(),
 				ChannelName: "electra",
-				LastUpdate:   GetMillis(),
+				LastUpdate:  GetMillis(),
 				Type:        "audio",
 				Private:     false,
 				Description: "Testing channel description :O",
@@ -42,10 +44,10 @@ func TestChannelModel(t *testing.T) {
 			So(channel.IsValid(false), ShouldNotResemble, u.NewLocAppError("Channel.IsValid", "model.channel.is_valid.type.app_error", nil, "id="+channel.WebID))
 		})
 		Convey("Given an incorrect channel. Channel should be refused", func() {
-			empty := Channel{}
+			empty := EmptyChannel
 			channel := Channel{
 				ChannelName: "Electra",
-				LastUpdate:   GetMillis(),
+				LastUpdate:  GetMillis(),
 				Type:        "audio",
 				Private:     false,
 				Description: "Testing channel description :O",
@@ -105,7 +107,7 @@ func TestChannelModel(t *testing.T) {
 	})
 
 	Convey("Testing PreSave function", t, func() {
-		channel := Channel{}
+		channel := EmptyChannel
 		Convey("If channel is empty, should fill some fields - webID, ChannelName, LastUpdate, Avatar and type, and channel should not be valid", func() {
 			channel.PreSave()
 			So(channel.IsValid(false), ShouldResemble, u.NewLocAppError("Channel.IsValid", "model.channel.is_valid.channel_name.app_error", nil, "id="+channel.WebID))
@@ -148,7 +150,7 @@ func TestChannelModel(t *testing.T) {
 			channel := Channel{
 				WebID:       "TestWebID",
 				ChannelName: "TestChannelName",
-				LastUpdate:   GetMillis() - 20,
+				LastUpdate:  GetMillis() - 20,
 				Type:        "audio",
 				Private:     true,
 				Description: "Testing channel description",

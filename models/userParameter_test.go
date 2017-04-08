@@ -40,7 +40,7 @@ func TestUserParameterModel(t *testing.T) {
 			So(userParameter.IsValid(), ShouldNotResemble, genUPsleepError("end", userParameter.SleepEnd))
 		})
 		Convey("Given an incorrect userParameter. UserParameter should be refused", func() {
-			empty := UserParameter{}
+			empty := EmptyUserParameter
 			userParameter.ParameterName = ""
 			Convey("Empty userParameter should return first error from is valid error", func() {
 				So(empty.IsValid(), ShouldNotBeNil)

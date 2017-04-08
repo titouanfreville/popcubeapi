@@ -149,6 +149,7 @@ func TestRoleStore(t *testing.T) {
 			CanManage:     true,
 			CanManageUser: false,
 		}
+
 		role2 := Role{
 			RoleName:      "fg",
 			CanUsePrivate: true,
@@ -204,17 +205,17 @@ func TestRoleStore(t *testing.T) {
 
 		Convey("We have to be able to find an role from is name", func() {
 			role := rsi.GetByName(role0.RoleName, db)
-			So(role, ShouldNotResemble, Role{})
+			So(role, ShouldNotResemble, EmptyRole)
 			So(role, ShouldResemble, role0)
 			role = rsi.GetByName(role2.RoleName, db)
-			So(role, ShouldNotResemble, Role{})
+			So(role, ShouldNotResemble, EmptyRole)
 			So(role, ShouldResemble, role2)
 			role = rsi.GetByName(role3.RoleName, db)
-			So(role, ShouldNotResemble, Role{})
+			So(role, ShouldNotResemble, EmptyRole)
 			So(role, ShouldResemble, role3)
 			Convey("Should also work from updated value", func() {
 				role = rsi.GetByName(role1New.RoleName, db)
-				So(role, ShouldNotResemble, Role{})
+				So(role, ShouldNotResemble, EmptyRole)
 				So(role, ShouldResemble, role1)
 			})
 		})
@@ -231,7 +232,7 @@ func TestRoleStore(t *testing.T) {
 
 		Convey("Searching for non existent role should return empty", func() {
 			role := rsi.GetByName("fantome", db)
-			So(role, ShouldResemble, Role{})
+			So(role, ShouldResemble, EmptyRole)
 		})
 
 		db.Delete(&role0)
@@ -299,7 +300,7 @@ func TestRoleStore(t *testing.T) {
 			appError := rsi.Delete(&role2, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dberror)
-			So(rsi.GetByName("God", db), ShouldResemble, Role{})
+			So(rsi.GetByName("God", db), ShouldResemble, EmptyRole)
 		})
 
 		Convey("Trying to delete from non conform role should return specific role error and should not delete roles.", func() {

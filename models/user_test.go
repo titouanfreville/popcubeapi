@@ -387,7 +387,7 @@ func TestUserModel(t *testing.T) {
 
 	Convey("Testing Full Name getter", t, func() {
 		Convey("Providing an user without full name should return an empty string", func() {
-			user := User{}
+			user := EmptyUser
 			So(user.GetFullName(), ShouldBeBlank)
 			user.Password = "test"
 			user.PreSave()

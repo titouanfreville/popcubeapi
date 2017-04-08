@@ -87,7 +87,7 @@ func initParameterRoute(router chi.Router) {
 func parameterContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := strconv.ParseUint(chi.URLParam(r, "parameterID"), 10, 64)
-		parameter := models.Parameter{}
+		parameter := models.EmptyParameter
 		if err == nil {
 			parameter = datastores.Store().Parameter().Get(dbStore.db)
 		}
@@ -118,9 +118,9 @@ func newParameter(w http.ResponseWriter, r *http.Request) {
 	}
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Parameter)
-	if err != nil || Parameter == (models.Parameter{}) {
+	
+	err := chiRender.Bind(r, &Parameter)
+	if err != nil || Parameter == (models.EmptyParameter) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -147,10 +147,10 @@ func updateParameter(w http.ResponseWriter, r *http.Request) {
 	}
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Parameter)
+	
+	err := chiRender.Bind(r, &Parameter)
 	parameter := r.Context().Value(oldParameterKey).(models.Parameter)
-	if err != nil || Parameter == (models.Parameter{}) {
+	if err != nil || Parameter == (models.EmptyParameter) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}

@@ -170,11 +170,11 @@ func memberContext(next http.Handler) http.Handler {
 		var userFromParam models.User
 		channel, ok = ctx.Value(oldChannelKey).(models.Channel)
 		if !ok {
-			channel = models.Channel{}
+			channel = models.EmptyChannel
 		}
 		user, ok = ctx.Value(oldUserKey).(models.User)
 		if !ok {
-			user = models.User{}
+			user = models.EmptyUser
 			userID, err := strconv.ParseUint(chi.URLParam(r, "userID"), 10, 64)
 			if err == nil {
 				userFromParam = datastores.Store().User().GetByID(userID, dbStore.db)
@@ -183,8 +183,8 @@ func memberContext(next http.Handler) http.Handler {
 				userFromParam = datastores.Store().User().GetByUserName(userID, dbStore.db)
 			}
 		}
-		oldMember := models.Member{}
-		if user != (models.User{}) {
+		oldMember := models.EmptyMember
+		if user != (models.EmptyUser) {
 			channelID, err := strconv.ParseUint(chi.URLParam(r, "channelID"), 10, 64)
 			if err != nil {
 				channeName := chi.URLParam(r, "channelID")
@@ -192,7 +192,7 @@ func memberContext(next http.Handler) http.Handler {
 				channelID = channel.IDChannel
 			}
 			oldMember = datastores.Store().Member().GetByID(channelID, user.IDUser, dbStore.db)
-		} else if channel != (models.Channel{}) {
+		} else if channel != (models.EmptyChannel) {
 			userID, err := strconv.ParseUint(chi.URLParam(r, "userID"), 10, 64)
 			if err != nil {
 				userName := chi.URLParam(r, "userID")
@@ -244,15 +244,12 @@ func getMemberFromChannel(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Role   *models.Role
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Role models.Role
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Role == nil {
+	
+	err := chiRender.Bind(r, &Role)
+	if err != nil || Role == models.EmptyRole {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -260,20 +257,17 @@ func getMemberFromRole(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	member := store.Member().GetByRole(data.Role, db)
+	member := store.Member().GetByRole(&Role, db)
 	render.JSON(w, 200, member)
 }
 
 func newMember(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Member *models.Member
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Member models.Member
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Member == nil {
+	
+	err := chiRender.Bind(r, &Member)
+	if err != nil || Member == models.EmptyMember {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -282,7 +276,7 @@ func newMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
-	chanel := store.Channel().GetByID(data.Member.IDChannel, db)
+	chanel := store.Channel().GetByID(Member.IDChannel, db)
 	if &chanel == nil {
 		message := "You are trying to invite member to chanel : " + chanel.ChannelName + " but channel doesn't exist."
 		apierr := utils.NewAPIError(404, "Channel don't exist", message)
@@ -295,25 +289,22 @@ func newMember(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error401.StatusCode, error401)
 		return
 	}
-	apperr := store.Member().Save(data.Member, db)
+	apperr := store.Member().Save(&Member, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return
 	}
-	render.JSON(w, 201, data.Member)
+	render.JSON(w, 201, Member)
 }
 
 func updateMember(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Member *models.Member
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Member models.Member
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
+	
+	err := chiRender.Bind(r, &Member)
 	member := r.Context().Value(oldMemberKey).(models.Member)
-	if err != nil || data.Member == nil {
+	if err != nil || Member == models.EmptyMember {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -324,7 +315,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	chanel := store.Channel().GetByID(member.IDChannel, db)
 	user := store.User().GetByID(member.IDUser, db)
-	rename := store.User().GetByID(data.Member.IDUser, db)
+	rename := store.User().GetByID(Member.IDUser, db)
 	if &chanel == nil {
 		message := "You are trying to update member from chanel : " + chanel.ChannelName + " but this channel doesn't exist."
 		apierr := utils.NewAPIError(404, "Channel don't exist", message)
@@ -346,7 +337,7 @@ func updateMember(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error401.StatusCode, error401)
 		return
 	}
-	apperr := store.Member().Update(&member, data.Member, db)
+	apperr := store.Member().Update(&member, &Member, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return

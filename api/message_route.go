@@ -140,7 +140,7 @@ func messageContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		messageID, err := strconv.ParseUint(chi.URLParam(r, "messageID"), 10, 64)
 		date, _ := strconv.ParseInt(chi.URLParam(r, "messageDate"), 10, 64)
-		oldMessage := models.Message{}
+		oldMessage := models.EmptyMessage
 		ctx := context.WithValue(r.Context(), messageDateKey, date)
 		if err == nil {
 			oldMessage = datastores.Store().Message().GetByID(messageID, dbStore.db)
@@ -177,9 +177,9 @@ func getMessageFromUser(w http.ResponseWriter, r *http.Request) {
 	var User models.User
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &User)
-	if err != nil || User == (models.User{}) {
+	
+	err := chiRender.Bind(r, &User)
+	if err != nil || User == (models.EmptyUser) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -195,9 +195,9 @@ func getMessageFromChannel(w http.ResponseWriter, r *http.Request) {
 	var Channel models.Channel
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Channel)
-	if err != nil || Channel == (models.Channel{}) {
+	
+	err := chiRender.Bind(r, &Channel)
+	if err != nil || Channel == (models.EmptyChannel) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -213,9 +213,9 @@ func newMessage(w http.ResponseWriter, r *http.Request) {
 	var Message models.Message
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Message)
-	if err != nil || Message == (models.Message{}) {
+	
+	err := chiRender.Bind(r, &Message)
+	if err != nil || Message == (models.EmptyMessage) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -235,10 +235,10 @@ func updateMessage(w http.ResponseWriter, r *http.Request) {
 	var Message models.Message
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Message)
+	
+	err := chiRender.Bind(r, &Message)
 	message := r.Context().Value(oldMessageKey).(models.Message)
-	if err != nil || Message == (models.Message{}) {
+	if err != nil || Message == (models.EmptyMessage) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
