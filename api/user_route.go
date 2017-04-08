@@ -237,6 +237,9 @@ func canManageUser(place string, self bool, currentUser string, token *jwt.Token
 	chanel := store.Channel().GetByName(place, db)
 	member := store.Member().GetChannelMember(&user, &chanel, db)
 	channelRights := store.Role().GetByID(member.IDRole, db)
+	if channelRights == models.EmptyRole {
+		channelRights = userRights
+	}
 	return channelRights.CanManageUser
 }
 
