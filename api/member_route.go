@@ -134,7 +134,6 @@ func initMemberOverUser(userRoutes chi.Router) {
 		// 	  422: wrongEntity
 		// 	  503: databaseError
 		// 	  default: genericError
-		userRoutes.Post("/role/:roleID", getMemberFromRole)
 		// swagger:route PUT user/{userID}/channel/{channelID} Members updateMember
 		//
 		// Update member
@@ -160,6 +159,7 @@ func initMemberOverUser(userRoutes chi.Router) {
 		// 	  default: genericError
 		r.Delete("/", deleteMember)
 	})
+	userRoutes.Get("/role/:roleID", getMemberFromRole)
 }
 
 func memberContext(next http.Handler) http.Handler {
@@ -203,12 +203,12 @@ func memberContext(next http.Handler) http.Handler {
 			}
 			oldMember = datastores.Store().Member().GetByID(channel.IDChannel, userID, dbStore.db)
 		}
-		roleId, err := strconv.ParseUint(chi.URLParam(r, "roleID"), 10, 64)
+		roleID, err := strconv.ParseUint(chi.URLParam(r, "roleID"), 10, 64)
 		if err != nil {
 			roleName := chi.URLParam(r, "roleID")
 			role = datastores.Store().Role().GetByName(roleName, dbStore.db)
 		} else {
-			role = datastores.Store().Role().GetByID(roleId, dbStore.db)
+			role = datastores.Store().Role().GetByID(roleID, dbStore.db)
 		}
 		ctx = context.WithValue(ctx, oldMemberKey, oldMember)
 		ctx = context.WithValue(ctx, oldChannelKey, channel)
