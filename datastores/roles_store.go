@@ -65,7 +65,7 @@ func (rsi RoleStoreImpl) Update(role *models.Role, newRole *models.Role, db *gor
 
 // GetByID Used to get role from DB
 func (rsi RoleStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Role {
-	role := models.Role{}
+	role := models.EmptyRole
 	db.Where("idRole = ?", ID).First(&role)
 	return role
 }
@@ -79,7 +79,7 @@ func (rsi RoleStoreImpl) GetAll(db *gorm.DB) []models.Role {
 
 // GetByName Used to get role from DB
 func (rsi RoleStoreImpl) GetByName(roleName string, db *gorm.DB) models.Role {
-	role := models.Role{}
+	role := models.EmptyRole
 	db.Where("roleName = ?", roleName).First(&role)
 	return role
 }

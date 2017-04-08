@@ -126,7 +126,7 @@ func roleContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		roleID, err := strconv.ParseUint(chi.URLParam(r, "roleID"), 10, 64)
 		name := chi.URLParam(r, "roleName")
-		oldRole := models.Role{}
+		oldRole := models.EmptyRole
 		ctx := context.WithValue(r.Context(), roleNameKey, name)
 		if err == nil {
 			oldRole = datastores.Store().Role().GetByID(roleID, dbStore.db)
@@ -161,23 +161,20 @@ func getRoleFromName(w http.ResponseWriter, r *http.Request) {
 }
 
 func getRoleFromRight(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Role   *models.Role
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Role models.Role
 	store := datastores.Store()
 	db := dbStore.db
 	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Role == nil {
+	
+	err := chiRender.Bind(r, &Role)
+	if err != nil || Role == models.EmptyRole {
 		render.JSON(w, error422.StatusCode, error422)
 	} else {
 		if err := db.DB().Ping(); err == nil {
-			role := store.Role().GetByRights(data.Role, db)
+			role := store.Role().GetByRights(&Role, db)
 			render.JSON(w, 200, role)
 		} else {
 			render.JSON(w, error503.StatusCode, error503)
@@ -189,9 +186,9 @@ func newRole(w http.ResponseWriter, r *http.Request) {
 	var Role models.Role
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Role)
-	if err != nil || Role == (models.Role{}) {
+	
+	err := chiRender.Bind(r, &Role)
+	if err != nil || Role == (models.EmptyRole) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -211,10 +208,10 @@ func updateRole(w http.ResponseWriter, r *http.Request) {
 	var Role models.Role
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Role)
+	
+	err := chiRender.Bind(r, &Role)
 	role := r.Context().Value(oldRoleKey).(models.Role)
-	if err != nil || Role == (models.Role{}) {
+	if err != nil || Role == (models.EmptyRole) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}

@@ -57,7 +57,7 @@ func (psi ParameterStoreImpl) Update(parameter *models.Parameter, newParameter *
 
 // Get Used to get parameter from DB
 func (psi ParameterStoreImpl) Get(db *gorm.DB) models.Parameter {
-	parameter := models.Parameter{}
+	parameter := models.EmptyParameter
 	db.First(&parameter)
 	return parameter
 }

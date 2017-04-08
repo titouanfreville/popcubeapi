@@ -94,7 +94,7 @@ func TestParameterStore(t *testing.T) {
 			So(appError, ShouldNotResemble, dbError)
 		})
 		// Convey("Providing an incorrect user as new should result in errors", func() {
-		// 	empty := Parameter{}
+		// 	empty := EmptyParameter
 		// 	Convey("Empty parameter should return first error from is valid error", func() {
 		// 		appError := psi.Update(&parameter, &empty, db)
 		// 		So(appError, ShouldResemble, u.NewLocAppError("parameterStoreImpl.Update.parameterNew.PreSave", "model.parameter.is_valid.parameter_local.app_error", nil, ""))
@@ -135,7 +135,7 @@ func TestParameterStore(t *testing.T) {
 		// })
 
 		Convey("Providing an incorrect user as old should result in errors", func() {
-			empty := Parameter{}
+			empty := EmptyParameter
 			Convey("Empty parameter should return first error from is valid error", func() {
 				appError := psi.Update(&empty, &newParameter, db)
 				So(appError, ShouldResemble, u.NewLocAppError("parameterStoreImpl.Update.parameterOld.PreSave", "model.parameter.is_valid.parameter_local.app_error", nil, ""))
@@ -186,7 +186,7 @@ func TestParameterStore(t *testing.T) {
 			SleepEnd:   24,
 		}
 		Convey("Trying to get parameter from empty DB should return empty", func() {
-			So(psi.Get(db), ShouldResemble, Parameter{})
+			So(psi.Get(db), ShouldResemble, EmptyParameter)
 		})
 		appError := psi.Save(&parameter, db)
 		So(appError, ShouldBeNil)

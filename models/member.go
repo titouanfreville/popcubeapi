@@ -1,7 +1,14 @@
 package models
 
 import (
+	"net/http"
+
 	u "github.com/titouanfreville/popcubeapi/utils"
+)
+
+var (
+	// EmptyMember var for empty member
+	EmptyMember = Member{}
 )
 
 // Member object.
@@ -23,12 +30,17 @@ type Member struct {
 	TimeOutEnd int64  `gorm:"column:timeOutEnd" json:"timeout_end, omitempty"`
 }
 
+// Bind method used in API
+func (member *Member) Bind(r *http.Request) error {
+	return nil
+}
+
 // IsValid check validity of member object
 func (member *Member) IsValid() *u.AppError {
-	// if member.User == (User{}) {
+	// if member.User == (EmptyUser) {
 	// 	return u.NewLocAppError("Member.IsValid", "model.member.user.app_error", nil, "")
 	// }
-	// if member.Channel == (Channel{}) {
+	// if member.Channel == (EmptyChannel) {
 	// 	return u.NewLocAppError("Member.IsValid", "model.member.channel.app_error", nil, "")
 	// }
 	return nil

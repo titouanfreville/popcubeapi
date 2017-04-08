@@ -20,10 +20,10 @@ type Read struct {
 
 // IsValid check validity of read object
 func (read *Read) IsValid() *u.AppError {
-	// if read.User == (User{}) {
+	// if read.User == (EmptyUser) {
 	// 	return u.NewLocAppError("Read.IsValid", "model.read.user.app_error", nil, "")
 	// }
-	// if read.Channel == (Channel{}) {
+	// if read.Channel == (EmptyChannel) {
 	// 	return u.NewLocAppError("Read.IsValid", "model.read.channel.app_error", nil, "")
 	// }
 	return nil

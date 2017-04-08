@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 	"regexp"
 
 	u "github.com/titouanfreville/popcubeapi/utils"
@@ -101,7 +102,14 @@ var (
 		"guest",
 	}
 	validRoleNameChars = regexp.MustCompile(`^[a-z]+$`)
+	// EmptyRole var for empty role
+	EmptyRole = Role{}
 )
+
+// Bind method used in API
+func (role *Role) Bind(r *http.Request) error {
+	return nil
+}
 
 // IsValid is used to check validity of Role objects
 func (role *Role) IsValid() *u.AppError {

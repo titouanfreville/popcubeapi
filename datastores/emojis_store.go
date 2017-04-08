@@ -59,28 +59,28 @@ func (esi EmojiStoreImpl) GetAll(db *gorm.DB) []models.Emoji {
 
 // GetByID Used to get emoji from DB
 func (esi EmojiStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Emoji {
-	emoji := models.Emoji{}
+	emoji := models.EmptyEmoji
 	db.Where("idEmoji = ?", ID).First(&emoji)
 	return emoji
 }
 
 // GetByName Used to get emoji from DB
 func (esi EmojiStoreImpl) GetByName(emojiName string, db *gorm.DB) models.Emoji {
-	emoji := models.Emoji{}
+	emoji := models.EmptyEmoji
 	db.Where("name = ?", emojiName).First(&emoji)
 	return emoji
 }
 
 // GetByShortcut Used to get emoji from DB
 func (esi EmojiStoreImpl) GetByShortcut(EmojiShortcut string, db *gorm.DB) models.Emoji {
-	emoji := models.Emoji{}
+	emoji := models.EmptyEmoji
 	db.Where("shortcut = ?", EmojiShortcut).First(&emoji)
 	return emoji
 }
 
 // GetByLink Used to get emoji from DB
 func (esi EmojiStoreImpl) GetByLink(emojiLink string, db *gorm.DB) models.Emoji {
-	emoji := models.Emoji{}
+	emoji := models.EmptyEmoji
 	db.Where("link = ?", emojiLink).First(&emoji)
 	return emoji
 }

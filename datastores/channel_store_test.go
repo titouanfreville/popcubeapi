@@ -334,42 +334,42 @@ func TestChannelStore(t *testing.T) {
 
 		Convey("We have to be able to find a channel from is name", func() {
 			channel := csi.GetByName(channel0.ChannelName, db)
-			So(channel, ShouldNotResemble, Channel{})
+			So(channel, ShouldNotResemble, EmptyChannel)
 			So(channel, ShouldResemble, channel0)
 			channel = csi.GetByName(channel2.ChannelName, db)
-			So(channel, ShouldNotResemble, Channel{})
+			So(channel, ShouldNotResemble, EmptyChannel)
 			So(channel, ShouldResemble, channel2)
 			channel = csi.GetByName(channel3.ChannelName, db)
-			So(channel, ShouldNotResemble, Channel{})
+			So(channel, ShouldNotResemble, EmptyChannel)
 			So(channel, ShouldResemble, channel3)
 			Convey("Should also work from updated value", func() {
 				channel = csi.GetByName(channel1.ChannelName, db)
-				So(channel, ShouldNotResemble, Channel{})
+				So(channel, ShouldNotResemble, EmptyChannel)
 				So(channel, ShouldResemble, channel1)
 			})
 		})
 
 		Convey("We have to be able to find channels from type", func() {
 			channels := csi.GetByType("audio", db)
-			So(channels, ShouldNotResemble, Channel{})
+			So(channels, ShouldNotResemble, EmptyChannel)
 			So(channels, ShouldResemble, audioList)
 			channels = csi.GetByType("direct", db)
-			So(channels, ShouldNotResemble, Channel{})
+			So(channels, ShouldNotResemble, EmptyChannel)
 			So(channels, ShouldResemble, directList)
 		})
 
 		Convey("We have to be able to find private or public channels list", func() {
 			channels := csi.GetPrivate(db)
-			So(channels, ShouldNotResemble, Channel{})
+			So(channels, ShouldNotResemble, EmptyChannel)
 			So(channels, ShouldResemble, privateList)
 			channels = csi.GetPublic(db)
-			So(channels, ShouldNotResemble, Channel{})
+			So(channels, ShouldNotResemble, EmptyChannel)
 			So(channels, ShouldResemble, publicList)
 		})
 
 		Convey("Searching for non existent channel should return empty", func() {
 			channel := csi.GetByName("fantome", db)
-			So(channel, ShouldResemble, Channel{})
+			So(channel, ShouldResemble, EmptyChannel)
 		})
 
 		db.Delete(&channel0)
@@ -435,7 +435,7 @@ func TestChannelStore(t *testing.T) {
 			appError := csi.Delete(&channel2, db)
 			So(appError, ShouldBeNil)
 			So(appError, ShouldNotResemble, dberror)
-			So(csi.GetByName("God", db), ShouldResemble, Channel{})
+			So(csi.GetByName("God", db), ShouldResemble, EmptyChannel)
 		})
 
 		// Convey("Trying to delete from non conform channel should return specific channel error and should not delete channels.", func() {

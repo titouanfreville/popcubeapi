@@ -3,8 +3,14 @@ package models
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 
 	u "github.com/titouanfreville/popcubeapi/utils"
+)
+
+var (
+	// EmptyParameter em var param
+	EmptyParameter = Parameter{}
 )
 
 const (
@@ -43,6 +49,11 @@ type Parameter struct {
 	//
 	// required: true
 	SleepEnd int `gorm:"column:sleepEnd;not null;unique" json:"sleep_end,omitempty"`
+}
+
+// Bind method used in API
+func (parameter *Parameter) Bind(r *http.Request) error {
+	return nil
 }
 
 // ToJSON transfoorm an Parameter into JSON

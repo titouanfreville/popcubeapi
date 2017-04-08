@@ -316,51 +316,51 @@ func TestMemberStore(t *testing.T) {
 
 	// 	Convey("We have to be able to find a member from is name", func() {
 	// 		member := msi.GetByMemberName(member0.Membername, db)
-	// 		So(member, ShouldNotResemble, &Member{})
+	// 		So(member, ShouldNotResemble, &EmptyMember)
 	// 		So(member, ShouldResemble, &member0)
 	// 		member = msi.GetByMemberName(member2.Membername, db)
-	// 		So(member, ShouldNotResemble, &Member{})
+	// 		So(member, ShouldNotResemble, &EmptyMember)
 	// 		So(member, ShouldResemble, &member2)
 	// 		member = msi.GetByMemberName(member3.Membername, db)
-	// 		So(member, ShouldNotResemble, &Member{})
+	// 		So(member, ShouldNotResemble, &EmptyMember)
 	// 		So(member, ShouldResemble, &member3)
 	// 		member = msi.GetByMemberName(member4.Membername, db)
-	// 		So(member, ShouldNotResemble, &Member{})
+	// 		So(member, ShouldNotResemble, &EmptyMember)
 	// 		So(member, ShouldResemble, &member4)
 	// 		Convey("Should also work from updated value", func() {
 	// 			member = msi.GetByMemberName(member1New.Membername, db)
-	// 			So(member, ShouldNotResemble, &Member{})
+	// 			So(member, ShouldNotResemble, &EmptyMember)
 	// 			So(member, ShouldResemble, &member1)
 	// 		})
 	// 	})
 
 	// 	Convey("We have to be able to find a member from his email", func() {
 	// 		member := msi.GetByEmail(member0.Email, db)
-	// 		So(member, ShouldNotResemble, &Member{})
+	// 		So(member, ShouldNotResemble, &EmptyMember)
 	// 		So(member, ShouldResemble, &member0)
 	// 		member = msi.GetByEmail(member2.Email, db)
-	// 		So(member, ShouldNotResemble, &Member{})
+	// 		So(member, ShouldNotResemble, &EmptyMember)
 	// 		So(member, ShouldResemble, &member2)
 	// 		member = msi.GetByEmail(member3.Email, db)
 	// 		So(member, ShouldResemble, &member3)
 	// 		member = msi.GetByEmail(member4.Email, db)
-	// 		So(member, ShouldNotResemble, &Member{})
+	// 		So(member, ShouldNotResemble, &EmptyMember)
 	// 		So(member, ShouldResemble, &member4)
 	// 	})
 
 	// 	Convey("We have to be able to find an member from his Role", func() {
 	// 		members := msi.GetByRole(&adminRole, db)
-	// 		So(members, ShouldNotResemble, &Member{})
+	// 		So(members, ShouldNotResemble, &EmptyMember)
 	// 		So(members, ShouldResemble, &admins)
 	// 		members = msi.GetByRole(&guestRole, db)
-	// 		So(members, ShouldNotResemble, &Member{})
+	// 		So(members, ShouldNotResemble, &EmptyMember)
 	// 		So(members, ShouldResemble, &guests)
 
 	// 	})
 
 	// 	Convey("Searching for non existent member should return empty", func() {
 	// 		member := msi.GetByMemberName("fantome", db)
-	// 		So(member, ShouldResemble, &Member{})
+	// 		So(member, ShouldResemble, &EmptyMember)
 	// 	})
 
 	// 	db.Delete(&member0)
@@ -432,7 +432,7 @@ func TestMemberStore(t *testing.T) {
 	// 		appError := msi.Delete(&member2, db)
 	// 		So(appError, ShouldBeNil)
 	// 		So(appError, ShouldNotResemble, dberror)
-	// 		So(msi.GetByMemberName("moris", db), ShouldResemble, &Member{})
+	// 		So(msi.GetByMemberName("moris", db), ShouldResemble, &EmptyMember)
 	// 	})
 
 	// 	// Convey("Trying to delete from non conform member should return specific member error and should not delete members.", func() {

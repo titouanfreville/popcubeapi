@@ -63,7 +63,7 @@ func (fsi FolderStoreImpl) GetAll(db *gorm.DB) []models.Folder {
 
 // GetByID Used to get folder from DB
 func (fsi FolderStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Folder {
-	folder := models.Folder{}
+	folder := models.EmptyFolder
 	db.Where("idFolder = ?", ID).First(&folder)
 	return folder
 }

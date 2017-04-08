@@ -3,8 +3,14 @@ package models
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 
 	u "github.com/titouanfreville/popcubeapi/utils"
+)
+
+var (
+	// EmptyEmoji empty var for emoji
+	EmptyEmoji = Emoji{}
 )
 
 // Emoji object.
@@ -28,6 +34,11 @@ type Emoji struct {
 	//
 	// required: true
 	Link string `gorm:"column:link;not null;unique" json:"link,omitempty"`
+}
+
+// Bind method used in API
+func (emoji *Emoji) Bind(r *http.Request) error {
+	return nil
 }
 
 // IsValid is used to check validity of Emoji objects

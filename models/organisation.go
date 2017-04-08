@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -15,6 +16,11 @@ const (
 	organisationNameMaxLength       = 64
 	organisationDescriptionMaxRunes = 1024
 	organisationSubjectMaxRunes     = 250
+)
+
+var (
+	// EmptyOrganisation empty org var
+	EmptyOrganisation = Organisation{}
 )
 
 // Organisation object
@@ -40,6 +46,11 @@ type Organisation struct {
 	Avatar      string `gorm:"column:avatar" json:"avatar,omitempty"`
 	// Domain name of the organisation
 	Domain string `gorm:"column:domain" json:"domain,omitempty"`
+}
+
+// Bind method used in API
+func (organisation *Organisation) Bind(r *http.Request) error {
+	return nil
 }
 
 // ToJSON transfoorm an Organisation into JSON

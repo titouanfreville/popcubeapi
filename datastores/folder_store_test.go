@@ -318,51 +318,51 @@ func TestFolderStore(t *testing.T) {
 
 	// 	Convey("We have to be able to find a folder from is name", func() {
 	// 		folder := fsi.GetByFolderName(folder0.Foldername, db)
-	// 		So(folder, ShouldNotResemble, &Folder{})
+	// 		So(folder, ShouldNotResemble, &EmptyFolder)
 	// 		So(folder, ShouldResemble, &folder0)
 	// 		folder = fsi.GetByFolderName(folder2.Foldername, db)
-	// 		So(folder, ShouldNotResemble, &Folder{})
+	// 		So(folder, ShouldNotResemble, &EmptyFolder)
 	// 		So(folder, ShouldResemble, &folder2)
 	// 		folder = fsi.GetByFolderName(folder3.Foldername, db)
-	// 		So(folder, ShouldNotResemble, &Folder{})
+	// 		So(folder, ShouldNotResemble, &EmptyFolder)
 	// 		So(folder, ShouldResemble, &folder3)
 	// 		folder = fsi.GetByFolderName(folder4.Foldername, db)
-	// 		So(folder, ShouldNotResemble, &Folder{})
+	// 		So(folder, ShouldNotResemble, &EmptyFolder)
 	// 		So(folder, ShouldResemble, &folder4)
 	// 		Convey("Should also work from updated value", func() {
 	// 			folder = fsi.GetByFolderName(folder1New.Foldername, db)
-	// 			So(folder, ShouldNotResemble, &Folder{})
+	// 			So(folder, ShouldNotResemble, &EmptyFolder)
 	// 			So(folder, ShouldResemble, &folder1)
 	// 		})
 	// 	})
 
 	// 	Convey("We have to be able to find a folder from his email", func() {
 	// 		folder := fsi.GetByEmail(folder0.Email, db)
-	// 		So(folder, ShouldNotResemble, &Folder{})
+	// 		So(folder, ShouldNotResemble, &EmptyFolder)
 	// 		So(folder, ShouldResemble, &folder0)
 	// 		folder = fsi.GetByEmail(folder2.Email, db)
-	// 		So(folder, ShouldNotResemble, &Folder{})
+	// 		So(folder, ShouldNotResemble, &EmptyFolder)
 	// 		So(folder, ShouldResemble, &folder2)
 	// 		folder = fsi.GetByEmail(folder3.Email, db)
 	// 		So(folder, ShouldResemble, &folder3)
 	// 		folder = fsi.GetByEmail(folder4.Email, db)
-	// 		So(folder, ShouldNotResemble, &Folder{})
+	// 		So(folder, ShouldNotResemble, &EmptyFolder)
 	// 		So(folder, ShouldResemble, &folder4)
 	// 	})
 
 	// 	Convey("We have to be able to find an folder from his Role", func() {
 	// 		folders := fsi.GetByRole(&adminRole, db)
-	// 		So(folders, ShouldNotResemble, &Folder{})
+	// 		So(folders, ShouldNotResemble, &EmptyFolder)
 	// 		So(folders, ShouldResemble, &admins)
 	// 		folders = fsi.GetByRole(&guestRole, db)
-	// 		So(folders, ShouldNotResemble, &Folder{})
+	// 		So(folders, ShouldNotResemble, &EmptyFolder)
 	// 		So(folders, ShouldResemble, &guests)
 
 	// 	})
 
 	// 	Convey("Searching for non existent folder should return empty", func() {
 	// 		folder := fsi.GetByFolderName("fantome", db)
-	// 		So(folder, ShouldResemble, &Folder{})
+	// 		So(folder, ShouldResemble, &EmptyFolder)
 	// 	})
 
 	// 	db.Delete(&folder0)
@@ -434,7 +434,7 @@ func TestFolderStore(t *testing.T) {
 	// 		appError := fsi.Delete(&folder2, db)
 	// 		So(appError, ShouldBeNil)
 	// 		So(appError, ShouldNotResemble, dberror)
-	// 		So(fsi.GetByFolderName("moris", db), ShouldResemble, &Folder{})
+	// 		So(fsi.GetByFolderName("moris", db), ShouldResemble, &EmptyFolder)
 	// 	})
 
 	// 	// Convey("Trying to delete from non conform folder should return specific folder error and should not delete folders.", func() {

@@ -65,7 +65,7 @@ func (msi MessageStoreImpl) GetAll(db *gorm.DB) []models.Message {
 
 // GetByID Used to get message from DB
 func (msi MessageStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Message {
-	message := models.Message{}
+	message := models.EmptyMessage
 	db.Where("idMessage = ?", ID).First(&message)
 	return message
 }

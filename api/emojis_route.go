@@ -152,7 +152,7 @@ func emojiContext(next http.Handler) http.Handler {
 		name := chi.URLParam(r, "emojiName")
 		link := chi.URLParam(r, "emojiLink")
 		shortcut := chi.URLParam(r, "emojiShortcut")
-		oldEmoji := models.Emoji{}
+		oldEmoji := models.EmptyEmoji
 		ctx := context.WithValue(r.Context(), emojiNameKey, name)
 		ctx = context.WithValue(ctx, emojiLinkKey, link)
 		ctx = context.WithValue(ctx, emojiShortcutKey, shortcut)
@@ -212,10 +212,7 @@ func getEmojiFromLink(w http.ResponseWriter, r *http.Request) {
 }
 
 func newEmoji(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Emoji  *models.Emoji
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Emoji models.Emoji
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageOrganisation(token) {
 		res := error401
@@ -225,9 +222,8 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 	}
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
-	if err != nil || data.Emoji == nil {
+	err := chiRender.Bind(r, &Emoji)
+	if err != nil || Emoji == (models.EmptyEmoji) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -236,19 +232,16 @@ func newEmoji(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Emoji().Save(data.Emoji, db)
+	apperr := store.Emoji().Save(&Emoji, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return
 	}
-	render.JSON(w, 201, data.Emoji)
+	render.JSON(w, 201, Emoji)
 }
 
 func updateEmoji(w http.ResponseWriter, r *http.Request) {
-	var data struct {
-		Emoji  *models.Emoji
-		OmitID interface{} `json:"id,omitempty"`
-	}
+	var Emoji models.Emoji
 	token := r.Context().Value(jwtTokenKey).(*jwt.Token)
 	if !canManageOrganisation(token) {
 		res := error401
@@ -258,17 +251,17 @@ func updateEmoji(w http.ResponseWriter, r *http.Request) {
 	}
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &data)
+
+	err := chiRender.Bind(r, &Emoji)
 	emoji := r.Context().Value(oldEmojiKey).(models.Emoji)
-	if err != nil || data.Emoji == nil {
+	if err != nil || Emoji == (models.EmptyEmoji) {
 		render.JSON(w, error422.StatusCode, error422)
 	}
 	if err := db.DB().Ping(); err != nil {
 		render.JSON(w, error503.StatusCode, error503)
 		return
 	}
-	apperr := store.Emoji().Update(&emoji, data.Emoji, db)
+	apperr := store.Emoji().Update(&emoji, &Emoji, db)
 	if apperr != nil {
 		render.JSON(w, apperr.StatusCode, apperr)
 		return

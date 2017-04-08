@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"regexp"
 	"strings"
 	"unicode/utf8"
@@ -29,6 +30,8 @@ var (
 		"popcubebot",
 		"here",
 	}
+	// EmptyUser em user
+	EmptyUser = User{}
 	// Definition of character user can possess in there names.
 	validUsernameChars = regexp.MustCompile(`^[a-z0-9\.\-_]+$`)
 )
@@ -94,6 +97,11 @@ type User struct {
 	// User Lastname
 	LastName       string `gorm:"column:lastName;" json:"last_name, omitempty"`
 	LastActivityAt int64  `gorm:"-" db:"-" json:"last_activity_at, omitempty"`
+}
+
+// Bind method used in API to manage request.
+func (user *User) Bind(r *http.Request) error {
+	return nil
 }
 
 // IsValid valwebIDates the user and returns an error if it isn't configured

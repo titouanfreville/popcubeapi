@@ -95,7 +95,7 @@ func canManageOrganisation(token *jwt.Token) bool {
 func organisationContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := strconv.ParseUint(chi.URLParam(r, "organisationID"), 10, 64)
-		oldOrganisation := models.Organisation{}
+		oldOrganisation := models.EmptyOrganisation
 		if err == nil {
 			oldOrganisation = datastores.Store().Organisation().Get(dbStore.db)
 		}
@@ -126,9 +126,8 @@ func newOrganisation(w http.ResponseWriter, r *http.Request) {
 	}
 	store := datastores.Store()
 	db := dbStore.db
-	request := r.Body
-	err := chiRender.Bind(request, &Organisation)
-	if err != nil || Organisation == (models.Organisation{}) {
+	err := chiRender.Bind(r, &Organisation)
+	if err != nil || Organisation == (models.EmptyOrganisation) {
 		render.JSON(w, error422.StatusCode, error422)
 		return
 	}
@@ -155,10 +154,9 @@ func updateOrganisation(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, error401.StatusCode, error401)
 		return
 	}
-	request := r.Body
-	err := chiRender.Bind(request, &Organisation)
+	err := chiRender.Bind(r, &Organisation)
 	organisation := r.Context().Value(oldOrganisationKey).(models.Organisation)
-	if err != nil || Organisation == (models.Organisation{}) {
+	if err != nil || Organisation == (models.EmptyOrganisation) {
 		render.JSON(w, error422.StatusCode, error422)
 	}
 	if err := db.DB().Ping(); err != nil {

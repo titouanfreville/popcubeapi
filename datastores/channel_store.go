@@ -72,7 +72,7 @@ func (csi ChannelStoreImpl) GetAll(db *gorm.DB) []models.Channel {
 
 // GetByID Used to get channel from DB
 func (csi ChannelStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Channel {
-	channel := models.Channel{}
+	channel := models.EmptyChannel
 	db.Where("idChannel = ?", ID).First(&channel)
 	return channel
 }
@@ -80,7 +80,7 @@ func (csi ChannelStoreImpl) GetByID(ID uint64, db *gorm.DB) models.Channel {
 // GetByName Used to get channel from DB
 func (csi ChannelStoreImpl) GetByName(channelName string, db *gorm.DB) models.Channel {
 
-	channel := models.Channel{}
+	channel := models.EmptyChannel
 	db.Where("channelName = ?", channelName).First(&channel)
 	return channel
 }

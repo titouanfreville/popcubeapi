@@ -1,10 +1,11 @@
 package models
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"strconv"
 	"strings"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 	u "github.com/titouanfreville/popcubeapi/utils"
 )
 
@@ -36,7 +37,7 @@ func TestOrganisationModel(t *testing.T) {
 			So(organisation.IsValid(), ShouldNotResemble, u.NewLocAppError("Organisation.IsValid", "model.organisation.is_valid.description.app_error", nil, "id="+strconv.FormatUint(organisation.IDOrganisation, 10)))
 		})
 		Convey("Given an incorrect organisation. Organisation should be refused", func() {
-			empty := Organisation{}
+			empty := EmptyOrganisation
 			organisation := Organisation{
 				IDOrganisation: 0,
 				DockerStack:    1,
@@ -83,7 +84,7 @@ func TestOrganisationModel(t *testing.T) {
 	})
 
 	Convey("Testing PreSave function", t, func() {
-		organisation := Organisation{}
+		organisation := EmptyOrganisation
 		Convey("If organisation is empty, should fill some fields - webID, OrganisationName, LastUpdate, Avatar and type, and organisation should not be valid", func() {
 			organisation.PreSave()
 			So(organisation.IsValid(), ShouldResemble, u.NewLocAppError("Organisation.IsValid", "model.organisation.is_valid.organisation_name.app_error", nil, "id="+strconv.FormatUint(organisation.IDOrganisation, 10)))

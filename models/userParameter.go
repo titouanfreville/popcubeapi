@@ -1,6 +1,7 @@
 package models
 
 import (
+	"net/http"
 	"strconv"
 
 	u "github.com/titouanfreville/popcubeapi/utils"
@@ -12,6 +13,11 @@ import (
 // 	timeZoneMaxSize = 6
 // 	maxTime         = 1440
 // )
+
+var (
+	// EmptyUserParameter em var user param
+	EmptyUserParameter = UserParameter{}
+)
 
 // UserParameter object
 //
@@ -39,6 +45,11 @@ type UserParameter struct {
 	//
 	// required: true
 	SleepEnd int `gorm:"column:sleepEnd" json:"sleep_end,omitempty"`
+}
+
+// Bind method used in API
+func (userParameter *UserParameter) Bind(r *http.Request) error {
+	return nil
 }
 
 // IsValid is used to check validity of UserParameter objects

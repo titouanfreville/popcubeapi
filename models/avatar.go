@@ -4,7 +4,14 @@ import (
 	"encoding/json"
 	"io"
 
+	"net/http"
+
 	u "github.com/titouanfreville/popcubeapi/utils"
+)
+
+var (
+	// EmptyAvatar var for empty avatar
+	EmptyAvatar = Avatar{}
 )
 
 // Avatar object
@@ -26,6 +33,11 @@ type Avatar struct {
 	//
 	// required: true
 	Link string `gorm:"column:link;not null;unique" json:"link,omitempty"`
+}
+
+// Bind method used in API
+func (avatar *Avatar) Bind(r *http.Request) error {
+	return nil
 }
 
 // IsValid check the validity of on Avatar object before saving it to DB in update or creation process

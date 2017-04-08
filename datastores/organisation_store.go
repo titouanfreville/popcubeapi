@@ -58,7 +58,7 @@ func (osi OrganisationStoreImpl) Update(organisation *models.Organisation, newOr
 
 // Get Used to get organisation from DB
 func (osi OrganisationStoreImpl) Get(db *gorm.DB) models.Organisation {
-	organisation := models.Organisation{}
+	organisation := models.EmptyOrganisation
 	db.First(&organisation)
 	return organisation
 }

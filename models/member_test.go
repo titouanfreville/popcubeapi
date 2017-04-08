@@ -47,12 +47,12 @@ func TestMemberModel(t *testing.T) {
 		// })
 
 		// Convey("Given incorrect member. Should be refused", func() {
-		// 	empty := Member{}
+		// 	empty := EmptyMember
 		// 	member := Member{
 		// 		User:    userTest,
 		// 		Channel: channelTest,
 		// 	}
-		// 	member.User = User{}
+		// 	member.User = EmptyUser
 		// 	Convey("Empty member or member without User should return User error", func() {
 		// 		So(member.IsValid(), ShouldResemble, u.NewLocAppError("Member.IsValid", "model.member.user.app_error", nil, ""))
 		// 		So(member.IsValid(), ShouldNotResemble, u.NewLocAppError("Member.IsValid", "model.member.channel.app_error", nil, ""))
@@ -61,7 +61,7 @@ func TestMemberModel(t *testing.T) {
 		// 	})
 
 		// 	member.User = userTest
-		// 	member.Channel = Channel{}
+		// 	member.Channel = EmptyChannel
 		// 	Convey("Empty link should result in link error", func() {
 		// 		So(member.IsValid(), ShouldNotResemble, u.NewLocAppError("Member.IsValid", "model.member.user.app_error", nil, ""))
 		// 		So(member.IsValid(), ShouldResemble, u.NewLocAppError("Member.IsValid", "model.member.channel.app_error", nil, ""))

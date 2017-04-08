@@ -323,51 +323,51 @@ func TestMessageStore(t *testing.T) {
 
 	// 	Convey("We have to be able to find a message from is name", func() {
 	// 		message := msi.GetByMessageName(message0.Messagename, db)
-	// 		So(message, ShouldNotResemble, &Message{})
+	// 		So(message, ShouldNotResemble, &EmptyMessage)
 	// 		So(message, ShouldResemble, &message0)
 	// 		message = msi.GetByMessageName(message2.Messagename, db)
-	// 		So(message, ShouldNotResemble, &Message{})
+	// 		So(message, ShouldNotResemble, &EmptyMessage)
 	// 		So(message, ShouldResemble, &message2)
 	// 		message = msi.GetByMessageName(message3.Messagename, db)
-	// 		So(message, ShouldNotResemble, &Message{})
+	// 		So(message, ShouldNotResemble, &EmptyMessage)
 	// 		So(message, ShouldResemble, &message3)
 	// 		message = msi.GetByMessageName(message4.Messagename, db)
-	// 		So(message, ShouldNotResemble, &Message{})
+	// 		So(message, ShouldNotResemble, &EmptyMessage)
 	// 		So(message, ShouldResemble, &message4)
 	// 		Convey("Should also work from updated value", func() {
 	// 			message = msi.GetByMessageName(message1New.Messagename, db)
-	// 			So(message, ShouldNotResemble, &Message{})
+	// 			So(message, ShouldNotResemble, &EmptyMessage)
 	// 			So(message, ShouldResemble, &message1)
 	// 		})
 	// 	})
 
 	// 	Convey("We have to be able to find a message from his email", func() {
 	// 		message := msi.GetByEmail(message0.Email, db)
-	// 		So(message, ShouldNotResemble, &Message{})
+	// 		So(message, ShouldNotResemble, &EmptyMessage)
 	// 		So(message, ShouldResemble, &message0)
 	// 		message = msi.GetByEmail(message2.Email, db)
-	// 		So(message, ShouldNotResemble, &Message{})
+	// 		So(message, ShouldNotResemble, &EmptyMessage)
 	// 		So(message, ShouldResemble, &message2)
 	// 		message = msi.GetByEmail(message3.Email, db)
 	// 		So(message, ShouldResemble, &message3)
 	// 		message = msi.GetByEmail(message4.Email, db)
-	// 		So(message, ShouldNotResemble, &Message{})
+	// 		So(message, ShouldNotResemble, &EmptyMessage)
 	// 		So(message, ShouldResemble, &message4)
 	// 	})
 
 	// 	Convey("We have to be able to find an message from his Role", func() {
 	// 		messages := msi.GetByRole(&adminRole, db)
-	// 		So(messages, ShouldNotResemble, &Message{})
+	// 		So(messages, ShouldNotResemble, &EmptyMessage)
 	// 		So(messages, ShouldResemble, &admins)
 	// 		messages = msi.GetByRole(&guestRole, db)
-	// 		So(messages, ShouldNotResemble, &Message{})
+	// 		So(messages, ShouldNotResemble, &EmptyMessage)
 	// 		So(messages, ShouldResemble, &guests)
 
 	// 	})
 
 	// 	Convey("Searching for non existent message should return empty", func() {
 	// 		message := msi.GetByMessageName("fantome", db)
-	// 		So(message, ShouldResemble, &Message{})
+	// 		So(message, ShouldResemble, &EmptyMessage)
 	// 	})
 
 	// 	db.Delete(&message0)
@@ -443,7 +443,7 @@ func TestMessageStore(t *testing.T) {
 	// 		appError := msi.Delete(&message2, db)
 	// 		So(appError, ShouldBeNil)
 	// 		So(appError, ShouldNotResemble, dberror)
-	// 		So(msi.GetByMessageName("moris", db), ShouldResemble, &Message{})
+	// 		So(msi.GetByMessageName("moris", db), ShouldResemble, &EmptyMessage)
 	// 	})
 
 	// 	// Convey("Trying to delete from non conform message should return specific message error and should not delete messages.", func() {

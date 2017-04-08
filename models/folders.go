@@ -3,8 +3,14 @@ package models
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 
 	u "github.com/titouanfreville/popcubeapi/utils"
+)
+
+var (
+	// EmptyFolder empty var for folder
+	EmptyFolder = Folder{}
 )
 
 // Folder object
@@ -36,6 +42,11 @@ type Folder struct {
 	IDMessage uint64 `gorm:"column:idMessage; not null;" json:"id_message,omitempty"`
 }
 
+// Bind method used in API
+func (folder *Folder) Bind(r *http.Request) error {
+	return nil
+}
+
 // IsValid is used to check validity of Folder objects
 func (folder *Folder) IsValid() *u.AppError {
 	if len(folder.Name) == 0 {
@@ -48,7 +59,7 @@ func (folder *Folder) IsValid() *u.AppError {
 	if len(folder.Type) == 0 {
 		return u.NewLocAppError("Folder.IsValid", "model.folder.type.app_error", nil, "")
 	}
-	// if folder.Message == (Message{}) {
+	// if folder.Message == (EmptyMessage) {
 	// 	return u.NewLocAppError("Folder.IsValid", "model.folder.message.app_error", nil, "")
 	// }
 	return nil
