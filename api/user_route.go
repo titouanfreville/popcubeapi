@@ -187,7 +187,7 @@ func initUserRoute(router chi.Router) {
 			// 	  default: deleteMessage
 			r.Delete("/", deleteUser)
 			initUserParameterRoute(r)
-			initMemberOverUser(r)
+			//initMemberOverUser(r)
 		})
 	})
 }
