@@ -1,6 +1,6 @@
 FROM golang:1.7-alpine
 
-MAINTAINER FREVILLE Titouan titouanfreville@gmail.com
+LABEL MAINTAINER "titouanfreville@gmail.com"
 
 ENV TERM xterm-256color
 ENV GOCOPYPATH go/src/github.com/titouanfreville/popcubeapi

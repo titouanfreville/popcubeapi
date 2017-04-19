@@ -1,5 +1,5 @@
 FROM registry.le-corre.eu:5000/go:base
-MAINTAINER FREVILLE Titouan titouanfreville@gmail.com
+LABEL MAINTAINER "titouanfreville@gmail.com"
 
 ENV TERM xterm-256color
 ENV WATCHING 0
