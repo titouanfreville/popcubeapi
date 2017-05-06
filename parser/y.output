@@ -1,0 +1,69 @@
+state 0 //
+
+    0 $accept: . texts
+
+    CODE   shift, and goto state 4
+    PING   shift, and goto state 6
+    QUOTE  shift, and goto state 5
+    URL    shift, and goto state 3
+
+    text   goto state 2
+    texts  goto state 1
+
+state 1 // CODE '\n' [$end]
+
+    0 $accept: texts .  [$end]
+
+    $end  accept
+
+state 2 // CODE ['\n']
+
+    1 texts: text . '\n' texts
+    2 texts: text . '\n'
+
+    '\n'  shift, and goto state 7
+
+state 3 // URL
+
+    3 text: URL .  ['\n']
+
+    '\n'  reduce using rule 3 (text)
+
+state 4 // CODE
+
+    4 text: CODE .  ['\n']
+
+    '\n'  reduce using rule 4 (text)
+
+state 5 // QUOTE
+
+    5 text: QUOTE .  ['\n']
+
+    '\n'  reduce using rule 5 (text)
+
+state 6 // PING
+
+    6 text: PING .  ['\n']
+
+    '\n'  reduce using rule 6 (text)
+
+state 7 // CODE '\n'
+
+    1 texts: text '\n' . texts
+    2 texts: text '\n' .  [$end]
+
+    $end   reduce using rule 2 (texts)
+    CODE   shift, and goto state 4
+    PING   shift, and goto state 6
+    QUOTE  shift, and goto state 5
+    URL    shift, and goto state 3
+
+    text   goto state 2
+    texts  goto state 8
+
+state 8 // CODE '\n' CODE '\n' [$end]
+
+    1 texts: text '\n' texts .  [$end]
+
+    $end  reduce using rule 1 (texts)
+
