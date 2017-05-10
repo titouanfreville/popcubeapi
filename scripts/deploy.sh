@@ -3,7 +3,7 @@
 # Popcube Release branch and deployement
 # MAINTAINER - Clément LE CORRE
 DEPLOY=false
-REPO="registry.le-corre.eu:5000"
+REPO="registry.popcube.xyz:5000"
 
 function usage(){
     echo "Popcube Release branch and deployement"
