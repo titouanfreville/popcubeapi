@@ -1,4 +1,4 @@
-FROM registry.le-corre.eu:5000/go:base
+FROM registry.popcube.xyz:5000/go:base
 LABEL MAINTAINER "titouanfreville@gmail.com"
 
 ENV TERM xterm-256color

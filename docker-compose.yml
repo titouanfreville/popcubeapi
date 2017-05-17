@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: docker/slateserver.Dockerfile
-    image: registry.le-corre.eu:5000/innerapi:slate-alpha-doc
+    image: registry.popcube.xyz:5000/innerapi:slate-alpha-doc
     volumes:
       - "./swagger.yaml:/tmp/swagger"
     ports:
@@ -23,7 +23,7 @@ services:
       - "./utils:/go/src/github.com/titouanfreville/popcubeapi/utils"
       - "./configs:/go/src/github.com/titouanfreville/popcubeapi/configs"
       - "./main.go:/go/src/github.com/titouanfreville/popcubeapi/main.go"
-    image: registry.le-corre.eu:5000/go:base
+    image: registry.popcube.xyz:5000/go:base
     ports:
       - 3000:3000
   goconvey:

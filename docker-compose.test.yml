@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile:  docker/gobase.Dockerfile
-    image: registry.le-corre.eu:5000/go:base
+    image: registry.popcube.xyz:5000/go:base
     ports:
       - 3000:3000
     env_file: .env
