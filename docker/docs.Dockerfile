@@ -1,5 +1,5 @@
 FROM golang:1.7-alpine
-MAINTAINER Clement LE CORRE <clement@le-corre.eu>
+LABEL MAINTAINER "clement@le-corre.eu"
 
 ENV TERM xterm-256color
 

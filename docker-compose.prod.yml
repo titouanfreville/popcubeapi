@@ -1,14 +1,49 @@
 version: "3"
+
+networks:
+  traefik-net:
+    external: true
+  database-network:
+    external: true
+
 services:
-  back:
-    image: registry.popcube.xyz:5000/popcubeapi:latest
-    env_file: .env.prod.back
-    network_mode: "bridge"
-    links:
-      - database
+  api:
+    image: registry.popcube.xyz:5000/popcubeapi:alpha-1.1.11
+    env_file: .env
+    networks:
+      - traefik-net
+      - database-network
     depends_on:
-      - database    
+      - database
+    deploy:
+      labels:
+        traefik.port: "3000"
+        traefik.frontend.rule: "Host:${ORG}.popcube.xyz"
+        xyz.popcube.date.created: "${created_date}"
+        traefik.backend.loadbalancer.sticky: "true"
+        traefik.backend.loadbalancer.swarm: "true"
+        traefik.docker.network: "traefik-net"
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.40'
+          memory: 90M
+        reservations:
+          cpus: '0.10'
+          memory: 10M
   database:
-    image: registry.popcube.xyz:5000/popcubedb:latest
-    env_file: .env.prod
-    network_mode: "bridge"
+    image: registry.popcube.xyz:5000/popcubedb_base:latest
+    env_file: .env
+    networks:
+      - database-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.90'
+          memory: 250M
+        reservations:
+          cpus: '0.20'
+          memory: 120M
