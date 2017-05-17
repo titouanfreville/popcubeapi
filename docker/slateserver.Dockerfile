@@ -1,4 +1,5 @@
 FROM rails
+LABEL MAINTAINER "clement@le-corre.eu"
 
 ## ADD ressources to serve slate ;)
 ADD docker_resources/slate_resources /home/slate
@@ -11,13 +12,13 @@ RUN apt-get -q update && \
  git curl php5-cli ca-certificates default-jre && \
  rm -rf /var/cache/apt/*
 
-RUN cd /home/slate && bundle install && bundle exec middleman build --clean
-
-## Set workdir and expose the serveur port
 WORKDIR /home/slate
+RUN bundle install && bundle exec middleman build --clean
+
+## Set workdir and expose the serveur port
 EXPOSE 4567
 
-# GO :)
+# GO :)
 CMD java -jar /home/swagger/swagger-codegen-cli.jar generate -i /tmp/swagger -l swagger -v -o /home/slate/json/popcubeapi > /dev/null && \
     rm -f /home/slate/popcubeapi.html.md && \
     php /home/swagger/index.php convert /home/slate/json/popcubeapi/swagger.json > /home/slate/source/index.html.md && \

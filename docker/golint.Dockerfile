@@ -1,6 +1,6 @@
 FROM cl3m3nt/golinter
+LABEL MAINTAINER "clement@le-corre.eu"
 ENV TERM xterm-256color
-MAINTAINER Clement LE CORRE <clement@le-corre.eu>
 COPY api /go/src/api
 COPY models /go/src/models
 COPY utils /go/src/utils
