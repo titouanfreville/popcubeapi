@@ -30,5 +30,5 @@ VALUES ("generalvidchannel", "general - vid", "video", 1, false, "defaultAvatar"
 INSERT INTO channels (webId, channelName, type, lastUpdate, private, avatar)
 VALUES ("randomvidchannel", "random - vid", "video", 1, false, "defaultAvatar");
 
-INSERT INTO organisations (dockerStack, organisationName, description, avatar, domain)
-VALUES (1, "%org_organisationName%", "%org_description%", "%org_avatar%", "%org_domain%");
+INSERT INTO organisations (dockerStack, public, organisationName, description, avatar, domain)
+VALUES (1, 1, "%org_organisationName%", "%org_description%", "%org_avatar%", "%org_domain%");
