@@ -2,11 +2,12 @@ FROM golang:1.7-alpine
 
 LABEL MAINTAINER "titouanfreville@gmail.com"
 
-ENV TERM xterm-256color
-ENV GOCOPYPATH go/src/github.com/titouanfreville/popcubeapi
-ENV GOSU_VERSION 1.9
-ENV ENVTYPE container
-ENV WATCHING 1
+ENV TERM=xterm-256color \
+		GOCOPYPATH=go/src/github.com/titouanfreville/popcubeapi \
+		GOSU_VERSION=1.9 \
+		ENVTYPE=container \
+		MYSQL_PORT=3306 \
+		WATCHING=1
 
 COPY api /$GOCOPYPATH/api
 COPY models /$GOCOPYPATH/models
@@ -16,6 +17,7 @@ COPY configs /$GOCOPYPATH/configs
 COPY main.go /$GOCOPYPATH/main.go
 COPY scripts/wait-for-it.sh /bin/waitforit
 COPY scripts/dev_api_build.sh /bin/buildapi
+COPY scripts/gobase_run.sh /bin/docker-run.sh
 
 RUN apk add --update git bash && \
 		cd /go/ && \
@@ -47,4 +49,4 @@ WORKDIR /$GOCOPYPATH
 
 EXPOSE 3000
 
-ENTRYPOINT waitforit database:3306 -t 0 -- echo "Db is ready" && go install && popcubeapi
+CMD /bin/docker-run.sh
